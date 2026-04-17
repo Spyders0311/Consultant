@@ -469,6 +469,11 @@ export default function PortalApp({ consultantName, consultantEmail, tenantId })
             <div className="card">
               <h3>Decision Log</h3>
               <textarea placeholder="Track pricing, scope, and strategic tradeoffs..." />
+              <div className="actions">
+                <Link href="/dashboard/clients/new" className="tab active">
+                  Create New Client
+                </Link>
+              </div>
             </div>
           </div>
         </section>
