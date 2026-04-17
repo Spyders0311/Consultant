@@ -1,8 +1,11 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createClient as createSupabaseClient } from '@/lib/supabase/client';
 
-const tabs = ['Marketing', 'Analysis', 'Consulting', 'Invoice/Billing', 'BMS Forms'];
+const tabs = ['Marketing', 'Analysis', 'Analyst Wizard', 'Consulting', 'Invoice/Billing', 'BMS Forms'];
 
 const capBudgDefaults = {
   initialInvestment: 50000,
@@ -70,7 +73,7 @@ function Field({ label, value, onChange, type = 'number', step = 'any' }) {
   );
 }
 
-export default function PortalApp() {
+export default function PortalApp({ consultantName, consultantEmail, tenantId }) {
   const [activeTab, setActiveTab] = useState('Analysis');
   const [capForm, setCapForm] = useState(capBudgDefaults);
   const [fcfeForm, setFcfeForm] = useState(fcfeDefaults);
@@ -78,6 +81,9 @@ export default function PortalApp() {
   const [fcfeResult, setFcfeResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('Ready');
+  const [signingOut, setSigningOut] = useState(false);
+  const router = useRouter();
+  const supabase = useMemo(() => createSupabaseClient(), []);
 
   const kpis = useMemo(() => {
     if (!capResult) return null;
@@ -191,8 +197,31 @@ export default function PortalApp() {
     }
   }
 
+  async function handleSignOut() {
+    setSigningOut(true);
+    try {
+      await supabase.auth.signOut();
+      router.replace('/login');
+      router.refresh();
+    } finally {
+      setSigningOut(false);
+    }
+  }
+
   return (
     <main className="portal-wrap">
+      <section className="session-bar">
+        <div>
+          <p className="eyebrow">Consultant Dashboard</p>
+          <p className="session-text">
+            {consultantName} ({consultantEmail}) · Tenant: <strong>{tenantId}</strong>
+          </p>
+        </div>
+        <button type="button" className="ghost" onClick={handleSignOut} disabled={signingOut}>
+          {signingOut ? 'Signing out...' : 'Sign out'}
+        </button>
+      </section>
+
       <section className="hero">
         <p className="eyebrow">BMS Intelligent Portal</p>
         <h1>Secure Decision Engine</h1>
@@ -399,6 +428,31 @@ export default function PortalApp() {
                   )}
                 </>
               )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {activeTab === 'Analyst Wizard' && (
+        <section className="panel">
+          <h2>Analyst Wizard</h2>
+          <div className="grid two">
+            <div className="card">
+              <h3>TurboTax-Style Guided Flow</h3>
+              <p>Walk analysts through company info, revenue/COGS, fixed expenses, and market assumptions.</p>
+              <p>
+                The guided route posts to the Python calculation engine and returns projected output with workbook
+                provenance.
+              </p>
+            </div>
+            <div className="card">
+              <h3>Launch Wizard</h3>
+              <p>Open the dedicated wizard experience for a clean, step-by-step intake process.</p>
+              <div className="actions">
+                <Link href="/analyst-wizard" className="tab active">
+                  Open Analyst Wizard
+                </Link>
+              </div>
             </div>
           </div>
         </section>

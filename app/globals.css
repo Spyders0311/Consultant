@@ -31,6 +31,24 @@ body {
   padding: 30px 20px 60px;
 }
 
+.session-bar {
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid #ffffff2a;
+  border-radius: 14px;
+  background: #0a1424b8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.session-text {
+  margin: 6px 0 0;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
 .hero {
   background: linear-gradient(135deg, #0f172aee, #1d4ed8bb);
   border: 1px solid #ffffff22;
@@ -244,15 +262,228 @@ td {
   padding-left: 18px;
 }
 
+.tab-nav {
+  margin: 8px 0 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tab-nav .tab {
+  text-decoration: none;
+}
+
+.wizard-shell {
+  background: linear-gradient(160deg, #0b1222e0 0%, #111d2fd9 45%, #13273ad9 100%);
+  border: 1px solid #ffffff24;
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 18px 40px #02061759;
+}
+
+.wizard-header h1 {
+  margin: 8px 0;
+  font-size: clamp(28px, 5vw, 42px);
+}
+
+.wizard-header p {
+  margin: 0;
+  color: #cbd5e1;
+  max-width: 800px;
+}
+
+.wizard-kicker {
+  margin: 0;
+  color: #7dd3fc;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 12px;
+}
+
+.wizard-progress {
+  margin: 20px 0 14px;
+  height: 8px;
+  border-radius: 999px;
+  background: #ffffff20;
+  overflow: hidden;
+}
+
+.wizard-progress span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #14b8a6, #22d3ee);
+  transition: width 0.3s ease;
+}
+
+.wizard-step-list {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.wizard-step-list li {
+  background: #0b1324;
+  border: 1px solid #ffffff1f;
+  border-radius: 12px;
+  padding: 10px;
+  opacity: 0.65;
+}
+
+.wizard-step-list li.current {
+  opacity: 1;
+  border-color: #22d3ee9c;
+}
+
+.wizard-step-list strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.wizard-step-list span {
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.wizard-card {
+  background: #f8fafc;
+  color: #0f172a;
+  border-radius: 16px;
+  border: 1px solid #cbd5e1;
+  padding: 16px;
+}
+
+.wizard-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.wizard-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #334155;
+}
+
+.wizard-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+}
+
+.wizard-error {
+  margin: 10px 0 0;
+  color: #b91c1c;
+}
+
+.wizard-result {
+  margin-top: 14px;
+  background: #0b1324d4;
+  border: 1px solid #ffffff24;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.wizard-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.wizard-kpis article {
+  background: #f8fafc;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.wizard-kpis span {
+  display: block;
+  font-size: 12px;
+  color: #475569;
+}
+
+.wizard-kpis strong {
+  font-size: 18px;
+}
+
+.wizard-meta {
+  margin: 10px 0 0;
+  color: #cbd5e1;
+  font-size: 12px;
+}
+
+.auth-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-card {
+  width: min(520px, 100%);
+  background: #0b1220cc;
+  border: 1px solid #ffffff2a;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 18px 40px #02061759;
+}
+
+.auth-copy {
+  margin: 8px 0 16px;
+  color: #cbd5e1;
+}
+
+.auth-form .field span {
+  color: #cbd5e1;
+}
+
+.auth-form input {
+  background: #f8fafc;
+}
+
+.auth-error {
+  margin: 0 0 12px;
+  color: #fecaca;
+}
+
+.auth-status {
+  margin: 12px 0 0;
+  color: #bfdbfe;
+}
+
+.auth-toggle {
+  margin-top: 16px;
+  width: 100%;
+}
+
 @media (max-width: 900px) {
   .grid.two,
   .form-grid,
   .choice-grid,
-  .kpi-row {
+  .kpi-row,
+  .wizard-fields,
+  .wizard-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .wizard-step-list {
     grid-template-columns: 1fr;
   }
 
   .hero {
     padding: 18px;
+  }
+
+  .session-bar {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }
