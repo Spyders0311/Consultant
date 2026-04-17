@@ -120,12 +120,26 @@ export default function AnalystWizard() {
       </div>
 
       <ol className="wizard-step-list">
-        {steps.map((step, idx) => (
-          <li key={step.id} className={idx <= stepIndex ? 'current' : ''}>
-            <strong>{step.title}</strong>
-            <span>{step.hint}</span>
-          </li>
-        ))}
+        {steps.map((step, idx) => {
+          const isCurrent = idx === stepIndex;
+          const isCompleted = idx < stepIndex;
+          const canJumpForward = idx > stepIndex ? canAdvance : true;
+
+          return (
+            <li key={step.id}>
+              <button
+                type="button"
+                className={`wizard-step-button ${isCurrent ? 'active' : ''} ${isCompleted ? 'complete' : ''}`}
+                onClick={() => setStepIndex(idx)}
+                disabled={loading || !canJumpForward}
+                aria-current={isCurrent ? 'step' : undefined}
+              >
+                <strong>{step.title}</strong>
+                <span>{step.hint}</span>
+              </button>
+            </li>
+          );
+        })}
       </ol>
 
       <form className="wizard-card" onSubmit={submitWizard}>

@@ -326,25 +326,50 @@ td {
 }
 
 .wizard-step-list li {
-  background: #0b1324;
+  min-width: 0;
+}
+
+.wizard-step-button {
+  width: 100%;
+  text-align: left;
   border: 1px solid #ffffff1f;
   border-radius: 12px;
   padding: 10px;
-  opacity: 0.65;
+  background: #0b1324;
+  color: #e2e8f0;
+  opacity: 0.75;
+  transition: border-color 0.2s ease, background 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
 }
 
-.wizard-step-list li.current {
+.wizard-step-button:not(:disabled):hover {
+  border-color: #38bdf8;
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.wizard-step-button.active {
   opacity: 1;
-  border-color: #22d3ee9c;
+  border-color: #22d3ee;
+  background: linear-gradient(135deg, #102544, #15335c);
 }
 
-.wizard-step-list strong {
+.wizard-step-button.complete {
+  border-color: #14b8a6b0;
+  opacity: 1;
+}
+
+.wizard-step-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.wizard-step-button strong {
   display: block;
   margin-bottom: 4px;
   font-size: 14px;
 }
 
-.wizard-step-list span {
+.wizard-step-button span {
   color: #94a3b8;
   font-size: 12px;
 }

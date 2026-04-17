@@ -1,8 +1,27 @@
 import { NextResponse } from 'next/server';
 
 const PYTHON_ENGINE_URL = process.env.PYTHON_ENGINE_URL || 'http://127.0.0.1:8001';
+const ENGINE_CONFIG_ERROR =
+  'Calculation engine not configured. Set PYTHON_ENGINE_URL in Vercel to your deployed Python engine URL.';
+
+function isLocalEngineUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === '127.0.0.1' || parsed.hostname === 'localhost';
+  } catch {
+    return true;
+  }
+}
 
 export async function POST(request) {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isMissing = !process.env.PYTHON_ENGINE_URL;
+  const isLocalOrDefault = isLocalEngineUrl(PYTHON_ENGINE_URL);
+
+  if (isProduction && (isMissing || isLocalOrDefault)) {
+    return NextResponse.json({ ok: false, error: ENGINE_CONFIG_ERROR }, { status: 500 });
+  }
+
   try {
     const body = await request.json();
 
@@ -23,8 +42,12 @@ export async function POST(request) {
 
     return NextResponse.json({ ok: true, result: data.result });
   } catch (error) {
+    if (isProduction && isLocalOrDefault) {
+      return NextResponse.json({ ok: false, error: ENGINE_CONFIG_ERROR }, { status: 500 });
+    }
+
     return NextResponse.json(
-      { ok: false, error: error?.message || 'Unable to reach calculation engine.' },
+      { ok: false, error: 'Unable to reach calculation engine.' },
       { status: 502 },
     );
   }
