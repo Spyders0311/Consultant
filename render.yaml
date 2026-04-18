@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: bms-python-engine
+    runtime: python
+    rootDir: python_engine
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_ENGINE_ALLOWED_ORIGINS
+        value: ""
+      - key: ANALYST_SPREADSHEET_PATH
+        value: ""

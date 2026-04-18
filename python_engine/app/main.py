@@ -10,7 +10,6 @@ from .models import AnalystWizardInput, AnalystWizardResult
 from .spreadsheet_context import WorkbookContext, load_workbook_context
 
 ENGINE_VERSION = "1.0.0"
-DEFAULT_SPREADSHEET_PATH = "/Users/teneightvideo/.openclaw/media/inbound/b0f6af9c-67d5-4d08-ae0c-26dee3f89c8d"
 
 app = FastAPI(title="BMS Python Analyst Engine", version=ENGINE_VERSION)
 app.add_middleware(
@@ -21,14 +20,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-WORKBOOK_CONTEXT: WorkbookContext | None = None
+def _fallback_workbook_context(path: str) -> WorkbookContext:
+    return WorkbookContext(
+        path=path,
+        sha256="unavailable",
+        size_bytes=0,
+        sheet_names=[],
+    )
+
+
+WORKBOOK_CONTEXT: WorkbookContext = _fallback_workbook_context("unavailable")
 
 
 @app.on_event("startup")
 def startup_event() -> None:
     global WORKBOOK_CONTEXT
-    spreadsheet_path = os.getenv("ANALYST_SPREADSHEET_PATH", DEFAULT_SPREADSHEET_PATH)
-    WORKBOOK_CONTEXT = load_workbook_context(spreadsheet_path)
+    spreadsheet_path = os.getenv("ANALYST_SPREADSHEET_PATH")
+    if not spreadsheet_path:
+        WORKBOOK_CONTEXT = _fallback_workbook_context("unavailable")
+        return
+
+    try:
+        WORKBOOK_CONTEXT = load_workbook_context(spreadsheet_path)
+    except FileNotFoundError:
+        WORKBOOK_CONTEXT = _fallback_workbook_context(spreadsheet_path)
+    except Exception:  # noqa: BLE001
+        WORKBOOK_CONTEXT = _fallback_workbook_context(spreadsheet_path)
 
 
 @app.get("/health")
@@ -40,9 +57,6 @@ def health() -> dict:
 def calculate(payload: dict):
     try:
         validated = AnalystWizardInput.model_validate(payload)
-        if not WORKBOOK_CONTEXT:
-            raise RuntimeError("Workbook context not initialized.")
-
         computed = run_projection(validated, WORKBOOK_CONTEXT)
         result = AnalystWizardResult.model_validate(
             {
