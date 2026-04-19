@@ -46,8 +46,10 @@ export default function AnalystWizard() {
   const [form, setForm] = useState(defaultForm);
   const [stepIndex, setStepIndex] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
+  const [pdfError, setPdfError] = useState('');
 
   const progress = ((stepIndex + 1) / steps.length) * 100;
 
@@ -104,6 +106,45 @@ export default function AnalystWizard() {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function downloadPdf() {
+    if (!result) return;
+
+    setPdfLoading(true);
+    setPdfError('');
+
+    try {
+      const response = await fetch('/api/pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'analyst-wizard', result }),
+      });
+
+      if (!response.ok) {
+        let message = 'Unable to generate PDF.';
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const data = await response.json();
+          if (data?.error) message = data.error;
+        }
+        throw new Error(message);
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'bms-analyst-wizard-report.pdf';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setPdfError(err.message || 'Unable to generate PDF.');
+    } finally {
+      setPdfLoading(false);
     }
   }
 
@@ -331,6 +372,13 @@ export default function AnalystWizard() {
 
       {result ? (
         <section className="wizard-result">
+          <div className="wizard-actions">
+            <button type="button" onClick={downloadPdf} disabled={pdfLoading}>
+              {pdfLoading ? 'Generating PDF...' : 'Download PDF'}
+            </button>
+          </div>
+          {pdfError ? <p className="wizard-error">{pdfError}</p> : null}
+
           <div className="wizard-kpis">
             <article>
               <span>Enterprise Value (NPV)</span>
