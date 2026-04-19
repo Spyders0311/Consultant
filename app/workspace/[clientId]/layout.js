@@ -37,9 +37,14 @@ export default async function WorkspaceLayout({ children, params }) {
           <p className="eyebrow">Client Workspace</p>
           <h1>{client.company_name || 'Untitled client'}</h1>
         </div>
-        <Link href="/dashboard/clients" className="tab workspace-back-link">
-          Back to Clients
-        </Link>
+        <div className="actions" style={{ margin: 0 }}>
+          <Link href="/dashboard/clients" className="tab workspace-back-link">
+            Back to Clients
+          </Link>
+          <Link href="/settings" className="tab workspace-back-link">
+            Settings
+          </Link>
+        </div>
       </section>
 
       <WorkspaceTabNav clientId={clientId} />

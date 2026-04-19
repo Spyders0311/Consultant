@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 
 function friendlyError(paramError) {
   if (paramError === 'unauthorized') {
-    return 'Your account is missing consultant access or tenant assignment.';
+    return 'Your account is missing consultant access.';
   }
   return '';
 }
@@ -16,7 +16,7 @@ export default function AuthForm({ paramError, nextPath }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [tenantId, setTenantId] = useState('');
+  const [workspaceName, setWorkspaceName] = useState('');
   const [status, setStatus] = useState('');
   const [busy, setBusy] = useState(false);
   const router = useRouter();
@@ -32,27 +32,14 @@ export default function AuthForm({ paramError, nextPath }) {
       if (mode === 'login') {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        const normalizedTenant = tenantId.trim().toLowerCase();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        const userTenant =
-          user?.app_metadata?.tenant_id?.toLowerCase() ||
-          user?.user_metadata?.tenant_id?.toLowerCase() ||
-          '';
-        if (!normalizedTenant || !userTenant || normalizedTenant !== userTenant) {
-          await supabase.auth.signOut();
-          throw new Error('Tenant ID does not match your consultant account.');
-        }
-
         router.replace(nextPath || '/');
         router.refresh();
         return;
       }
 
-      const normalizedTenant = tenantId.trim().toLowerCase();
-      if (!normalizedTenant) {
-        throw new Error('Tenant ID is required for consultant onboarding.');
+      const normalizedWorkspaceName = workspaceName.trim();
+      if (!normalizedWorkspaceName) {
+        throw new Error('Workspace name is required for consultant onboarding.');
       }
 
       const { data, error } = await supabase.auth.signUp({
@@ -62,7 +49,7 @@ export default function AuthForm({ paramError, nextPath }) {
           data: {
             full_name: fullName,
             role: 'consultant',
-            tenant_id: normalizedTenant,
+            workspace_name: normalizedWorkspaceName,
           },
         },
       });
@@ -87,7 +74,7 @@ export default function AuthForm({ paramError, nextPath }) {
       <section className="auth-card">
         <p className="eyebrow">BMS Portal Access</p>
         <h1>{mode === 'login' ? 'Consultant Login' : 'Consultant Sign Up'}</h1>
-        <p className="auth-copy">Use your consultant credentials and tenant ID to access the portal dashboard.</p>
+        <p className="auth-copy">Use your consultant credentials to access the portal dashboard.</p>
 
         {displayError && <p className="auth-error">{displayError}</p>}
 
@@ -100,6 +87,19 @@ export default function AuthForm({ paramError, nextPath }) {
                 autoComplete="name"
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
+                required
+              />
+            </label>
+          )}
+
+          {mode === 'signup' && (
+            <label className="field">
+              <span>Workspace Name</span>
+              <input
+                type="text"
+                value={workspaceName}
+                onChange={(event) => setWorkspaceName(event.target.value)}
+                placeholder="BMS Consulting"
                 required
               />
             </label>
@@ -125,17 +125,6 @@ export default function AuthForm({ paramError, nextPath }) {
               onChange={(event) => setPassword(event.target.value)}
               required
               minLength={8}
-            />
-          </label>
-
-          <label className="field">
-            <span>Tenant ID</span>
-            <input
-              type="text"
-              value={tenantId}
-              onChange={(event) => setTenantId(event.target.value)}
-              placeholder="acme-consulting"
-              required
             />
           </label>
 
