@@ -8,4 +8,5 @@
 
 ## Notes
 
+- This repo includes a `.python-version` file set to `3.12` so Render doesn’t default to Python 3.14 (which can force a Rust build for `pydantic-core`).
 - `ANALYST_SPREADSHEET_PATH` is optional. If it is unset or points to a missing file, the engine starts with a fallback workbook context (`sha256="unavailable"`, `sizeBytes=0`, empty sheet names).
