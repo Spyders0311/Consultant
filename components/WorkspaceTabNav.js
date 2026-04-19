@@ -19,7 +19,7 @@ export default function WorkspaceTabNav({ clientId }) {
     <nav className="tab-nav workspace-tabs" aria-label="Workspace sections">
       {tabs.map((tab) => {
         const href = `/workspace/${clientId}/${tab.key}`;
-        const isActive = pathname === href;
+        const isActive = pathname === href || pathname.startsWith(`${href}/`);
 
         return (
           <Link key={tab.key} href={href} className={isActive ? 'tab active' : 'tab'} aria-current={isActive ? 'page' : undefined}>

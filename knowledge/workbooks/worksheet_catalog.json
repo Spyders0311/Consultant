@@ -1,0 +1,446 @@
+[
+  {
+    "key": "5-year-projections",
+    "sheetName": "5 YEAR PROJECTIONS",
+    "category": "analyst-wizard",
+    "priorityRank": 100
+  },
+  {
+    "key": "balance-sht-comparisons",
+    "sheetName": "BALANCE SHT COMPARISONS",
+    "category": "analyst-wizard",
+    "priorityRank": 100
+  },
+  {
+    "key": "basic-client-info",
+    "sheetName": "BASIC CLIENT INFO",
+    "category": "analyst-wizard",
+    "priorityRank": 100
+  },
+  {
+    "key": "breakeven-analysis",
+    "sheetName": "BREAKEVEN ANALYSIS",
+    "category": "analyst-wizard",
+    "priorityRank": 100
+  },
+  {
+    "key": "p-l-comparisons",
+    "sheetName": "P&L COMPARISONS",
+    "category": "analyst-wizard",
+    "priorityRank": 100
+  },
+  {
+    "key": "working-capital-analysis",
+    "sheetName": "WORKING CAPITAL ANALYSIS",
+    "category": "analyst-wizard",
+    "priorityRank": 100
+  },
+  {
+    "key": "12-month-analysis-material",
+    "sheetName": "12 MONTH ANALYSIS - MATERIAL",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "12-month-analysis-payroll",
+    "sheetName": "12 MONTH ANALYSIS - PAYROLL",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "12-month-analysis-direct-labor",
+    "sheetName": "12 MONTH ANALYSIS -DIRECT LABOR",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "12-month-analysis-operating-exp",
+    "sheetName": "12 MONTH ANALYSIS-OPERATING EXP",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "12-month-p-l-comparisons",
+    "sheetName": "12 MONTH P&L COMPARISONS",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "4-year-history-auto",
+    "sheetName": "4 YEAR HISTORY (Auto)",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "4-yr-pie",
+    "sheetName": "4 YR PIE",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "average-collection-period",
+    "sheetName": "Average Collection Period",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "business-impact",
+    "sheetName": "Business Impact",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "client-business-goals",
+    "sheetName": "CLIENT BUSINESS GOALS",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "client-personal-goals",
+    "sheetName": "CLIENT PERSONAL GOALS",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "comparative-activity-ratios",
+    "sheetName": "COMPARATIVE ACTIVITY RATIOS",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "contractor-matrix",
+    "sheetName": "Contractor Matrix",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "cost-of-business-yr1-vs-yr2",
+    "sheetName": "Cost of Business YR1 Vs. YR2",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "cost-of-business-yr3-vs-yr4",
+    "sheetName": "Cost of Business YR3 Vs. YR4",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "current-business-val-approx",
+    "sheetName": "CURRENT BUSINESS VAL APPROX",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "current-ratio",
+    "sheetName": "Current Ratio",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "debt-ratio",
+    "sheetName": "Debt Ratio",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "directory",
+    "sheetName": "DIRECTORY",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "equity-ratio",
+    "sheetName": "Equity Ratio",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "financial-matrix",
+    "sheetName": "Financial Matrix",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "fixed-business-val-approx",
+    "sheetName": "FIXED BUSINESS VAL APPROX",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "gross-profit-margin",
+    "sheetName": "Gross Profit Margin",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "improved-business-val-approx",
+    "sheetName": "IMPROVED BUSINESS VAL APPROX",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "intro",
+    "sheetName": "Intro",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "inventory-turnover-ratio",
+    "sheetName": "Inventory Turnover Ratio",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "line-graphs",
+    "sheetName": "Line Graphs",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "manufact-matrix",
+    "sheetName": "Manufact Matrix",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "mgmt-memo",
+    "sheetName": "Mgmt Memo",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "misc-direct-expenses",
+    "sheetName": "MISC DIRECT EXPENSES",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "misc-indirect-expenses",
+    "sheetName": "MISC INDIRECT EXPENSES",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "net-profit-margin",
+    "sheetName": "Net Profit Margin",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "operational-matrix",
+    "sheetName": "Operational Matrix",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "organizational-matrix",
+    "sheetName": "Organizational Matrix",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "owner-return-line-graphs",
+    "sheetName": "Owner Return Line Graphs",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "p-l-comparisons-min-max",
+    "sheetName": "P&L COMPARISONS MIN MAX",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "quick-ratio",
+    "sheetName": "Quick Ratio",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "r-o-i-misc-direct",
+    "sheetName": "R O I - MISC DIRECT",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "ratios-introduction",
+    "sheetName": "Ratios Introduction",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "report-cover-sheet",
+    "sheetName": "REPORT COVER SHEET",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "return-on-assets",
+    "sheetName": "Return on Assets",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "return-on-equity",
+    "sheetName": "Return on Equity",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "return-on-investment-c-o-g-s",
+    "sheetName": "Return on Investment - C.O.G.S.",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "return-on-investment-labor",
+    "sheetName": "Return on Investment - LABOR",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "return-on-investment-material",
+    "sheetName": "Return on Investment - MATERIAL",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "return-on-investment-sub-cont",
+    "sheetName": "Return on Investment - SUB-CONT",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "roi-indirect-slide-1",
+    "sheetName": "ROI-INDIRECT- SLIDE #1",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "roi-indirect-slide-2",
+    "sheetName": "ROI-INDIRECT- SLIDE #2",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "roi-indirect-slide-3",
+    "sheetName": "ROI-INDIRECT- SLIDE #3",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "roi-indirect-slide-4",
+    "sheetName": "ROI-INDIRECT- SLIDE #4",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "sheet1",
+    "sheetName": "Sheet1",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "sheet2",
+    "sheetName": "Sheet2",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "times-interest-earned-ratio",
+    "sheetName": "Times Interest Earned Ratio",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "z-score-private-heavy-assets",
+    "sheetName": "Z SCORE -PRIVATE & HEAVY ASSETS",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "z-score-private-light-assets",
+    "sheetName": "Z SCORE -PRIVATE & LIGHT ASSETS",
+    "category": "analyst-wizard",
+    "priorityRank": 0
+  },
+  {
+    "key": "current-financial-information",
+    "sheetName": "CURRENT FINANCIAL INFORMATION",
+    "category": "bms-forms",
+    "priorityRank": 100
+  },
+  {
+    "key": "hotel-of-record-form",
+    "sheetName": "HOTEL of RECORD FORM",
+    "category": "bms-forms",
+    "priorityRank": 0
+  },
+  {
+    "key": "emp-questionnaire-graph",
+    "sheetName": "Emp Questionnaire Graph",
+    "category": "consulting",
+    "priorityRank": 0
+  },
+  {
+    "key": "employee-eval-matrix",
+    "sheetName": "Employee Eval Matrix",
+    "category": "consulting",
+    "priorityRank": 0
+  },
+  {
+    "key": "employee-questionnaire-pg1",
+    "sheetName": "Employee Questionnaire PG1",
+    "category": "consulting",
+    "priorityRank": 0
+  },
+  {
+    "key": "employee-questionnaire-pg2",
+    "sheetName": "Employee Questionnaire PG2",
+    "category": "consulting",
+    "priorityRank": 0
+  },
+  {
+    "key": "employee-questionnaire-tally",
+    "sheetName": "Employee Questionnaire Tally",
+    "category": "consulting",
+    "priorityRank": 0
+  },
+  {
+    "key": "management-matrix",
+    "sheetName": "Management Matrix",
+    "category": "consulting",
+    "priorityRank": 0
+  },
+  {
+    "key": "management-styles",
+    "sheetName": "MANAGEMENT STYLES",
+    "category": "consulting",
+    "priorityRank": 0
+  },
+  {
+    "key": "initial-consultation-invoice",
+    "sheetName": "INITIAL CONSULTATION INVOICE",
+    "category": "invoice-billing",
+    "priorityRank": 0
+  },
+  {
+    "key": "ps-retainer-invoice",
+    "sheetName": "PS Retainer Invoice",
+    "category": "invoice-billing",
+    "priorityRank": 0
+  },
+  {
+    "key": "sales-marketing-matrix",
+    "sheetName": "Sales & Marketing Matrix",
+    "category": "marketing",
+    "priorityRank": 0
+  },
+  {
+    "key": "sales-marketing-dist-matrix",
+    "sheetName": "Sales & Marketing- Dist. Matrix",
+    "category": "marketing",
+    "priorityRank": 0
+  }
+]
