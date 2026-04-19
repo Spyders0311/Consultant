@@ -62,3 +62,23 @@ class AnalystWizardResult(BaseModel):
     projections: list[ProjectionRow]
     engine_version: str = Field(alias="engineVersion")
     workbook: WorkbookMeta
+
+
+class BreakevenInput(BaseModel):
+    annual_revenue: float = Field(alias="annualRevenue", ge=0)
+    cogs_amount: float = Field(alias="cogsAmount", ge=0)
+    fixed_expenses_amount: float = Field(alias="fixedExpensesAmount", ge=0)
+    work_days_per_year: float = Field(alias="workDaysPerYear", ge=1, default=250)
+    work_hours_per_day: float = Field(alias="workHoursPerDay", ge=1, default=8)
+
+
+class BreakevenResult(BaseModel):
+    gross_margin_amount: float = Field(alias="grossMarginAmount")
+    gross_margin_percent: float = Field(alias="grossMarginPercent")
+    breakeven_revenue: float | None = Field(alias="breakevenRevenue")
+    breakeven_percent: float | None = Field(alias="breakevenPercent")
+    breakeven_monthly: float | None = Field(alias="breakevenMonthly")
+    breakeven_weekly: float | None = Field(alias="breakevenWeekly")
+    breakeven_daily: float | None = Field(alias="breakevenDaily")
+    breakeven_hourly: float | None = Field(alias="breakevenHourly")
+    notes: list[str] = Field(default_factory=list)
