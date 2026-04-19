@@ -2,11 +2,14 @@ export default function WorkspaceInvoiceBillingPage() {
   return (
     <section className="panel">
       <h2>Invoice / Billing</h2>
-      <p>POC billing dashboard with invoice statuses and payment visibility.</p>
+      <p>
+        Invoice &amp; Billing worksheet. Maintain billing details, invoice history, payment status, and follow-ups for
+        this client.
+      </p>
       <ul>
-        <li>Draft and sent invoice queue</li>
-        <li>Accounts receivable aging summary</li>
-        <li>Payment exception log</li>
+        <li>Invoice schedule + line items</li>
+        <li>Payment tracking + AR notes</li>
+        <li>Collections follow-up checklist</li>
       </ul>
     </section>
   );

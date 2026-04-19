@@ -2,11 +2,14 @@ export default function WorkspaceMarketingPage() {
   return (
     <section className="panel">
       <h2>Marketing</h2>
-      <p>Campaign highlights, messaging briefs, and lead funnel KPIs for BMS initiatives.</p>
+      <p>
+        Marketing worksheet. Capture positioning, campaigns, channel mix, and top of funnel assumptions for this
+        client.
+      </p>
       <ul>
-        <li>Q2 demand generation plan</li>
-        <li>Account-based outreach tracker</li>
-        <li>Proposal collateral repository</li>
+        <li>Messaging + offer notes</li>
+        <li>Channel plan + KPIs (leads, CPL, conversion)</li>
+        <li>Outbound sequences + target list notes</li>
       </ul>
     </section>
   );

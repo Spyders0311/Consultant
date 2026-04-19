@@ -153,7 +153,10 @@ export default function AnalystWizard() {
       <header className="wizard-header">
         <p className="wizard-kicker">Analyst Wizard</p>
         <h1>Guided Financial Intake</h1>
-        <p>Answer one section at a time. The backend handles the protected math logic and sends back projections.</p>
+        <p>
+          Analyst worksheet. Answer one section at a time. The backend handles the protected math logic and sends back
+          projections.
+        </p>
       </header>
 
       <div className="wizard-progress" aria-hidden="true">
