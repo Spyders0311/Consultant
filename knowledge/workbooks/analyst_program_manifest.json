@@ -1,0 +1,1767 @@
+{
+  "workbookSha256": "dc84e5971e41d68974b1bec3a4e62472b105c9bbeb68fcb7bec059c0291ef373",
+  "sheetCount": 74,
+  "definedNameCount": 421,
+  "sheets": [
+    "Sheet2",
+    "DIRECTORY",
+    "BASIC CLIENT INFO",
+    "CURRENT FINANCIAL INFORMATION",
+    "P&L COMPARISONS",
+    "Business Impact",
+    "MISC DIRECT EXPENSES",
+    "MISC INDIRECT EXPENSES",
+    "BALANCE SHT COMPARISONS",
+    "4 YEAR HISTORY (Auto)",
+    "P&L COMPARISONS MIN MAX",
+    "12 MONTH P&L COMPARISONS",
+    "12 MONTH ANALYSIS - PAYROLL",
+    "12 MONTH ANALYSIS -DIRECT LABOR",
+    "12 MONTH ANALYSIS-OPERATING EXP",
+    "12 MONTH ANALYSIS - MATERIAL",
+    "5 YEAR PROJECTIONS",
+    "Employee Questionnaire Tally",
+    "Emp Questionnaire Graph",
+    "FIXED BUSINESS VAL APPROX",
+    "WORKING CAPITAL ANALYSIS",
+    "COMPARATIVE ACTIVITY RATIOS",
+    "Z SCORE -PRIVATE & LIGHT ASSETS",
+    "Z SCORE -PRIVATE & HEAVY ASSETS",
+    "Cost of Business YR1 Vs. YR2",
+    "Cost of Business YR3 Vs. YR4",
+    "BREAKEVEN ANALYSIS",
+    "Return on Investment - LABOR",
+    "Return on Investment - C.O.G.S.",
+    "Return on Investment - MATERIAL",
+    "Return on Investment - SUB-CONT",
+    "R O I - MISC DIRECT",
+    "ROI-INDIRECT- SLIDE #1",
+    "ROI-INDIRECT- SLIDE #2",
+    "ROI-INDIRECT- SLIDE #3",
+    "ROI-INDIRECT- SLIDE #4",
+    "CURRENT BUSINESS VAL APPROX",
+    "IMPROVED BUSINESS VAL APPROX",
+    "Sales & Marketing Matrix",
+    "Sales & Marketing- Dist. Matrix",
+    "Manufact Matrix",
+    "Financial Matrix",
+    "Employee Eval Matrix",
+    "Management Matrix",
+    "Operational Matrix",
+    "Organizational Matrix",
+    "Contractor Matrix",
+    "Employee Questionnaire PG1",
+    "Employee Questionnaire PG2",
+    "Mgmt Memo",
+    "CLIENT BUSINESS GOALS",
+    "CLIENT PERSONAL GOALS",
+    "MANAGEMENT STYLES",
+    "REPORT COVER SHEET",
+    "HOTEL of RECORD FORM",
+    "PS Retainer Invoice",
+    "INITIAL CONSULTATION INVOICE",
+    "4 YR PIE",
+    "Line Graphs",
+    "Owner Return Line Graphs",
+    "Ratios Introduction",
+    "Current Ratio",
+    "Quick Ratio",
+    "Gross Profit Margin",
+    "Net Profit Margin",
+    "Return on Assets",
+    "Return on Equity",
+    "Average Collection Period",
+    "Inventory Turnover Ratio",
+    "Debt Ratio",
+    "Equity Ratio",
+    "Times Interest Earned Ratio",
+    "Intro",
+    "Sheet1"
+  ],
+  "definedNames": [
+    {
+      "name": "_MDE1",
+      "ref": "'[1]Master Data Entry'!$J$51:$J$52"
+    },
+    {
+      "name": "_MDE1",
+      "ref": "'[2]Master Data Entry'!$J$51:$J$52"
+    },
+    {
+      "name": "_MDE10",
+      "ref": "'[1]Master Data Entry'!$J$150:$J$151"
+    },
+    {
+      "name": "_MDE10",
+      "ref": "'[2]Master Data Entry'!$J$150:$J$151"
+    },
+    {
+      "name": "_MDE11",
+      "ref": "'[1]Master Data Entry'!$J$154"
+    },
+    {
+      "name": "_MDE11",
+      "ref": "'[2]Master Data Entry'!$J$154"
+    },
+    {
+      "name": "_MDE12",
+      "ref": "'[1]Master Data Entry'!$J$161:$J$166"
+    },
+    {
+      "name": "_MDE12",
+      "ref": "'[2]Master Data Entry'!$J$161:$J$166"
+    },
+    {
+      "name": "_MDE13",
+      "ref": "'[1]Master Data Entry'!$J$170:$J$173"
+    },
+    {
+      "name": "_MDE13",
+      "ref": "'[2]Master Data Entry'!$J$170:$J$173"
+    },
+    {
+      "name": "_MDE14",
+      "ref": "'[1]Master Data Entry'!$J$178:$J$181"
+    },
+    {
+      "name": "_MDE14",
+      "ref": "'[2]Master Data Entry'!$J$178:$J$181"
+    },
+    {
+      "name": "_MDE2",
+      "ref": "'[1]Master Data Entry'!$J$54:$J$56"
+    },
+    {
+      "name": "_MDE2",
+      "ref": "'[2]Master Data Entry'!$J$54:$J$56"
+    },
+    {
+      "name": "_MDE3",
+      "ref": "'[1]Master Data Entry'!$J$63:$J$82"
+    },
+    {
+      "name": "_MDE3",
+      "ref": "'[2]Master Data Entry'!$J$63:$J$82"
+    },
+    {
+      "name": "_MDE4",
+      "ref": "'[1]Master Data Entry'!$J$86:$J$100"
+    },
+    {
+      "name": "_MDE4",
+      "ref": "'[2]Master Data Entry'!$J$86:$J$100"
+    },
+    {
+      "name": "_MDE5",
+      "ref": "'[1]Master Data Entry'!$J$105:$J$108"
+    },
+    {
+      "name": "_MDE5",
+      "ref": "'[2]Master Data Entry'!$J$105:$J$108"
+    },
+    {
+      "name": "_MDE6",
+      "ref": "'[1]Master Data Entry'!$J$114:$J$115"
+    },
+    {
+      "name": "_MDE6",
+      "ref": "'[2]Master Data Entry'!$J$114:$J$115"
+    },
+    {
+      "name": "_MDE7",
+      "ref": "'[1]Master Data Entry'!$J$134:$J$138"
+    },
+    {
+      "name": "_MDE7",
+      "ref": "'[2]Master Data Entry'!$J$134:$J$138"
+    },
+    {
+      "name": "_MDE8",
+      "ref": "'[1]Master Data Entry'!$J$142:$J$144"
+    },
+    {
+      "name": "_MDE8",
+      "ref": "'[2]Master Data Entry'!$J$142:$J$144"
+    },
+    {
+      "name": "_MDE9",
+      "ref": "'[1]Master Data Entry'!$J$146"
+    },
+    {
+      "name": "_MDE9",
+      "ref": "'[2]Master Data Entry'!$J$146"
+    },
+    {
+      "name": "Balance",
+      "ref": "'[1]Master Data Entry'!$B$147"
+    },
+    {
+      "name": "Balance",
+      "ref": "'[2]Master Data Entry'!$B$147"
+    },
+    {
+      "name": "Balance2",
+      "ref": "'[1]Master Data Entry'!$J$134"
+    },
+    {
+      "name": "Balance2",
+      "ref": "'[2]Master Data Entry'!$J$134"
+    },
+    {
+      "name": "Consultant1",
+      "ref": "[1]Consultant!$C$5:$F$87"
+    },
+    {
+      "name": "Consultant1",
+      "ref": "[2]Consultant!$C$5:$F$87"
+    },
+    {
+      "name": "Consultant2",
+      "ref": "[1]Consultant!$C$89:$F$171"
+    },
+    {
+      "name": "Consultant2",
+      "ref": "[2]Consultant!$C$89:$F$171"
+    },
+    {
+      "name": "Current2",
+      "ref": "'[1]Master Data Entry'!$L$25"
+    },
+    {
+      "name": "Current2",
+      "ref": "'[2]Master Data Entry'!$L$25"
+    },
+    {
+      "name": "data1",
+      "ref": "'[1]Master Data Entry'!$J$51:$L$56"
+    },
+    {
+      "name": "data1",
+      "ref": "'[2]Master Data Entry'!$J$51:$L$56"
+    },
+    {
+      "name": "data10",
+      "ref": "'[1]Master Data Entry'!$M$86:$M$100"
+    },
+    {
+      "name": "data10",
+      "ref": "'[2]Master Data Entry'!$M$86:$M$100"
+    },
+    {
+      "name": "data13",
+      "ref": "'[1]Master Data Entry'!$J$105:$L$108"
+    },
+    {
+      "name": "data13",
+      "ref": "'[2]Master Data Entry'!$J$105:$L$108"
+    },
+    {
+      "name": "data14",
+      "ref": "'[1]Master Data Entry'!$M$105:$M$108"
+    },
+    {
+      "name": "data14",
+      "ref": "'[2]Master Data Entry'!$M$105:$M$108"
+    },
+    {
+      "name": "data16a",
+      "ref": "'[1]Master Data Entry'!$H$115:$J$116,'[1]Master Data Entry'!$L$115:$N$116,'[1]Master Data Entry'!$P$115:$R$116,'[1]Master Data Entry'!$T$115:$V$116"
+    },
+    {
+      "name": "data16a",
+      "ref": "'[2]Master Data Entry'!$H$115:$J$116,'[2]Master Data Entry'!$L$115:$N$116,'[2]Master Data Entry'!$P$115:$R$116,'[2]Master Data Entry'!$T$115:$V$116"
+    },
+    {
+      "name": "data17",
+      "ref": "'[1]Master Data Entry'!$J$134:$L$138"
+    },
+    {
+      "name": "data17",
+      "ref": "'[2]Master Data Entry'!$J$134:$L$138"
+    },
+    {
+      "name": "data18",
+      "ref": "'[1]Master Data Entry'!$M$134:$M$138"
+    },
+    {
+      "name": "data18",
+      "ref": "'[2]Master Data Entry'!$M$134:$M$138"
+    },
+    {
+      "name": "data2",
+      "ref": "'[1]Master Data Entry'!$M$51:$M$56"
+    },
+    {
+      "name": "data2",
+      "ref": "'[2]Master Data Entry'!$M$51:$M$56"
+    },
+    {
+      "name": "data20a",
+      "ref": "'[1]Master Data Entry'!$H$143:$J$145,'[1]Master Data Entry'!$H$147:$J$147,'[1]Master Data Entry'!$L$143:$N$145,'[1]Master Data Entry'!$L$147:$N$147,'[1]Master Data Entry'!$P$143:$R$145,'[1]Master Data Entry'!$P$147:$R$147,'[1]Master Data Entry'!$T$143:$V$145,'[1]Master Data Entry'!$T$147:$V$147"
+    },
+    {
+      "name": "data20a",
+      "ref": "'[2]Master Data Entry'!$H$143:$J$145,'[2]Master Data Entry'!$H$147:$J$147,'[2]Master Data Entry'!$L$143:$N$145,'[2]Master Data Entry'!$L$147:$N$147,'[2]Master Data Entry'!$P$143:$R$145,'[2]Master Data Entry'!$P$147:$R$147,'[2]Master Data Entry'!$T$143:$V$145,'[2]Master Data Entry'!$T$147:$V$147"
+    },
+    {
+      "name": "data21",
+      "ref": "'[1]Master Data Entry'!$H$151:$J$152,'[1]Master Data Entry'!$L$151:$N$152,'[1]Master Data Entry'!$P$151:$R$152,'[1]Master Data Entry'!$T$151:$V$152"
+    },
+    {
+      "name": "data21",
+      "ref": "'[2]Master Data Entry'!$H$151:$J$152,'[2]Master Data Entry'!$L$151:$N$152,'[2]Master Data Entry'!$P$151:$R$152,'[2]Master Data Entry'!$T$151:$V$152"
+    },
+    {
+      "name": "data22",
+      "ref": "'[1]Master Data Entry'!$H$155:$J$155,'[1]Master Data Entry'!$L$155:$N$155,'[1]Master Data Entry'!$P$155:$R$155,'[1]Master Data Entry'!$T$155:$V$155"
+    },
+    {
+      "name": "data22",
+      "ref": "'[2]Master Data Entry'!$H$155:$J$155,'[2]Master Data Entry'!$L$155:$N$155,'[2]Master Data Entry'!$P$155:$R$155,'[2]Master Data Entry'!$T$155:$V$155"
+    },
+    {
+      "name": "data23",
+      "ref": "'[1]Master Data Entry'!$H$162:$J$167,'[1]Master Data Entry'!$L$162:$N$167,'[1]Master Data Entry'!$P$162:$R$167,'[1]Master Data Entry'!$T$162:$V$167"
+    },
+    {
+      "name": "data23",
+      "ref": "'[2]Master Data Entry'!$H$162:$J$167,'[2]Master Data Entry'!$L$162:$N$167,'[2]Master Data Entry'!$P$162:$R$167,'[2]Master Data Entry'!$T$162:$V$167"
+    },
+    {
+      "name": "data24",
+      "ref": "'[1]Master Data Entry'!$H$171:$J$174,'[1]Master Data Entry'!$L$171:$N$174,'[1]Master Data Entry'!$P$171:$R$174,'[1]Master Data Entry'!$T$171:$V$174"
+    },
+    {
+      "name": "data24",
+      "ref": "'[2]Master Data Entry'!$H$171:$J$174,'[2]Master Data Entry'!$L$171:$N$174,'[2]Master Data Entry'!$P$171:$R$174,'[2]Master Data Entry'!$T$171:$V$174"
+    },
+    {
+      "name": "data25",
+      "ref": "'[1]Master Data Entry'!$H$179:$J$182,'[1]Master Data Entry'!$L$179:$N$182,'[1]Master Data Entry'!$P$179:$R$182,'[1]Master Data Entry'!$T$179:$V$182"
+    },
+    {
+      "name": "data25",
+      "ref": "'[2]Master Data Entry'!$H$179:$J$182,'[2]Master Data Entry'!$L$179:$N$182,'[2]Master Data Entry'!$P$179:$R$182,'[2]Master Data Entry'!$T$179:$V$182"
+    },
+    {
+      "name": "data5",
+      "ref": "'[1]Master Data Entry'!$J$63:$L$82"
+    },
+    {
+      "name": "data5",
+      "ref": "'[2]Master Data Entry'!$J$63:$L$82"
+    },
+    {
+      "name": "data6",
+      "ref": "'[1]Master Data Entry'!$M$63:$M$82"
+    },
+    {
+      "name": "data6",
+      "ref": "'[2]Master Data Entry'!$M$63:$M$82"
+    },
+    {
+      "name": "data9",
+      "ref": "'[1]Master Data Entry'!$J$86:$L$100"
+    },
+    {
+      "name": "data9",
+      "ref": "'[2]Master Data Entry'!$J$86:$L$100"
+    },
+    {
+      "name": "DateList",
+      "ref": "#REF!"
+    },
+    {
+      "name": "DateList",
+      "ref": "#REF!"
+    },
+    {
+      "name": "execsum",
+      "ref": "'[3]Executive Summary'!$A$1"
+    },
+    {
+      "name": "execsum",
+      "ref": "'[4]Executive Summary'!$A$1"
+    },
+    {
+      "name": "FLOW",
+      "ref": "#REF!"
+    },
+    {
+      "name": "FLOW",
+      "ref": "#REF!"
+    },
+    {
+      "name": "FLOW0",
+      "ref": "#REF!"
+    },
+    {
+      "name": "FLOW0",
+      "ref": "#REF!"
+    },
+    {
+      "name": "FLOW0",
+      "ref": "#REF!"
+    },
+    {
+      "name": "FLOW0",
+      "ref": "#REF!"
+    },
+    {
+      "name": "Home",
+      "ref": "'[1]Master Data Entry'!$B$1"
+    },
+    {
+      "name": "Home",
+      "ref": "'[2]Master Data Entry'!$B$1"
+    },
+    {
+      "name": "Homebase",
+      "ref": "'[1]Master Data Entry'!$A$1"
+    },
+    {
+      "name": "Homebase",
+      "ref": "'[2]Master Data Entry'!$A$1"
+    },
+    {
+      "name": "HTML_Control",
+      "ref": "{\"'Proforma'!$A$1:$J$189\"}"
+    },
+    {
+      "name": "HTML_Control",
+      "ref": "{\"'Proforma'!$A$1:$J$189\"}"
+    },
+    {
+      "name": "HTML_Control",
+      "ref": "{\"'Proforma'!$A$1:$J$189\"}"
+    },
+    {
+      "name": "indexalphaorder",
+      "ref": "[1]IndexSource!$A$2:$F$24"
+    },
+    {
+      "name": "indexalphaorder",
+      "ref": "[2]IndexSource!$A$2:$F$24"
+    },
+    {
+      "name": "IndexBasic",
+      "ref": "[1]IndexSource!$H$2:$L$29"
+    },
+    {
+      "name": "IndexBasic",
+      "ref": "[2]IndexSource!$H$2:$L$29"
+    },
+    {
+      "name": "IndexBasic2",
+      "ref": "[1]IndexSource!$H$31:$L$58"
+    },
+    {
+      "name": "IndexBasic2",
+      "ref": "[2]IndexSource!$H$31:$L$58"
+    },
+    {
+      "name": "IndexPopular",
+      "ref": "[1]IndexSource!$N$2:$R$29"
+    },
+    {
+      "name": "IndexPopular",
+      "ref": "[2]IndexSource!$N$2:$R$29"
+    },
+    {
+      "name": "IndexPopular2",
+      "ref": "[1]IndexSource!$N$31:$R$58"
+    },
+    {
+      "name": "IndexPopular2",
+      "ref": "[2]IndexSource!$N$31:$R$58"
+    },
+    {
+      "name": "indexworder",
+      "ref": "[1]IndexSource!$A$31:$F$53"
+    },
+    {
+      "name": "indexworder",
+      "ref": "[2]IndexSource!$A$31:$F$53"
+    },
+    {
+      "name": "Macro1",
+      "ref": "'Debt Ratio'!Macro1"
+    },
+    {
+      "name": "Macro1",
+      "ref": "'Emp Questionnaire Graph'!Macro1"
+    },
+    {
+      "name": "Macro1",
+      "ref": "'Equity Ratio'!Macro1"
+    },
+    {
+      "name": "Macro1",
+      "ref": "'Times Interest Earned Ratio'!Macro1"
+    },
+    {
+      "name": "Macro1",
+      "ref": "[0]!Macro1"
+    },
+    {
+      "name": "Macro2",
+      "ref": "'Debt Ratio'!Macro2"
+    },
+    {
+      "name": "Macro2",
+      "ref": "'Emp Questionnaire Graph'!Macro2"
+    },
+    {
+      "name": "Macro2",
+      "ref": "'Equity Ratio'!Macro2"
+    },
+    {
+      "name": "Macro2",
+      "ref": "'Times Interest Earned Ratio'!Macro2"
+    },
+    {
+      "name": "Macro2",
+      "ref": "[0]!Macro2"
+    },
+    {
+      "name": "Master",
+      "ref": "'[1]Master Data Entry'!$J$51:$M$186"
+    },
+    {
+      "name": "Master",
+      "ref": "'[2]Master Data Entry'!$J$51:$M$186"
+    },
+    {
+      "name": "MasterAlpha",
+      "ref": "[1]Master!$C$4:$F$139"
+    },
+    {
+      "name": "MasterAlpha",
+      "ref": "[2]Master!$C$4:$F$139"
+    },
+    {
+      "name": "MasterAlpha2",
+      "ref": "[1]Master!$H$4:$K$139"
+    },
+    {
+      "name": "MasterAlpha2",
+      "ref": "[2]Master!$H$4:$K$139"
+    },
+    {
+      "name": "MasterAlpha3",
+      "ref": "[1]Master!$M$4:$P$139"
+    },
+    {
+      "name": "MasterAlpha3",
+      "ref": "[2]Master!$M$4:$P$139"
+    },
+    {
+      "name": "MasterAlpha4",
+      "ref": "[1]Master!$R$4:$U$139"
+    },
+    {
+      "name": "MasterAlpha4",
+      "ref": "[2]Master!$R$4:$U$139"
+    },
+    {
+      "name": "MasterAlpha5",
+      "ref": "[1]Master!$W$4:$Z$139"
+    },
+    {
+      "name": "MasterAlpha5",
+      "ref": "[2]Master!$W$4:$Z$139"
+    },
+    {
+      "name": "MotherExpanded1",
+      "ref": "[1]Master!$AK$4:$AN$25"
+    },
+    {
+      "name": "MotherExpanded1",
+      "ref": "[2]Master!$AK$4:$AN$25"
+    },
+    {
+      "name": "MotherExpanded2",
+      "ref": "[1]Master!$AP$4:$AS$25"
+    },
+    {
+      "name": "MotherExpanded2",
+      "ref": "[2]Master!$AP$4:$AS$25"
+    },
+    {
+      "name": "MotherQuick1",
+      "ref": "[1]Master!$AG$4:$AG$25"
+    },
+    {
+      "name": "MotherQuick1",
+      "ref": "[2]Master!$AG$4:$AG$25"
+    },
+    {
+      "name": "MotherQuick2",
+      "ref": "[1]Master!$AI$4:$AI$25"
+    },
+    {
+      "name": "MotherQuick2",
+      "ref": "[2]Master!$AI$4:$AI$25"
+    },
+    {
+      "name": "NET_OPERATING_INCOME",
+      "ref": "'P&L COMPARISONS'!$B$37"
+    },
+    {
+      "name": "Ownership",
+      "ref": "OFFSET([0]!Data.Top.Left,1,0)"
+    },
+    {
+      "name": "Ownership",
+      "ref": "OFFSET([0]!Data.Top.Left,1,0)"
+    },
+    {
+      "name": "Ownership",
+      "ref": "OFFSET([0]!Data.Top.Left,1,0)"
+    },
+    {
+      "name": "Ownership",
+      "ref": "OFFSET([0]!Data.Top.Left,1,0)"
+    },
+    {
+      "name": "Ownership",
+      "ref": "OFFSET([0]!Data.Top.Left,1,0)"
+    },
+    {
+      "name": "Print_Area_MI",
+      "ref": "#REF!"
+    },
+    {
+      "name": "Print_Area_MI",
+      "ref": "#REF!"
+    },
+    {
+      "name": "RatingOwner",
+      "ref": "[1]Owner!$C$4:$F$86"
+    },
+    {
+      "name": "RatingOwner",
+      "ref": "[2]Owner!$C$4:$F$86"
+    },
+    {
+      "name": "RatingOwner2",
+      "ref": "[1]Owner!$C$88:$F$170"
+    },
+    {
+      "name": "RatingOwner2",
+      "ref": "[2]Owner!$C$88:$F$170"
+    },
+    {
+      "name": "Sales",
+      "ref": "'[1]Master Data Entry'!$J$51"
+    },
+    {
+      "name": "Sales",
+      "ref": "'[2]Master Data Entry'!$J$51"
+    },
+    {
+      "name": "Select_Report",
+      "ref": "'Emp Questionnaire Graph'!Select_Report"
+    },
+    {
+      "name": "Select_Report",
+      "ref": "[0]!Select_Report"
+    },
+    {
+      "name": "stat1",
+      "ref": "[1]Statistics!$K$8:$K$34"
+    },
+    {
+      "name": "stat1",
+      "ref": "[2]Statistics!$K$8:$K$34"
+    },
+    {
+      "name": "stat10",
+      "ref": "[1]Statistics!$AU$8:$AU$34"
+    },
+    {
+      "name": "stat10",
+      "ref": "[2]Statistics!$AU$8:$AU$34"
+    },
+    {
+      "name": "stat10a",
+      "ref": "[1]Statistics!$AS$6"
+    },
+    {
+      "name": "stat10a",
+      "ref": "[2]Statistics!$AS$6"
+    },
+    {
+      "name": "stat11",
+      "ref": "[1]Statistics!$AY$8:$AY$34"
+    },
+    {
+      "name": "stat11",
+      "ref": "[2]Statistics!$AY$8:$AY$34"
+    },
+    {
+      "name": "stat11a",
+      "ref": "[1]Statistics!$AW$6"
+    },
+    {
+      "name": "stat11a",
+      "ref": "[2]Statistics!$AW$6"
+    },
+    {
+      "name": "stat12",
+      "ref": "[1]Statistics!$BC$8:$BC$34"
+    },
+    {
+      "name": "stat12",
+      "ref": "[2]Statistics!$BC$8:$BC$34"
+    },
+    {
+      "name": "stat12a",
+      "ref": "[1]Statistics!$BA$6"
+    },
+    {
+      "name": "stat12a",
+      "ref": "[2]Statistics!$BA$6"
+    },
+    {
+      "name": "stat13",
+      "ref": "[1]Statistics!$BG$8:$BG$34"
+    },
+    {
+      "name": "stat13",
+      "ref": "[2]Statistics!$BG$8:$BG$34"
+    },
+    {
+      "name": "stat13a",
+      "ref": "[1]Statistics!$BE$6"
+    },
+    {
+      "name": "stat13a",
+      "ref": "[2]Statistics!$BE$6"
+    },
+    {
+      "name": "stat14",
+      "ref": "[1]Statistics!$BK$8:$BK$34"
+    },
+    {
+      "name": "stat14",
+      "ref": "[2]Statistics!$BK$8:$BK$34"
+    },
+    {
+      "name": "stat14a",
+      "ref": "[1]Statistics!$BI$6"
+    },
+    {
+      "name": "stat14a",
+      "ref": "[2]Statistics!$BI$6"
+    },
+    {
+      "name": "stat15",
+      "ref": "[1]Statistics!$BO$8:$BO$34"
+    },
+    {
+      "name": "stat15",
+      "ref": "[2]Statistics!$BO$8:$BO$34"
+    },
+    {
+      "name": "stat15a",
+      "ref": "[1]Statistics!$BM$6"
+    },
+    {
+      "name": "stat15a",
+      "ref": "[2]Statistics!$BM$6"
+    },
+    {
+      "name": "stat16",
+      "ref": "[1]Statistics!$BS$8:$BS$34"
+    },
+    {
+      "name": "stat16",
+      "ref": "[2]Statistics!$BS$8:$BS$34"
+    },
+    {
+      "name": "stat16a",
+      "ref": "[1]Statistics!$BQ$6"
+    },
+    {
+      "name": "stat16a",
+      "ref": "[2]Statistics!$BQ$6"
+    },
+    {
+      "name": "stat17",
+      "ref": "[1]Statistics!$BW$8:$BW$34"
+    },
+    {
+      "name": "stat17",
+      "ref": "[2]Statistics!$BW$8:$BW$34"
+    },
+    {
+      "name": "stat17a",
+      "ref": "[1]Statistics!$BU$6"
+    },
+    {
+      "name": "stat17a",
+      "ref": "[2]Statistics!$BU$6"
+    },
+    {
+      "name": "stat18",
+      "ref": "[1]Statistics!$CA$8:$CA$34"
+    },
+    {
+      "name": "stat18",
+      "ref": "[2]Statistics!$CA$8:$CA$34"
+    },
+    {
+      "name": "stat18a",
+      "ref": "[1]Statistics!$BY$6"
+    },
+    {
+      "name": "stat18a",
+      "ref": "[2]Statistics!$BY$6"
+    },
+    {
+      "name": "stat19",
+      "ref": "[1]Statistics!$CE$8:$CE$34"
+    },
+    {
+      "name": "stat19",
+      "ref": "[2]Statistics!$CE$8:$CE$34"
+    },
+    {
+      "name": "stat19a",
+      "ref": "[1]Statistics!$CC$6"
+    },
+    {
+      "name": "stat19a",
+      "ref": "[2]Statistics!$CC$6"
+    },
+    {
+      "name": "stat1a",
+      "ref": "[1]Statistics!$I$6"
+    },
+    {
+      "name": "stat1a",
+      "ref": "[2]Statistics!$I$6"
+    },
+    {
+      "name": "stat2",
+      "ref": "[1]Statistics!$O$8:$O$34"
+    },
+    {
+      "name": "stat2",
+      "ref": "[2]Statistics!$O$8:$O$34"
+    },
+    {
+      "name": "stat20",
+      "ref": "[1]Statistics!$CI$8:$CI$34"
+    },
+    {
+      "name": "stat20",
+      "ref": "[2]Statistics!$CI$8:$CI$34"
+    },
+    {
+      "name": "stat20a",
+      "ref": "[1]Statistics!$CG$6"
+    },
+    {
+      "name": "stat20a",
+      "ref": "[2]Statistics!$CG$6"
+    },
+    {
+      "name": "stat21",
+      "ref": "[1]Statistics!$CM$8:$CM$34"
+    },
+    {
+      "name": "stat21",
+      "ref": "[2]Statistics!$CM$8:$CM$34"
+    },
+    {
+      "name": "stat21a",
+      "ref": "[1]Statistics!$CK$6"
+    },
+    {
+      "name": "stat21a",
+      "ref": "[2]Statistics!$CK$6"
+    },
+    {
+      "name": "stat22",
+      "ref": "[1]Statistics!$CQ$8:$CQ$34"
+    },
+    {
+      "name": "stat22",
+      "ref": "[2]Statistics!$CQ$8:$CQ$34"
+    },
+    {
+      "name": "stat22a",
+      "ref": "[1]Statistics!$CO$6"
+    },
+    {
+      "name": "stat22a",
+      "ref": "[2]Statistics!$CO$6"
+    },
+    {
+      "name": "stat23",
+      "ref": "[1]Statistics!$CU$8:$CU$34"
+    },
+    {
+      "name": "stat23",
+      "ref": "[2]Statistics!$CU$8:$CU$34"
+    },
+    {
+      "name": "stat23a",
+      "ref": "[1]Statistics!$CS$6"
+    },
+    {
+      "name": "stat23a",
+      "ref": "[2]Statistics!$CS$6"
+    },
+    {
+      "name": "stat24",
+      "ref": "[1]Statistics!$CY$8:$CY$34"
+    },
+    {
+      "name": "stat24",
+      "ref": "[2]Statistics!$CY$8:$CY$34"
+    },
+    {
+      "name": "stat24a",
+      "ref": "[1]Statistics!$CW$6"
+    },
+    {
+      "name": "stat24a",
+      "ref": "[2]Statistics!$CW$6"
+    },
+    {
+      "name": "stat25",
+      "ref": "[1]Statistics!$DC$8:$DC$34"
+    },
+    {
+      "name": "stat25",
+      "ref": "[2]Statistics!$DC$8:$DC$34"
+    },
+    {
+      "name": "stat25a",
+      "ref": "[1]Statistics!$DA$6"
+    },
+    {
+      "name": "stat25a",
+      "ref": "[2]Statistics!$DA$6"
+    },
+    {
+      "name": "stat26",
+      "ref": "[1]Statistics!$DG$8:$DG$34"
+    },
+    {
+      "name": "stat26",
+      "ref": "[2]Statistics!$DG$8:$DG$34"
+    },
+    {
+      "name": "stat26a",
+      "ref": "[1]Statistics!$DE$6"
+    },
+    {
+      "name": "stat26a",
+      "ref": "[2]Statistics!$DE$6"
+    },
+    {
+      "name": "stat27",
+      "ref": "[1]Statistics!$DK$8:$DK$34"
+    },
+    {
+      "name": "stat27",
+      "ref": "[2]Statistics!$DK$8:$DK$34"
+    },
+    {
+      "name": "stat27a",
+      "ref": "[1]Statistics!$DI$6"
+    },
+    {
+      "name": "stat27a",
+      "ref": "[2]Statistics!$DI$6"
+    },
+    {
+      "name": "stat28",
+      "ref": "[1]Statistics!$DO$8:$DO$34"
+    },
+    {
+      "name": "stat28",
+      "ref": "[2]Statistics!$DO$8:$DO$34"
+    },
+    {
+      "name": "stat28a",
+      "ref": "[1]Statistics!$DM$6"
+    },
+    {
+      "name": "stat28a",
+      "ref": "[2]Statistics!$DM$6"
+    },
+    {
+      "name": "stat29",
+      "ref": "[1]Statistics!$DS$8:$DS$34"
+    },
+    {
+      "name": "stat29",
+      "ref": "[2]Statistics!$DS$8:$DS$34"
+    },
+    {
+      "name": "stat29a",
+      "ref": "[1]Statistics!$DQ$6"
+    },
+    {
+      "name": "stat29a",
+      "ref": "[2]Statistics!$DQ$6"
+    },
+    {
+      "name": "stat2a",
+      "ref": "[1]Statistics!$M$6"
+    },
+    {
+      "name": "stat2a",
+      "ref": "[2]Statistics!$M$6"
+    },
+    {
+      "name": "stat3",
+      "ref": "[1]Statistics!$S$8:$S$34"
+    },
+    {
+      "name": "stat3",
+      "ref": "[2]Statistics!$S$8:$S$34"
+    },
+    {
+      "name": "stat30",
+      "ref": "[1]Statistics!$DW$8:$DW$34"
+    },
+    {
+      "name": "stat30",
+      "ref": "[2]Statistics!$DW$8:$DW$34"
+    },
+    {
+      "name": "stat30a",
+      "ref": "[1]Statistics!$DU$6"
+    },
+    {
+      "name": "stat30a",
+      "ref": "[2]Statistics!$DU$6"
+    },
+    {
+      "name": "stat31",
+      "ref": "[1]Statistics!$EA$8:$EA$34"
+    },
+    {
+      "name": "stat31",
+      "ref": "[2]Statistics!$EA$8:$EA$34"
+    },
+    {
+      "name": "stat31a",
+      "ref": "[1]Statistics!$DY$6"
+    },
+    {
+      "name": "stat31a",
+      "ref": "[2]Statistics!$DY$6"
+    },
+    {
+      "name": "stat32",
+      "ref": "[1]Statistics!$EE$8:$EE$34"
+    },
+    {
+      "name": "stat32",
+      "ref": "[2]Statistics!$EE$8:$EE$34"
+    },
+    {
+      "name": "stat32a",
+      "ref": "[1]Statistics!$EC$6"
+    },
+    {
+      "name": "stat32a",
+      "ref": "[2]Statistics!$EC$6"
+    },
+    {
+      "name": "stat33",
+      "ref": "[1]Statistics!$EI$8:$EI$34"
+    },
+    {
+      "name": "stat33",
+      "ref": "[2]Statistics!$EI$8:$EI$34"
+    },
+    {
+      "name": "stat33a",
+      "ref": "[1]Statistics!$EG$6"
+    },
+    {
+      "name": "stat33a",
+      "ref": "[2]Statistics!$EG$6"
+    },
+    {
+      "name": "stat3a",
+      "ref": "[1]Statistics!$Q$6"
+    },
+    {
+      "name": "stat3a",
+      "ref": "[2]Statistics!$Q$6"
+    },
+    {
+      "name": "stat4",
+      "ref": "[1]Statistics!$W$8:$W$34"
+    },
+    {
+      "name": "stat4",
+      "ref": "[2]Statistics!$W$8:$W$34"
+    },
+    {
+      "name": "stat48",
+      "ref": "[1]Statistics!$EM$8:$EM$34"
+    },
+    {
+      "name": "stat48",
+      "ref": "[2]Statistics!$EM$8:$EM$34"
+    },
+    {
+      "name": "stat48a",
+      "ref": "[1]Statistics!$EK$6"
+    },
+    {
+      "name": "stat48a",
+      "ref": "[2]Statistics!$EK$6"
+    },
+    {
+      "name": "stat49",
+      "ref": "[1]Statistics!$EQ$8:$EQ$34"
+    },
+    {
+      "name": "stat49",
+      "ref": "[2]Statistics!$EQ$8:$EQ$34"
+    },
+    {
+      "name": "stat49a",
+      "ref": "[1]Statistics!$EO$6"
+    },
+    {
+      "name": "stat49a",
+      "ref": "[2]Statistics!$EO$6"
+    },
+    {
+      "name": "stat4a",
+      "ref": "[1]Statistics!$U$6"
+    },
+    {
+      "name": "stat4a",
+      "ref": "[2]Statistics!$U$6"
+    },
+    {
+      "name": "stat5",
+      "ref": "[1]Statistics!$AA$8:$AA$34"
+    },
+    {
+      "name": "stat5",
+      "ref": "[2]Statistics!$AA$8:$AA$34"
+    },
+    {
+      "name": "stat50",
+      "ref": "[1]Statistics!$EU$8:$EU$34"
+    },
+    {
+      "name": "stat50",
+      "ref": "[2]Statistics!$EU$8:$EU$34"
+    },
+    {
+      "name": "stat50a",
+      "ref": "[1]Statistics!$ES$6"
+    },
+    {
+      "name": "stat50a",
+      "ref": "[2]Statistics!$ES$6"
+    },
+    {
+      "name": "stat51",
+      "ref": "[1]Statistics!$EY$8:$EY$34"
+    },
+    {
+      "name": "stat51",
+      "ref": "[2]Statistics!$EY$8:$EY$34"
+    },
+    {
+      "name": "stat51a",
+      "ref": "[1]Statistics!$EW$6"
+    },
+    {
+      "name": "stat51a",
+      "ref": "[2]Statistics!$EW$6"
+    },
+    {
+      "name": "stat52",
+      "ref": "[1]Statistics!$FC$8:$FC$34"
+    },
+    {
+      "name": "stat52",
+      "ref": "[2]Statistics!$FC$8:$FC$34"
+    },
+    {
+      "name": "stat52a",
+      "ref": "[1]Statistics!$FA$6"
+    },
+    {
+      "name": "stat52a",
+      "ref": "[2]Statistics!$FA$6"
+    },
+    {
+      "name": "stat53",
+      "ref": "[1]Statistics!$FG$8:$FG$34"
+    },
+    {
+      "name": "stat53",
+      "ref": "[2]Statistics!$FG$8:$FG$34"
+    },
+    {
+      "name": "stat53a",
+      "ref": "[1]Statistics!$FE$6"
+    },
+    {
+      "name": "stat53a",
+      "ref": "[2]Statistics!$FE$6"
+    },
+    {
+      "name": "stat54",
+      "ref": "[1]Statistics!$FK$8:$FK$34"
+    },
+    {
+      "name": "stat54",
+      "ref": "[2]Statistics!$FK$8:$FK$34"
+    },
+    {
+      "name": "stat54a",
+      "ref": "[1]Statistics!$FI$6"
+    },
+    {
+      "name": "stat54a",
+      "ref": "[2]Statistics!$FI$6"
+    },
+    {
+      "name": "stat55",
+      "ref": "[1]Statistics!$FO$8:$FO$34"
+    },
+    {
+      "name": "stat55",
+      "ref": "[2]Statistics!$FO$8:$FO$34"
+    },
+    {
+      "name": "stat55a",
+      "ref": "[1]Statistics!$FM$6"
+    },
+    {
+      "name": "stat55a",
+      "ref": "[2]Statistics!$FM$6"
+    },
+    {
+      "name": "stat56",
+      "ref": "[1]Statistics!$FS$8:$FS$34"
+    },
+    {
+      "name": "stat56",
+      "ref": "[2]Statistics!$FS$8:$FS$34"
+    },
+    {
+      "name": "stat56a",
+      "ref": "[1]Statistics!$FQ$6"
+    },
+    {
+      "name": "stat56a",
+      "ref": "[2]Statistics!$FQ$6"
+    },
+    {
+      "name": "stat57",
+      "ref": "[1]Statistics!$FW$8:$FW$34"
+    },
+    {
+      "name": "stat57",
+      "ref": "[2]Statistics!$FW$8:$FW$34"
+    },
+    {
+      "name": "stat57a",
+      "ref": "[1]Statistics!$FU$6"
+    },
+    {
+      "name": "stat57a",
+      "ref": "[2]Statistics!$FU$6"
+    },
+    {
+      "name": "stat58",
+      "ref": "[1]Statistics!$GA$8:$GA$34"
+    },
+    {
+      "name": "stat58",
+      "ref": "[2]Statistics!$GA$8:$GA$34"
+    },
+    {
+      "name": "stat58a",
+      "ref": "[1]Statistics!$FY$6"
+    },
+    {
+      "name": "stat58a",
+      "ref": "[2]Statistics!$FY$6"
+    },
+    {
+      "name": "stat59",
+      "ref": "[1]Statistics!$GE$8:$GE$34"
+    },
+    {
+      "name": "stat59",
+      "ref": "[2]Statistics!$GE$8:$GE$34"
+    },
+    {
+      "name": "stat59a",
+      "ref": "[1]Statistics!$GC$6"
+    },
+    {
+      "name": "stat59a",
+      "ref": "[2]Statistics!$GC$6"
+    },
+    {
+      "name": "stat5a",
+      "ref": "[1]Statistics!$Y$6"
+    },
+    {
+      "name": "stat5a",
+      "ref": "[2]Statistics!$Y$6"
+    },
+    {
+      "name": "stat6",
+      "ref": "[1]Statistics!$AE$8:$AE$34"
+    },
+    {
+      "name": "stat6",
+      "ref": "[2]Statistics!$AE$8:$AE$34"
+    },
+    {
+      "name": "stat60",
+      "ref": "[1]Statistics!$GI$8:$GI$34"
+    },
+    {
+      "name": "stat60",
+      "ref": "[2]Statistics!$GI$8:$GI$34"
+    },
+    {
+      "name": "stat60a",
+      "ref": "[1]Statistics!$GG$6"
+    },
+    {
+      "name": "stat60a",
+      "ref": "[2]Statistics!$GG$6"
+    },
+    {
+      "name": "stat61",
+      "ref": "[1]Statistics!$GM$8:$GM$34"
+    },
+    {
+      "name": "stat61",
+      "ref": "[2]Statistics!$GM$8:$GM$34"
+    },
+    {
+      "name": "stat61a",
+      "ref": "[1]Statistics!$GK$6"
+    },
+    {
+      "name": "stat61a",
+      "ref": "[2]Statistics!$GK$6"
+    },
+    {
+      "name": "stat62",
+      "ref": "[1]Statistics!$K$40:$K$66"
+    },
+    {
+      "name": "stat62",
+      "ref": "[2]Statistics!$K$40:$K$66"
+    },
+    {
+      "name": "stat62a",
+      "ref": "[1]Statistics!$I$38"
+    },
+    {
+      "name": "stat62a",
+      "ref": "[2]Statistics!$I$38"
+    },
+    {
+      "name": "stat63",
+      "ref": "[1]Statistics!$O$40:$O$66"
+    },
+    {
+      "name": "stat63",
+      "ref": "[2]Statistics!$O$40:$O$66"
+    },
+    {
+      "name": "stat63a",
+      "ref": "[1]Statistics!$M$38"
+    },
+    {
+      "name": "stat63a",
+      "ref": "[2]Statistics!$M$38"
+    },
+    {
+      "name": "stat64",
+      "ref": "[1]Statistics!$S$40:$S$66"
+    },
+    {
+      "name": "stat64",
+      "ref": "[2]Statistics!$S$40:$S$66"
+    },
+    {
+      "name": "stat64a",
+      "ref": "[1]Statistics!$Q$38"
+    },
+    {
+      "name": "stat64a",
+      "ref": "[2]Statistics!$Q$38"
+    },
+    {
+      "name": "stat65",
+      "ref": "[1]Statistics!$W$40:$W$66"
+    },
+    {
+      "name": "stat65",
+      "ref": "[2]Statistics!$W$40:$W$66"
+    },
+    {
+      "name": "stat65a",
+      "ref": "[1]Statistics!$U$38"
+    },
+    {
+      "name": "stat65a",
+      "ref": "[2]Statistics!$U$38"
+    },
+    {
+      "name": "stat66",
+      "ref": "[1]Statistics!$AA$40:$AA$66"
+    },
+    {
+      "name": "stat66",
+      "ref": "[2]Statistics!$AA$40:$AA$66"
+    },
+    {
+      "name": "stat66a",
+      "ref": "[1]Statistics!$Y$38"
+    },
+    {
+      "name": "stat66a",
+      "ref": "[2]Statistics!$Y$38"
+    },
+    {
+      "name": "stat67",
+      "ref": "[1]Statistics!$AE$40:$AE$66"
+    },
+    {
+      "name": "stat67",
+      "ref": "[2]Statistics!$AE$40:$AE$66"
+    },
+    {
+      "name": "stat67a",
+      "ref": "[1]Statistics!$AC$38"
+    },
+    {
+      "name": "stat67a",
+      "ref": "[2]Statistics!$AC$38"
+    },
+    {
+      "name": "stat68",
+      "ref": "[1]Statistics!$AI$40:$AI$66"
+    },
+    {
+      "name": "stat68",
+      "ref": "[2]Statistics!$AI$40:$AI$66"
+    },
+    {
+      "name": "stat68a",
+      "ref": "[1]Statistics!$AG$38"
+    },
+    {
+      "name": "stat68a",
+      "ref": "[2]Statistics!$AG$38"
+    },
+    {
+      "name": "stat69",
+      "ref": "[1]Statistics!$AM$40:$AM$66"
+    },
+    {
+      "name": "stat69",
+      "ref": "[2]Statistics!$AM$40:$AM$66"
+    },
+    {
+      "name": "stat69a",
+      "ref": "[1]Statistics!$AK$38"
+    },
+    {
+      "name": "stat69a",
+      "ref": "[2]Statistics!$AK$38"
+    },
+    {
+      "name": "stat6a",
+      "ref": "[1]Statistics!$AC$6"
+    },
+    {
+      "name": "stat6a",
+      "ref": "[2]Statistics!$AC$6"
+    },
+    {
+      "name": "stat7",
+      "ref": "[1]Statistics!$AI$8:$AI$34"
+    },
+    {
+      "name": "stat7",
+      "ref": "[2]Statistics!$AI$8:$AI$34"
+    },
+    {
+      "name": "stat70",
+      "ref": "[1]Statistics!$AQ$40:$AQ$66"
+    },
+    {
+      "name": "stat70",
+      "ref": "[2]Statistics!$AQ$40:$AQ$66"
+    },
+    {
+      "name": "stat70a",
+      "ref": "[1]Statistics!$AO$38"
+    },
+    {
+      "name": "stat70a",
+      "ref": "[2]Statistics!$AO$38"
+    },
+    {
+      "name": "stat71",
+      "ref": "[1]Statistics!$AU$40:$AU$66"
+    },
+    {
+      "name": "stat71",
+      "ref": "[2]Statistics!$AU$40:$AU$66"
+    },
+    {
+      "name": "stat71a",
+      "ref": "[1]Statistics!$AS$38"
+    },
+    {
+      "name": "stat71a",
+      "ref": "[2]Statistics!$AS$38"
+    },
+    {
+      "name": "stat72",
+      "ref": "[1]Statistics!$AY$40:$AY$66"
+    },
+    {
+      "name": "stat72",
+      "ref": "[2]Statistics!$AY$40:$AY$66"
+    },
+    {
+      "name": "stat72a",
+      "ref": "[1]Statistics!$AW$38"
+    },
+    {
+      "name": "stat72a",
+      "ref": "[2]Statistics!$AW$38"
+    },
+    {
+      "name": "stat73",
+      "ref": "[1]Statistics!$BC$40:$BC$66"
+    },
+    {
+      "name": "stat73",
+      "ref": "[2]Statistics!$BC$40:$BC$66"
+    },
+    {
+      "name": "stat73a",
+      "ref": "[1]Statistics!$BA$38"
+    },
+    {
+      "name": "stat73a",
+      "ref": "[2]Statistics!$BA$38"
+    },
+    {
+      "name": "stat74",
+      "ref": "[1]Statistics!$BG$40:$BG$66"
+    },
+    {
+      "name": "stat74",
+      "ref": "[2]Statistics!$BG$40:$BG$66"
+    },
+    {
+      "name": "stat74a",
+      "ref": "[1]Statistics!$BE$38"
+    },
+    {
+      "name": "stat74a",
+      "ref": "[2]Statistics!$BE$38"
+    },
+    {
+      "name": "stat75",
+      "ref": "[1]Statistics!$BK$40:$BK$66"
+    },
+    {
+      "name": "stat75",
+      "ref": "[2]Statistics!$BK$40:$BK$66"
+    },
+    {
+      "name": "stat75a",
+      "ref": "[1]Statistics!$BI$38"
+    },
+    {
+      "name": "stat75a",
+      "ref": "[2]Statistics!$BI$38"
+    },
+    {
+      "name": "stat76",
+      "ref": "[1]Statistics!$BO$40:$BO$66"
+    },
+    {
+      "name": "stat76",
+      "ref": "[2]Statistics!$BO$40:$BO$66"
+    },
+    {
+      "name": "stat76a",
+      "ref": "[1]Statistics!$BM$38"
+    },
+    {
+      "name": "stat76a",
+      "ref": "[2]Statistics!$BM$38"
+    },
+    {
+      "name": "stat77",
+      "ref": "[1]Statistics!$BS$40:$BS$66"
+    },
+    {
+      "name": "stat77",
+      "ref": "[2]Statistics!$BS$40:$BS$66"
+    },
+    {
+      "name": "stat77a",
+      "ref": "[1]Statistics!$BQ$38"
+    },
+    {
+      "name": "stat77a",
+      "ref": "[2]Statistics!$BQ$38"
+    },
+    {
+      "name": "stat78",
+      "ref": "[1]Statistics!$BW$40:$BW$66"
+    },
+    {
+      "name": "stat78",
+      "ref": "[2]Statistics!$BW$40:$BW$66"
+    },
+    {
+      "name": "stat78a",
+      "ref": "[1]Statistics!$BU$38"
+    },
+    {
+      "name": "stat78a",
+      "ref": "[2]Statistics!$BU$38"
+    },
+    {
+      "name": "stat79",
+      "ref": "[1]Statistics!$CA$40:$CA$66"
+    },
+    {
+      "name": "stat79",
+      "ref": "[2]Statistics!$CA$40:$CA$66"
+    },
+    {
+      "name": "stat79a",
+      "ref": "[1]Statistics!$BY$38"
+    },
+    {
+      "name": "stat79a",
+      "ref": "[2]Statistics!$BY$38"
+    },
+    {
+      "name": "stat7a",
+      "ref": "[1]Statistics!$AG$6"
+    },
+    {
+      "name": "stat7a",
+      "ref": "[2]Statistics!$AG$6"
+    },
+    {
+      "name": "stat8",
+      "ref": "[1]Statistics!$AM$8:$AM$34"
+    },
+    {
+      "name": "stat8",
+      "ref": "[2]Statistics!$AM$8:$AM$34"
+    },
+    {
+      "name": "stat80",
+      "ref": "[1]Statistics!$CE$40:$CE$66"
+    },
+    {
+      "name": "stat80",
+      "ref": "[2]Statistics!$CE$40:$CE$66"
+    },
+    {
+      "name": "stat80a",
+      "ref": "[1]Statistics!$CC$38"
+    },
+    {
+      "name": "stat80a",
+      "ref": "[2]Statistics!$CC$38"
+    },
+    {
+      "name": "stat81",
+      "ref": "[1]Statistics!$CI$40:$CI$66"
+    },
+    {
+      "name": "stat81",
+      "ref": "[2]Statistics!$CI$40:$CI$66"
+    },
+    {
+      "name": "stat81a",
+      "ref": "[1]Statistics!$CG$38"
+    },
+    {
+      "name": "stat81a",
+      "ref": "[2]Statistics!$CG$38"
+    },
+    {
+      "name": "stat8a",
+      "ref": "[1]Statistics!$AK$6"
+    },
+    {
+      "name": "stat8a",
+      "ref": "[2]Statistics!$AK$6"
+    },
+    {
+      "name": "stat9",
+      "ref": "[1]Statistics!$AQ$8:$AQ$34"
+    },
+    {
+      "name": "stat9",
+      "ref": "[2]Statistics!$AQ$8:$AQ$34"
+    },
+    {
+      "name": "stat9a",
+      "ref": "[1]Statistics!$AO$6"
+    },
+    {
+      "name": "stat9a",
+      "ref": "[2]Statistics!$AO$6"
+    },
+    {
+      "name": "test",
+      "ref": "#REF!"
+    },
+    {
+      "name": "Three",
+      "ref": "OFFSET([0]!Data.Top.Left,1,0)"
+    },
+    {
+      "name": "Three",
+      "ref": "OFFSET([0]!Data.Top.Left,1,0)"
+    },
+    {
+      "name": "Three",
+      "ref": "OFFSET([0]!Data.Top.Left,1,0)"
+    },
+    {
+      "name": "Year",
+      "ref": "'[1]Master Data Entry'!$J$49"
+    },
+    {
+      "name": "Year",
+      "ref": "'[2]Master Data Entry'!$J$49"
+    }
+  ]
+}
