@@ -273,6 +273,35 @@ td {
   text-decoration: none;
 }
 
+.workspace-shell {
+  padding-top: 20px;
+}
+
+.workspace-header {
+  margin-bottom: 12px;
+  padding: 14px 16px;
+  border: 1px solid #ffffff2a;
+  border-radius: 14px;
+  background: #0a1424b8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.workspace-header h1 {
+  margin: 8px 0 0;
+  font-size: clamp(24px, 4vw, 34px);
+}
+
+.workspace-back-link {
+  text-decoration: none;
+}
+
+.workspace-tabs {
+  margin-top: 0;
+}
+
 .wizard-shell {
   background: linear-gradient(160deg, #0b1222e0 0%, #111d2fd9 45%, #13273ad9 100%);
   border: 1px solid #ffffff24;
@@ -629,6 +658,11 @@ td {
   }
 
   .session-bar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .workspace-header {
     align-items: flex-start;
     flex-direction: column;
   }

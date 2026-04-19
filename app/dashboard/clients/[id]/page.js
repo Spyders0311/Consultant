@@ -63,6 +63,9 @@ export default async function ClientDetailPage({ params }) {
         <h1>{client.company_name || 'Untitled client'}</h1>
         <p>Baseline assumptions and stored intake values for this engagement.</p>
         <div className="actions">
+          <Link href={`/workspace/${id}/analysis`} className="tab active">
+            Open Workspace
+          </Link>
           <Link href="/dashboard/clients" className="tab active">
             Back to Clients
           </Link>

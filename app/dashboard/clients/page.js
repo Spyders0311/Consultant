@@ -73,7 +73,7 @@ export default async function ClientsPage() {
                 {clients.map((client) => (
                   <tr key={client.id}>
                     <td>
-                      <Link href={`/dashboard/clients/${client.id}`}>{client.company_name || 'Untitled client'}</Link>
+                      <Link href={`/workspace/${client.id}/analysis`}>{client.company_name || 'Untitled client'}</Link>
                     </td>
                     <td>{client.industry || 'Not set'}</td>
                     <td>{formatCreatedAt(client.created_at)}</td>

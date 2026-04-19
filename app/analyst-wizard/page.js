@@ -1,11 +1,5 @@
-import AnalystWizard from '@/components/AnalystWizard';
-import TabNav from '@/components/TabNav';
+import { redirect } from 'next/navigation';
 
 export default function AnalystWizardPage() {
-  return (
-    <main className="portal-wrap">
-      <TabNav />
-      <AnalystWizard />
-    </main>
-  );
+  redirect('/dashboard/clients');
 }
