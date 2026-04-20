@@ -11,6 +11,7 @@ from .models import (
     AnalystWizardResult,
     BreakevenInput,
     BreakevenResult,
+    PLComparisonsInput,
     WorkingCapitalInput,
     WorkingCapitalResult,
 )
@@ -181,6 +182,63 @@ def calculate_working_capital(payload: dict):
             }
         )
         return {"ok": True, "result": result.model_dump(by_alias=True)}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/pl-comparisons/calculate")
+def calculate_pl_comparisons(payload: dict):
+    try:
+        validated = PLComparisonsInput.model_validate(payload)
+
+        sorted_years = sorted(validated.years, key=lambda row: row.year)
+        per_year: list[dict] = []
+
+        for row in sorted_years:
+            revenue = float(row.revenue)
+            cogs = float(row.cogs)
+            operating_expenses = float(row.operating_expenses)
+            other_expenses = float(row.other_expenses)
+
+            gross_profit = revenue - cogs
+            ebit = gross_profit - operating_expenses
+            net_income = ebit - other_expenses
+            gross_margin_pct = (gross_profit / revenue * 100) if revenue > 0 else None
+            ebit_margin_pct = (ebit / revenue * 100) if revenue > 0 else None
+
+            per_year.append(
+                {
+                    "year": row.year,
+                    "revenue": revenue,
+                    "cogs": cogs,
+                    "operatingExpenses": operating_expenses,
+                    "otherExpenses": other_expenses,
+                    "grossProfit": gross_profit,
+                    "grossMarginPct": gross_margin_pct,
+                    "ebit": ebit,
+                    "ebitMarginPct": ebit_margin_pct,
+                    "netIncome": net_income,
+                }
+            )
+
+        for index, current in enumerate(per_year):
+            previous = per_year[index - 1] if index > 0 else None
+            trend = {}
+            for key in ["revenue", "grossProfit", "ebit", "netIncome"]:
+                current_value = current.get(key)
+                previous_value = previous.get(key) if previous else None
+                if previous_value is None or previous_value == 0:
+                    trend[f"{key}YoYPct"] = None
+                else:
+                    trend[f"{key}YoYPct"] = ((current_value - previous_value) / abs(previous_value)) * 100
+            current["trend"] = trend
+
+        result = {
+            "years": per_year,
+        }
+        return {"ok": True, "result": result}
     except ValidationError as error:
         return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
     except Exception as error:  # noqa: BLE001

@@ -100,3 +100,15 @@ class WorkingCapitalResult(BaseModel):
     cash_conversion_cycle: float = Field(alias="cashConversionCycle")
     working_capital_percent_of_revenue: float | None = Field(alias="workingCapitalPercentOfRevenue")
     warnings: list[str] = Field(default_factory=list)
+
+
+class PLComparisonsYearInput(BaseModel):
+    year: int = Field(ge=1900, le=3000)
+    revenue: float = Field(ge=0)
+    cogs: float = Field(ge=0)
+    operating_expenses: float = Field(alias="operatingExpenses", ge=0)
+    other_expenses: float = Field(alias="otherExpenses", ge=0)
+
+
+class PLComparisonsInput(BaseModel):
+    years: list[PLComparisonsYearInput] = Field(min_length=1, max_length=10)

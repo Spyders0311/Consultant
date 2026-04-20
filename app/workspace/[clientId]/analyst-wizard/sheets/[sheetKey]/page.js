@@ -1,5 +1,6 @@
 import worksheetCatalog from '@/knowledge/workbooks/worksheet_catalog.json';
 import BreakevenWizard from '@/components/BreakevenWizard';
+import PLComparisonsWizard from '@/components/PLComparisonsWizard';
 import WorkingCapitalWizard from '@/components/WorkingCapitalWizard';
 import { notFound } from 'next/navigation';
 
@@ -16,6 +17,9 @@ export default async function AnalystWizardSheetPlaceholderPage({ params }) {
   }
   if (sheetKey === 'working-capital-analysis') {
     return <WorkingCapitalWizard clientId={clientId} />;
+  }
+  if (sheetKey === 'p-l-comparisons') {
+    return <PLComparisonsWizard clientId={clientId} />;
   }
 
   return (
