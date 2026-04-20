@@ -281,33 +281,6 @@ export default function BalanceSheetComparisonsWizard({ clientId }) {
         <p>Enter four years of key balance sheet lines, run backend checks, and export a consultant-ready PDF.</p>
       </header>
 
-      <section className="wizard-history" aria-label="Balance sheet comparison run history">
-        <div className="wizard-history-actions">
-          <button
-            type="button"
-            className="ghost"
-            onClick={() => loadRun(runs[0])}
-            disabled={loading || runsLoading || runs.length === 0}
-          >
-            Continue last run
-          </button>
-          <button type="button" className="ghost" onClick={resetToNewRun} disabled={loading || runsLoading}>
-            Start new run
-          </button>
-        </div>
-        <ul className="wizard-history-list">
-          {runs.slice(0, 10).map((run) => (
-            <li key={run.id}>
-              <span>{formatRunTimestamp(run.created_at)}</span>
-              <button type="button" className="ghost" onClick={() => loadRun(run)} disabled={loading || runsLoading}>
-                Load
-              </button>
-            </li>
-          ))}
-          {!runsLoading && runs.length === 0 ? <li className="wizard-history-empty">No saved runs yet.</li> : null}
-        </ul>
-      </section>
-
       <div className="wizard-progress" aria-hidden="true">
         <span style={{ width: `${progress}%` }} />
       </div>
@@ -495,6 +468,33 @@ export default function BalanceSheetComparisonsWizard({ clientId }) {
           {runId ? <p className="wizard-meta">Saved run ID: {runId}</p> : null}
         </section>
       ) : null}
+
+      <section className="wizard-history" aria-label="Balance sheet comparison run history">
+        <div className="wizard-history-actions">
+          <button
+            type="button"
+            className="ghost"
+            onClick={() => loadRun(runs[0])}
+            disabled={loading || runsLoading || runs.length === 0}
+          >
+            Continue last run
+          </button>
+          <button type="button" className="ghost" onClick={resetToNewRun} disabled={loading || runsLoading}>
+            Start new run
+          </button>
+        </div>
+        <ul className="wizard-history-list">
+          {runs.slice(0, 10).map((run) => (
+            <li key={run.id}>
+              <span>{formatRunTimestamp(run.created_at)}</span>
+              <button type="button" className="ghost" onClick={() => loadRun(run)} disabled={loading || runsLoading}>
+                Load
+              </button>
+            </li>
+          ))}
+          {!runsLoading && runs.length === 0 ? <li className="wizard-history-empty">No saved runs yet.</li> : null}
+        </ul>
+      </section>
     </section>
   );
 }

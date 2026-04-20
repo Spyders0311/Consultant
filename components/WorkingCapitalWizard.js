@@ -191,76 +191,127 @@ export default function WorkingCapitalWizard({ clientId }) {
         throw new Error(bsData.error || 'Unable to load Balance Sheet Comparisons runs.');
       }
 
-      const plRun = plData.runs?.[0];
-      const bsRun = bsData.runs?.[0];
-
-      if (!plRun) {
-        throw new Error('No P&L Comparisons runs found to prefill from.');
-      }
-      if (!bsRun) {
-        throw new Error('No Balance Sheet Comparisons runs found to prefill from.');
-      }
-
+      const plRun = plData.runs?.[0] || null;
+      const bsRun = bsData.runs?.[0] || null;
       const latestPlYear = pickLatestYearRow(plRun?.inputs?.years);
       const latestBsYear = pickLatestYearRow(bsRun?.inputs?.years);
+      const primaryReady = Boolean(plRun && bsRun && latestPlYear && latestBsYear);
 
-      if (!latestPlYear || !latestBsYear) {
-        throw new Error('Latest linked runs are missing year-grid inputs needed for mapping.');
+      if (primaryReady) {
+        const patch = {};
+        const missingFields = [];
+
+        const revenue = Number(latestPlYear.revenue);
+        const cogs = Number(latestPlYear.cogs);
+        const ar = Number(latestBsYear.ar);
+        const inventory = Number(latestBsYear.inventory);
+        const ap = Number(latestBsYear.ap);
+
+        if (isFiniteNumber(revenue)) {
+          patch.annualRevenue = revenue;
+        } else {
+          missingFields.push('Annual Revenue');
+        }
+
+        if (isFiniteNumber(cogs)) {
+          patch.annualCogs = cogs;
+        } else {
+          missingFields.push('Annual COGS');
+        }
+
+        if (isFiniteNumber(revenue) && revenue > 0 && isFiniteNumber(ar)) {
+          patch.daysSalesOutstanding = round1((ar / revenue) * 365);
+        } else {
+          missingFields.push('Days Sales Outstanding (requires Revenue + A/R)');
+        }
+
+        if (isFiniteNumber(cogs) && cogs > 0 && isFiniteNumber(inventory)) {
+          patch.daysInventoryOnHand = round1((inventory / cogs) * 365);
+        } else {
+          missingFields.push('Days Inventory On Hand (requires COGS + Inventory)');
+        }
+
+        if (isFiniteNumber(cogs) && cogs > 0 && isFiniteNumber(ap)) {
+          patch.daysPayablesOutstanding = round1((ap / cogs) * 365);
+        } else {
+          missingFields.push('Days Payables Outstanding (requires COGS + A/P)');
+        }
+
+        if (Object.keys(patch).length === 0) {
+          throw new Error(
+            `Could not map any Working Capital fields from linked sheets. Missing: ${missingFields.join(', ')}`,
+          );
+        }
+
+        applyPrefill(patch, 'P&L + Balance Sheet Comparisons');
+
+        if (missingFields.length > 0) {
+          setPullError(`Some fields were not prefilled: ${missingFields.join(', ')}.`);
+        }
+
+        setPullAudit(
+          `Prefilled from P&L Comparisons run ${formatRunTimestamp(plRun.created_at)} and Balance Sheet Comparisons run ${formatRunTimestamp(bsRun.created_at)}`,
+        );
+        setStepIndex(0);
+        return;
       }
 
-      const patch = {};
-      const missingFields = [];
+      const missingSources = [];
+      if (!plRun || !latestPlYear) missingSources.push('P&L Comparisons');
+      if (!bsRun || !latestBsYear) missingSources.push('Balance Sheet Comparisons');
 
-      const revenue = Number(latestPlYear.revenue);
-      const cogs = Number(latestPlYear.cogs);
-      const ar = Number(latestBsYear.ar);
-      const inventory = Number(latestBsYear.inventory);
-      const ap = Number(latestBsYear.ap);
-
-      if (isFiniteNumber(revenue)) {
-        patch.annualRevenue = revenue;
-      } else {
-        missingFields.push('Annual Revenue');
+      const breakevenResponse = await fetch(
+        `/api/worksheets/breakeven/runs?client_id=${encodeURIComponent(clientId)}&limit=1`,
+        { cache: 'no-store' },
+      );
+      const breakevenData = await breakevenResponse.json();
+      if (!breakevenResponse.ok || !breakevenData.ok) {
+        throw new Error(breakevenData.error || 'Unable to load Breakeven runs for fallback prefill.');
       }
 
-      if (isFiniteNumber(cogs)) {
-        patch.annualCogs = cogs;
-      } else {
-        missingFields.push('Annual COGS');
-      }
-
-      if (isFiniteNumber(revenue) && revenue > 0 && isFiniteNumber(ar)) {
-        patch.daysSalesOutstanding = round1((ar / revenue) * 365);
-      } else {
-        missingFields.push('Days Sales Outstanding (requires Revenue + A/R)');
-      }
-
-      if (isFiniteNumber(cogs) && cogs > 0 && isFiniteNumber(inventory)) {
-        patch.daysInventoryOnHand = round1((inventory / cogs) * 365);
-      } else {
-        missingFields.push('Days Inventory On Hand (requires COGS + Inventory)');
-      }
-
-      if (isFiniteNumber(cogs) && cogs > 0 && isFiniteNumber(ap)) {
-        patch.daysPayablesOutstanding = round1((ap / cogs) * 365);
-      } else {
-        missingFields.push('Days Payables Outstanding (requires COGS + A/P)');
-      }
-
-      if (Object.keys(patch).length === 0) {
+      const breakevenRun = breakevenData.runs?.[0];
+      if (!breakevenRun) {
         throw new Error(
-          `Could not map any Working Capital fields from linked sheets. Missing: ${missingFields.join(', ')}`,
+          `No linked P&L/Balance run pair found (${missingSources.join(
+            ' + ',
+          )} missing) and no Breakeven run available for fallback.`,
         );
       }
 
-      applyPrefill(patch, 'P&L + Balance Sheet Comparisons');
+      const fallbackPatch = {};
+      const fallbackMissing = [];
+      const breakevenInputs = breakevenRun.inputs || {};
 
-      if (missingFields.length > 0) {
-        setPullError(`Some fields were not prefilled: ${missingFields.join(', ')}.`);
+      if (isFiniteNumber(breakevenInputs.annualRevenue)) {
+        fallbackPatch.annualRevenue = Number(breakevenInputs.annualRevenue);
+      } else {
+        fallbackMissing.push('Annual Revenue');
       }
 
+      if (isFiniteNumber(breakevenInputs.cogsAmount)) {
+        fallbackPatch.annualCogs = Number(breakevenInputs.cogsAmount);
+      } else {
+        fallbackMissing.push('Annual COGS');
+      }
+
+      if (Object.keys(fallbackPatch).length === 0) {
+        throw new Error(
+          `Fallback Breakeven run found (${formatRunTimestamp(
+            breakevenRun.created_at,
+          )}) but Annual Revenue/COGS were unavailable.`,
+        );
+      }
+
+      applyPrefill(fallbackPatch, 'Breakeven fallback');
       setPullAudit(
-        `Prefilled from P&L Comparisons run ${formatRunTimestamp(plRun.created_at)} and Balance Sheet Comparisons run ${formatRunTimestamp(bsRun.created_at)}`,
+        `Prefilled via Breakeven fallback run ${formatRunTimestamp(
+          breakevenRun.created_at,
+        )} because linked ${missingSources.join(' + ')} data was unavailable.`,
+      );
+      setPullError(
+        `Used Breakeven fallback: DSO, DIO, and DPO were not prefilled (they require Balance Sheet values).${
+          fallbackMissing.length > 0 ? ` Also missing from Breakeven run: ${fallbackMissing.join(', ')}.` : ''
+        }`,
       );
       setStepIndex(0);
     } catch (err) {
@@ -368,37 +419,6 @@ export default function WorkingCapitalWizard({ clientId }) {
         <h1>Working Capital Analysis</h1>
         <p>Model cash tied up in receivables and inventory, offset by payables financing, then export to PDF.</p>
       </header>
-
-      <section className="wizard-history" aria-label="Working capital run history">
-        <div className="wizard-history-actions">
-          <button
-            type="button"
-            className="ghost"
-            onClick={() => loadRun(runs[0])}
-            disabled={loading || runsLoading || runs.length === 0}
-          >
-            Continue last run
-          </button>
-          <button type="button" className="ghost" onClick={resetToNewRun} disabled={loading || runsLoading}>
-            Start new run
-          </button>
-          <button type="button" className="ghost" onClick={pullLinkedData} disabled={loading || pullLoading || !clientId}>
-            {pullLoading ? 'Pulling...' : 'Pull from P&L + Balance Sheet'}
-          </button>
-        </div>
-        {pullAudit ? <p className="wizard-meta">{pullAudit}</p> : null}
-        <ul className="wizard-history-list">
-          {runs.slice(0, 10).map((run) => (
-            <li key={run.id}>
-              <span>{formatRunTimestamp(run.created_at)}</span>
-              <button type="button" className="ghost" onClick={() => loadRun(run)} disabled={loading || runsLoading}>
-                Load
-              </button>
-            </li>
-          ))}
-          {!runsLoading && runs.length === 0 ? <li className="wizard-history-empty">No saved runs yet.</li> : null}
-        </ul>
-      </section>
 
       <div className="wizard-progress" aria-hidden="true">
         <span style={{ width: `${progress}%` }} />
@@ -593,6 +613,37 @@ export default function WorkingCapitalWizard({ clientId }) {
           {runId ? <p className="wizard-meta">Saved run ID: {runId}</p> : null}
         </section>
       ) : null}
+
+      <section className="wizard-history" aria-label="Working capital run history">
+        <div className="wizard-history-actions">
+          <button
+            type="button"
+            className="ghost"
+            onClick={() => loadRun(runs[0])}
+            disabled={loading || runsLoading || runs.length === 0}
+          >
+            Continue last run
+          </button>
+          <button type="button" className="ghost" onClick={resetToNewRun} disabled={loading || runsLoading}>
+            Start new run
+          </button>
+          <button type="button" className="ghost" onClick={pullLinkedData} disabled={loading || pullLoading || !clientId}>
+            {pullLoading ? 'Pulling...' : 'Pull from P&L + Balance Sheet'}
+          </button>
+        </div>
+        {pullAudit ? <p className="wizard-meta">{pullAudit}</p> : null}
+        <ul className="wizard-history-list">
+          {runs.slice(0, 10).map((run) => (
+            <li key={run.id}>
+              <span>{formatRunTimestamp(run.created_at)}</span>
+              <button type="button" className="ghost" onClick={() => loadRun(run)} disabled={loading || runsLoading}>
+                Load
+              </button>
+            </li>
+          ))}
+          {!runsLoading && runs.length === 0 ? <li className="wizard-history-empty">No saved runs yet.</li> : null}
+        </ul>
+      </section>
     </section>
   );
 }
