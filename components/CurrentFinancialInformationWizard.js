@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import WorksheetInput from '@/components/worksheet/WorksheetInput';
 
 const steps = [
   { id: 'revenue-margin', title: 'Revenue / Margin', hint: 'Enter annual revenue and COGS.' },
@@ -11,14 +12,14 @@ const steps = [
 ];
 
 const defaultForm = {
-  annualRevenue: 1250000,
-  annualCogs: 700000,
-  annualFixedExpenses: 320000,
-  daysSalesOutstanding: 45,
-  daysInventoryOnHand: 38,
-  daysPayablesOutstanding: 30,
-  workDaysPerYear: 250,
-  workHoursPerDay: 8,
+  annualRevenue: '',
+  annualCogs: '',
+  annualFixedExpenses: '',
+  daysSalesOutstanding: '',
+  daysInventoryOnHand: '',
+  daysPayablesOutstanding: '',
+  workDaysPerYear: '',
+  workHoursPerDay: '',
   optionalNotes: '',
 };
 
@@ -132,9 +133,6 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
         const fetchedRuns = data.runs || [];
         if (cancelled) return;
         setRuns(fetchedRuns);
-        if (fetchedRuns.length > 0) {
-          loadRun(fetchedRuns[0]);
-        }
       } catch (err) {
         if (!cancelled) {
           setError(err.message || 'Unable to load current financial information history.');
@@ -332,20 +330,22 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
           <div className="wizard-fields">
             <label>
               Annual Revenue
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.annualRevenue}
                 onChange={(event) => updateField('annualRevenue', event.target.value)}
+                placeholder="e.g. 1250000"
               />
             </label>
             <label>
               Annual COGS
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.annualCogs}
                 onChange={(event) => updateField('annualCogs', event.target.value)}
+                placeholder="e.g. 700000"
               />
             </label>
           </div>
@@ -355,11 +355,12 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
           <div className="wizard-fields">
             <label>
               Annual Fixed Expenses
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.annualFixedExpenses}
                 onChange={(event) => updateField('annualFixedExpenses', event.target.value)}
+                placeholder="e.g. 320000"
               />
             </label>
             <label>
@@ -378,29 +379,32 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
           <div className="wizard-fields">
             <label>
               Days Sales Outstanding (DSO)
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.daysSalesOutstanding}
                 onChange={(event) => updateField('daysSalesOutstanding', event.target.value)}
+                placeholder="e.g. 45"
               />
             </label>
             <label>
               Days Inventory On Hand (DIO)
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.daysInventoryOnHand}
                 onChange={(event) => updateField('daysInventoryOnHand', event.target.value)}
+                placeholder="e.g. 38"
               />
             </label>
             <label>
               Days Payables Outstanding (DPO)
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.daysPayablesOutstanding}
                 onChange={(event) => updateField('daysPayablesOutstanding', event.target.value)}
+                placeholder="e.g. 30"
               />
             </label>
           </div>
@@ -410,20 +414,22 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
           <div className="wizard-fields">
             <label>
               Work Days Per Year
-              <input
+              <WorksheetInput
                 type="number"
                 min="1"
                 value={form.workDaysPerYear}
                 onChange={(event) => updateField('workDaysPerYear', event.target.value)}
+                placeholder="e.g. 250"
               />
             </label>
             <label>
               Work Hours Per Day
-              <input
+              <WorksheetInput
                 type="number"
                 min="1"
                 value={form.workHoursPerDay}
                 onChange={(event) => updateField('workHoursPerDay', event.target.value)}
+                placeholder="e.g. 8"
               />
             </label>
           </div>

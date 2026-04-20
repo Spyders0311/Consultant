@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import WorksheetInput from '@/components/worksheet/WorksheetInput';
 
 const steps = [
   { id: 'company', title: 'Company Profile', hint: 'Set core company and location details.' },
@@ -9,9 +10,10 @@ const steps = [
 ];
 
 function normalizePrefill(initialClientInfo) {
+  void initialClientInfo;
   return {
-    companyName: initialClientInfo?.companyName || '',
-    industry: initialClientInfo?.industry || '',
+    companyName: '',
+    industry: '',
     primaryContactName: '',
     primaryContactEmail: '',
     primaryContactPhone: '',
@@ -107,9 +109,6 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
         if (cancelled) return;
 
         setRuns(fetchedRuns);
-        if (fetchedRuns.length > 0) {
-          loadRun(fetchedRuns[0]);
-        }
       } catch (err) {
         if (!cancelled) {
           setError(err.message || 'Unable to load basic client info history.');
@@ -287,7 +286,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
           <div className="wizard-fields">
             <label>
               Company Name
-              <input
+              <WorksheetInput
                 type="text"
                 value={form.companyName}
                 onChange={(event) => updateField('companyName', event.target.value)}
@@ -297,7 +296,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
             </label>
             <label>
               Industry
-              <input
+              <WorksheetInput
                 type="text"
                 value={form.industry}
                 onChange={(event) => updateField('industry', event.target.value)}
@@ -307,7 +306,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
             </label>
             <label>
               Location City
-              <input
+              <WorksheetInput
                 type="text"
                 value={form.locationCity}
                 onChange={(event) => updateField('locationCity', event.target.value)}
@@ -317,7 +316,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
             </label>
             <label>
               Location State
-              <input
+              <WorksheetInput
                 type="text"
                 value={form.locationState}
                 onChange={(event) => updateField('locationState', event.target.value)}
@@ -332,7 +331,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
           <div className="wizard-fields">
             <label>
               Primary Contact Name
-              <input
+              <WorksheetInput
                 type="text"
                 value={form.primaryContactName}
                 onChange={(event) => updateField('primaryContactName', event.target.value)}
@@ -342,7 +341,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
             </label>
             <label>
               Primary Contact Email
-              <input
+              <WorksheetInput
                 type="email"
                 value={form.primaryContactEmail}
                 onChange={(event) => updateField('primaryContactEmail', event.target.value)}
@@ -352,7 +351,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
             </label>
             <label>
               Primary Contact Phone
-              <input
+              <WorksheetInput
                 type="text"
                 value={form.primaryContactPhone}
                 onChange={(event) => updateField('primaryContactPhone', event.target.value)}
@@ -377,7 +376,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
             <div className="wizard-fields">
               <label>
                 Company Name
-                <input
+                <WorksheetInput
                   type="text"
                   value={form.companyName}
                   onChange={(event) => updateField('companyName', event.target.value)}
@@ -386,7 +385,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
               </label>
               <label>
                 Industry
-                <input
+                <WorksheetInput
                   type="text"
                   value={form.industry}
                   onChange={(event) => updateField('industry', event.target.value)}
@@ -395,7 +394,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
               </label>
               <label>
                 Primary Contact Name
-                <input
+                <WorksheetInput
                   type="text"
                   value={form.primaryContactName}
                   onChange={(event) => updateField('primaryContactName', event.target.value)}
@@ -404,7 +403,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
               </label>
               <label>
                 Primary Contact Email
-                <input
+                <WorksheetInput
                   type="email"
                   value={form.primaryContactEmail}
                   onChange={(event) => updateField('primaryContactEmail', event.target.value)}
@@ -413,7 +412,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
               </label>
               <label>
                 Primary Contact Phone
-                <input
+                <WorksheetInput
                   type="text"
                   value={form.primaryContactPhone}
                   onChange={(event) => updateField('primaryContactPhone', event.target.value)}
@@ -422,7 +421,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
               </label>
               <label>
                 Location City
-                <input
+                <WorksheetInput
                   type="text"
                   value={form.locationCity}
                   onChange={(event) => updateField('locationCity', event.target.value)}
@@ -431,7 +430,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
               </label>
               <label>
                 Location State
-                <input
+                <WorksheetInput
                   type="text"
                   value={form.locationState}
                   onChange={(event) => updateField('locationState', event.target.value)}

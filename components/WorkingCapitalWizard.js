@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import WorksheetInput from '@/components/worksheet/WorksheetInput';
+import usePrefillableForm from '@/lib/client/usePrefillableForm';
 
 const steps = [
   { id: 'annual', title: 'Annual Inputs', hint: 'Set annual revenue and COGS.' },
@@ -9,16 +11,38 @@ const steps = [
 ];
 
 const defaultForm = {
-  annualRevenue: 1250000,
-  annualCogs: 700000,
-  daysSalesOutstanding: 45,
-  daysInventoryOnHand: 38,
-  daysPayablesOutstanding: 30,
+  annualRevenue: '',
+  annualCogs: '',
+  daysSalesOutstanding: '',
+  daysInventoryOnHand: '',
+  daysPayablesOutstanding: '',
 };
 
 function parseNumber(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function isFiniteNumber(value) {
+  return Number.isFinite(Number(value));
+}
+
+function round1(value) {
+  return Math.round(Number(value) * 10) / 10;
+}
+
+function pickLatestYearRow(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) return null;
+
+  return rows.reduce((latest, row) => {
+    if (!latest) return row;
+    const rowYear = Number(row?.year);
+    const latestYear = Number(latest?.year);
+    if (Number.isFinite(rowYear) && Number.isFinite(latestYear)) {
+      return rowYear >= latestYear ? row : latest;
+    }
+    return row;
+  }, null);
 }
 
 function currency(value) {
@@ -50,15 +74,19 @@ function formatRunTimestamp(value) {
 
 export default function WorkingCapitalWizard({ clientId }) {
   const [stepIndex, setStepIndex] = useState(0);
-  const [form, setForm] = useState(defaultForm);
+  const { form, setFieldValue, resetForm, applyPrefill, clearPrefillTracking, prefilledFields, touchedFields } =
+    usePrefillableForm(defaultForm);
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [pullLoading, setPullLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [runId, setRunId] = useState('');
   const [runs, setRuns] = useState([]);
   const [runsLoading, setRunsLoading] = useState(false);
   const [error, setError] = useState('');
   const [pdfError, setPdfError] = useState('');
+  const [pullError, setPullError] = useState('');
+  const [pullAudit, setPullAudit] = useState('');
 
   const progress = ((stepIndex + 1) / steps.length) * 100;
 
@@ -75,26 +103,30 @@ export default function WorkingCapitalWizard({ clientId }) {
   }, [form, stepIndex]);
 
   function updateField(name, value) {
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setFieldValue(name, value);
   }
 
   function loadRun(run) {
     if (!run) return;
-    setForm({ ...defaultForm, ...(run.inputs || {}) });
+    resetForm({ ...defaultForm, ...(run.inputs || {}) });
     setResult(run.outputs || null);
     setRunId(run.id || '');
     setStepIndex(steps.length - 1);
     setError('');
     setPdfError('');
+    setPullError('');
+    setPullAudit('');
   }
 
   function resetToNewRun() {
-    setForm(defaultForm);
+    resetForm(defaultForm);
     setResult(null);
     setRunId('');
     setStepIndex(0);
     setError('');
     setPdfError('');
+    setPullError('');
+    setPullAudit('');
   }
 
   useEffect(() => {
@@ -115,9 +147,6 @@ export default function WorkingCapitalWizard({ clientId }) {
         const fetchedRuns = data.runs || [];
         if (cancelled) return;
         setRuns(fetchedRuns);
-        if (fetchedRuns.length > 0) {
-          loadRun(fetchedRuns[0]);
-        }
       } catch (err) {
         if (!cancelled) {
           setError(err.message || 'Unable to load working capital history.');
@@ -135,6 +164,111 @@ export default function WorkingCapitalWizard({ clientId }) {
       cancelled = true;
     };
   }, [clientId]);
+
+  async function pullLinkedData() {
+    if (!clientId) return;
+
+    setPullLoading(true);
+    setPullError('');
+    setError('');
+
+    try {
+      const [plResponse, bsResponse] = await Promise.all([
+        fetch(`/api/worksheets/pl-comparisons/runs?client_id=${encodeURIComponent(clientId)}&limit=1`, {
+          cache: 'no-store',
+        }),
+        fetch(`/api/worksheets/balance-sheet-comparisons/runs?client_id=${encodeURIComponent(clientId)}&limit=1`, {
+          cache: 'no-store',
+        }),
+      ]);
+
+      const [plData, bsData] = await Promise.all([plResponse.json(), bsResponse.json()]);
+
+      if (!plResponse.ok || !plData.ok) {
+        throw new Error(plData.error || 'Unable to load P&L Comparisons runs.');
+      }
+      if (!bsResponse.ok || !bsData.ok) {
+        throw new Error(bsData.error || 'Unable to load Balance Sheet Comparisons runs.');
+      }
+
+      const plRun = plData.runs?.[0];
+      const bsRun = bsData.runs?.[0];
+
+      if (!plRun) {
+        throw new Error('No P&L Comparisons runs found to prefill from.');
+      }
+      if (!bsRun) {
+        throw new Error('No Balance Sheet Comparisons runs found to prefill from.');
+      }
+
+      const latestPlYear = pickLatestYearRow(plRun?.inputs?.years);
+      const latestBsYear = pickLatestYearRow(bsRun?.inputs?.years);
+
+      if (!latestPlYear || !latestBsYear) {
+        throw new Error('Latest linked runs are missing year-grid inputs needed for mapping.');
+      }
+
+      const patch = {};
+      const missingFields = [];
+
+      const revenue = Number(latestPlYear.revenue);
+      const cogs = Number(latestPlYear.cogs);
+      const ar = Number(latestBsYear.ar);
+      const inventory = Number(latestBsYear.inventory);
+      const ap = Number(latestBsYear.ap);
+
+      if (isFiniteNumber(revenue)) {
+        patch.annualRevenue = revenue;
+      } else {
+        missingFields.push('Annual Revenue');
+      }
+
+      if (isFiniteNumber(cogs)) {
+        patch.annualCogs = cogs;
+      } else {
+        missingFields.push('Annual COGS');
+      }
+
+      if (isFiniteNumber(revenue) && revenue > 0 && isFiniteNumber(ar)) {
+        patch.daysSalesOutstanding = round1((ar / revenue) * 365);
+      } else {
+        missingFields.push('Days Sales Outstanding (requires Revenue + A/R)');
+      }
+
+      if (isFiniteNumber(cogs) && cogs > 0 && isFiniteNumber(inventory)) {
+        patch.daysInventoryOnHand = round1((inventory / cogs) * 365);
+      } else {
+        missingFields.push('Days Inventory On Hand (requires COGS + Inventory)');
+      }
+
+      if (isFiniteNumber(cogs) && cogs > 0 && isFiniteNumber(ap)) {
+        patch.daysPayablesOutstanding = round1((ap / cogs) * 365);
+      } else {
+        missingFields.push('Days Payables Outstanding (requires COGS + A/P)');
+      }
+
+      if (Object.keys(patch).length === 0) {
+        throw new Error(
+          `Could not map any Working Capital fields from linked sheets. Missing: ${missingFields.join(', ')}`,
+        );
+      }
+
+      applyPrefill(patch, 'P&L + Balance Sheet Comparisons');
+
+      if (missingFields.length > 0) {
+        setPullError(`Some fields were not prefilled: ${missingFields.join(', ')}.`);
+      }
+
+      setPullAudit(
+        `Prefilled from P&L Comparisons run ${formatRunTimestamp(plRun.created_at)} and Balance Sheet Comparisons run ${formatRunTimestamp(bsRun.created_at)}`,
+      );
+      setStepIndex(0);
+    } catch (err) {
+      setPullError(err.message || 'Unable to prefill from linked worksheets.');
+    } finally {
+      setPullLoading(false);
+    }
+  }
 
   async function calculateAndSave(event) {
     event.preventDefault();
@@ -180,6 +314,7 @@ export default function WorkingCapitalWizard({ clientId }) {
       };
       setRunId(savedRun.id);
       setRuns((prev) => [savedRun, ...prev.filter((run) => run.id !== savedRun.id)].slice(0, 10));
+      clearPrefillTracking();
     } catch (err) {
       setError(err.message || 'Unable to complete working capital run.');
     } finally {
@@ -247,7 +382,11 @@ export default function WorkingCapitalWizard({ clientId }) {
           <button type="button" className="ghost" onClick={resetToNewRun} disabled={loading || runsLoading}>
             Start new run
           </button>
+          <button type="button" className="ghost" onClick={pullLinkedData} disabled={loading || pullLoading || !clientId}>
+            {pullLoading ? 'Pulling...' : 'Pull from P&L + Balance Sheet'}
+          </button>
         </div>
+        {pullAudit ? <p className="wizard-meta">{pullAudit}</p> : null}
         <ul className="wizard-history-list">
           {runs.slice(0, 10).map((run) => (
             <li key={run.id}>
@@ -293,20 +432,26 @@ export default function WorkingCapitalWizard({ clientId }) {
           <div className="wizard-fields">
             <label>
               Annual Revenue
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.annualRevenue}
                 onChange={(event) => updateField('annualRevenue', event.target.value)}
+                placeholder="e.g. 1250000"
+                isPrefilled={Boolean(prefilledFields.annualRevenue)}
+                isTouched={Boolean(touchedFields.annualRevenue)}
               />
             </label>
             <label>
               Annual COGS
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.annualCogs}
                 onChange={(event) => updateField('annualCogs', event.target.value)}
+                placeholder="e.g. 700000"
+                isPrefilled={Boolean(prefilledFields.annualCogs)}
+                isTouched={Boolean(touchedFields.annualCogs)}
               />
             </label>
           </div>
@@ -316,29 +461,38 @@ export default function WorkingCapitalWizard({ clientId }) {
           <div className="wizard-fields">
             <label>
               Days Sales Outstanding (DSO)
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.daysSalesOutstanding}
                 onChange={(event) => updateField('daysSalesOutstanding', event.target.value)}
+                placeholder="e.g. 45"
+                isPrefilled={Boolean(prefilledFields.daysSalesOutstanding)}
+                isTouched={Boolean(touchedFields.daysSalesOutstanding)}
               />
             </label>
             <label>
               Days Inventory On Hand (DIO)
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.daysInventoryOnHand}
                 onChange={(event) => updateField('daysInventoryOnHand', event.target.value)}
+                placeholder="e.g. 38"
+                isPrefilled={Boolean(prefilledFields.daysInventoryOnHand)}
+                isTouched={Boolean(touchedFields.daysInventoryOnHand)}
               />
             </label>
             <label>
               Days Payables Outstanding (DPO)
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.daysPayablesOutstanding}
                 onChange={(event) => updateField('daysPayablesOutstanding', event.target.value)}
+                placeholder="e.g. 30"
+                isPrefilled={Boolean(prefilledFields.daysPayablesOutstanding)}
+                isTouched={Boolean(touchedFields.daysPayablesOutstanding)}
               />
             </label>
           </div>
@@ -392,6 +546,7 @@ export default function WorkingCapitalWizard({ clientId }) {
         </div>
 
         {error ? <p className="wizard-error">{error}</p> : null}
+        {pullError ? <p className="wizard-error">{pullError}</p> : null}
         {pdfError ? <p className="wizard-error">{pdfError}</p> : null}
       </form>
 

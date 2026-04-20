@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import WorksheetInput from '@/components/worksheet/WorksheetInput';
 
 const steps = [
   { id: 'grid', title: 'Enter 4 Years', hint: 'Input the core balance sheet lines by year.' },
@@ -23,20 +24,19 @@ const lineItems = [
 ];
 
 function makeDefaultYears() {
-  const currentYear = new Date().getFullYear();
   return Array.from({ length: 4 }, (_, idx) => ({
-    year: currentYear - (3 - idx),
-    cash: 0,
-    ar: 0,
-    inventory: 0,
-    otherCurrentAssets: 0,
-    fixedAssets: 0,
-    otherAssets: 0,
-    ap: 0,
-    otherCurrentLiabilities: 0,
-    longTermDebt: 0,
-    otherLiabilities: 0,
-    equity: 0,
+    year: '',
+    cash: '',
+    ar: '',
+    inventory: '',
+    otherCurrentAssets: '',
+    fixedAssets: '',
+    otherAssets: '',
+    ap: '',
+    otherCurrentLiabilities: '',
+    longTermDebt: '',
+    otherLiabilities: '',
+    equity: '',
   }));
 }
 
@@ -155,9 +155,6 @@ export default function BalanceSheetComparisonsWizard({ clientId }) {
         if (cancelled) return;
 
         setRuns(fetchedRuns);
-        if (fetchedRuns.length > 0) {
-          loadRun(fetchedRuns[0]);
-        }
       } catch (err) {
         if (!cancelled) {
           setError(err.message || 'Unable to load balance sheet comparison history.');
@@ -355,20 +352,22 @@ export default function BalanceSheetComparisonsWizard({ clientId }) {
                 {years.map((row, idx) => (
                   <tr key={`edit-${row.year}-${idx}`}>
                     <td>
-                      <input
+                      <WorksheetInput
                         type="number"
                         min="1900"
                         value={row.year}
                         onChange={(event) => updateYearCell(idx, 'year', event.target.value)}
+                        placeholder="e.g. 2026"
                       />
                     </td>
                     {lineItems.map((item) => (
                       <td key={`cell-${item.key}-${idx}`}>
-                        <input
+                        <WorksheetInput
                           type="number"
                           min="0"
                           value={row[item.key]}
                           onChange={(event) => updateYearCell(idx, item.key, event.target.value)}
+                          placeholder="e.g. 250000"
                         />
                       </td>
                     ))}

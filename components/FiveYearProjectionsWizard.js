@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import WorksheetInput from '@/components/worksheet/WorksheetInput';
 
 const steps = [
   { id: 'base', title: 'Base Inputs', hint: 'Set base year, revenue, and COGS assumptions.' },
@@ -10,12 +11,12 @@ const steps = [
 
 function defaultFormValues() {
   return {
-    baseYear: new Date().getFullYear(),
-    baseRevenue: 1250000,
-    revenueGrowthPercent: 8,
-    baseCogsPercent: 55,
-    baseFixedExpenses: 320000,
-    fixedExpenseGrowthPercent: 3,
+    baseYear: '',
+    baseRevenue: '',
+    revenueGrowthPercent: '',
+    baseCogsPercent: '',
+    baseFixedExpenses: '',
+    fixedExpenseGrowthPercent: '',
     taxRatePercent: '',
   };
 }
@@ -129,9 +130,6 @@ export default function FiveYearProjectionsWizard({ clientId }) {
         const fetchedRuns = data.runs || [];
         if (cancelled) return;
         setRuns(fetchedRuns);
-        if (fetchedRuns.length > 0) {
-          loadRun(fetchedRuns[0]);
-        }
       } catch (err) {
         if (!cancelled) {
           setError(err.message || 'Unable to load five year projection history.');
@@ -309,42 +307,46 @@ export default function FiveYearProjectionsWizard({ clientId }) {
           <div className="wizard-fields">
             <label>
               Base Year
-              <input
+              <WorksheetInput
                 type="number"
                 min="1900"
                 max="3000"
                 value={form.baseYear}
                 onChange={(event) => updateField('baseYear', event.target.value)}
+                placeholder="e.g. 2026"
               />
             </label>
             <label>
               Base Revenue
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.baseRevenue}
                 onChange={(event) => updateField('baseRevenue', event.target.value)}
+                placeholder="e.g. 1250000"
               />
             </label>
             <label>
               Revenue Growth %
-              <input
+              <WorksheetInput
                 type="number"
                 step="0.1"
                 min="-100"
                 value={form.revenueGrowthPercent}
                 onChange={(event) => updateField('revenueGrowthPercent', event.target.value)}
+                placeholder="e.g. 8"
               />
             </label>
             <label>
               Base COGS %
-              <input
+              <WorksheetInput
                 type="number"
                 step="0.1"
                 min="0"
                 max="100"
                 value={form.baseCogsPercent}
                 onChange={(event) => updateField('baseCogsPercent', event.target.value)}
+                placeholder="e.g. 55"
               />
             </label>
           </div>
@@ -354,26 +356,28 @@ export default function FiveYearProjectionsWizard({ clientId }) {
           <div className="wizard-fields">
             <label>
               Base Fixed Expenses
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.baseFixedExpenses}
                 onChange={(event) => updateField('baseFixedExpenses', event.target.value)}
+                placeholder="e.g. 320000"
               />
             </label>
             <label>
               Fixed Expense Growth %
-              <input
+              <WorksheetInput
                 type="number"
                 step="0.1"
                 min="-100"
                 value={form.fixedExpenseGrowthPercent}
                 onChange={(event) => updateField('fixedExpenseGrowthPercent', event.target.value)}
+                placeholder="e.g. 3"
               />
             </label>
             <label>
               Tax Rate % (Optional)
-              <input
+              <WorksheetInput
                 type="number"
                 step="0.1"
                 min="0"

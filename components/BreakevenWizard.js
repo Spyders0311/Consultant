@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import WorksheetInput from '@/components/worksheet/WorksheetInput';
+import usePrefillableForm from '@/lib/client/usePrefillableForm';
 
 const steps = [
   { id: 'revenue', title: 'Revenue & COGS', hint: 'Define annual sales and direct costs.' },
@@ -10,16 +12,34 @@ const steps = [
 ];
 
 const defaultForm = {
-  annualRevenue: 1250000,
-  cogsAmount: 700000,
-  fixedExpensesAmount: 320000,
-  workDaysPerYear: 250,
-  workHoursPerDay: 8,
+  annualRevenue: '',
+  cogsAmount: '',
+  fixedExpensesAmount: '',
+  workDaysPerYear: '',
+  workHoursPerDay: '',
 };
 
 function parseNumber(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function isFiniteNumber(value) {
+  return Number.isFinite(Number(value));
+}
+
+function pickLatestYearRow(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) return null;
+
+  return rows.reduce((latest, row) => {
+    if (!latest) return row;
+    const rowYear = Number(row?.year);
+    const latestYear = Number(latest?.year);
+    if (Number.isFinite(rowYear) && Number.isFinite(latestYear)) {
+      return rowYear >= latestYear ? row : latest;
+    }
+    return row;
+  }, null);
 }
 
 function currency(value) {
@@ -46,15 +66,19 @@ function formatRunTimestamp(value) {
 
 export default function BreakevenWizard({ clientId }) {
   const [stepIndex, setStepIndex] = useState(0);
-  const [form, setForm] = useState(defaultForm);
+  const { form, setFieldValue, resetForm, applyPrefill, clearPrefillTracking, prefilledFields, touchedFields } =
+    usePrefillableForm(defaultForm);
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [pullLoading, setPullLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [runId, setRunId] = useState('');
   const [runs, setRuns] = useState([]);
   const [runsLoading, setRunsLoading] = useState(false);
   const [error, setError] = useState('');
   const [pdfError, setPdfError] = useState('');
+  const [pullError, setPullError] = useState('');
+  const [pullAudit, setPullAudit] = useState('');
 
   const progress = ((stepIndex + 1) / steps.length) * 100;
 
@@ -66,26 +90,30 @@ export default function BreakevenWizard({ clientId }) {
   }, [form, stepIndex]);
 
   function updateField(name, value) {
-    setForm((prev) => ({ ...prev, [name]: value }));
+    setFieldValue(name, value);
   }
 
   function loadRun(run) {
     if (!run) return;
-    setForm({ ...defaultForm, ...(run.inputs || {}) });
+    resetForm({ ...defaultForm, ...(run.inputs || {}) });
     setResult(run.outputs || null);
     setRunId(run.id || '');
     setStepIndex(steps.length - 1);
     setError('');
     setPdfError('');
+    setPullError('');
+    setPullAudit('');
   }
 
   function resetToNewRun() {
-    setForm(defaultForm);
+    resetForm(defaultForm);
     setResult(null);
     setRunId('');
     setStepIndex(0);
     setError('');
     setPdfError('');
+    setPullError('');
+    setPullAudit('');
   }
 
   useEffect(() => {
@@ -106,9 +134,6 @@ export default function BreakevenWizard({ clientId }) {
         const fetchedRuns = data.runs || [];
         if (cancelled) return;
         setRuns(fetchedRuns);
-        if (fetchedRuns.length > 0) {
-          loadRun(fetchedRuns[0]);
-        }
       } catch (err) {
         if (!cancelled) {
           setError(err.message || 'Unable to load breakeven history.');
@@ -126,6 +151,73 @@ export default function BreakevenWizard({ clientId }) {
       cancelled = true;
     };
   }, [clientId]);
+
+  async function pullLinkedData() {
+    if (!clientId) return;
+
+    setPullLoading(true);
+    setPullError('');
+    setError('');
+
+    try {
+      const response = await fetch(
+        `/api/worksheets/pl-comparisons/runs?client_id=${encodeURIComponent(clientId)}&limit=1`,
+        { cache: 'no-store' },
+      );
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error || 'Unable to load P&L Comparisons runs.');
+      }
+
+      const sourceRun = data.runs?.[0];
+      if (!sourceRun) {
+        throw new Error('No P&L Comparisons runs found to prefill from.');
+      }
+
+      const latestYear = pickLatestYearRow(sourceRun?.inputs?.years);
+      if (!latestYear) {
+        throw new Error('Latest P&L run has no 4-year input grid to map from.');
+      }
+
+      const patch = {};
+      const missingFields = [];
+
+      if (isFiniteNumber(latestYear.revenue)) {
+        patch.annualRevenue = Number(latestYear.revenue);
+      } else {
+        missingFields.push('Annual Revenue');
+      }
+
+      if (isFiniteNumber(latestYear.cogs)) {
+        patch.cogsAmount = Number(latestYear.cogs);
+      } else {
+        missingFields.push('COGS Amount');
+      }
+
+      if (isFiniteNumber(latestYear.operatingExpenses) && isFiniteNumber(latestYear.otherExpenses)) {
+        patch.fixedExpensesAmount = Number(latestYear.operatingExpenses) + Number(latestYear.otherExpenses);
+      } else {
+        missingFields.push('Fixed Expenses (Operating + Other)');
+      }
+
+      if (Object.keys(patch).length === 0) {
+        throw new Error(`Could not map any Breakeven fields from P&L Comparisons. Missing: ${missingFields.join(', ')}`);
+      }
+
+      applyPrefill(patch, 'P&L Comparisons');
+
+      if (missingFields.length > 0) {
+        setPullError(`Some fields were not prefilled: ${missingFields.join(', ')}.`);
+      }
+
+      setPullAudit(`Prefilled from P&L Comparisons run ${formatRunTimestamp(sourceRun.created_at)}`);
+      setStepIndex(0);
+    } catch (err) {
+      setPullError(err.message || 'Unable to prefill from P&L Comparisons.');
+    } finally {
+      setPullLoading(false);
+    }
+  }
 
   async function calculateAndSave(event) {
     event.preventDefault();
@@ -171,6 +263,7 @@ export default function BreakevenWizard({ clientId }) {
       };
       setRunId(savedRun.id);
       setRuns((prev) => [savedRun, ...prev.filter((run) => run.id !== savedRun.id)].slice(0, 10));
+      clearPrefillTracking();
     } catch (err) {
       setError(err.message || 'Unable to complete breakeven run.');
     } finally {
@@ -238,7 +331,11 @@ export default function BreakevenWizard({ clientId }) {
           <button type="button" className="ghost" onClick={resetToNewRun} disabled={loading || runsLoading}>
             Start new run
           </button>
+          <button type="button" className="ghost" onClick={pullLinkedData} disabled={loading || pullLoading || !clientId}>
+            {pullLoading ? 'Pulling...' : 'Pull from P&L Comparisons'}
+          </button>
         </div>
+        {pullAudit ? <p className="wizard-meta">{pullAudit}</p> : null}
         <ul className="wizard-history-list">
           {runs.slice(0, 10).map((run) => (
             <li key={run.id}>
@@ -284,20 +381,26 @@ export default function BreakevenWizard({ clientId }) {
           <div className="wizard-fields">
             <label>
               Annual Revenue
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.annualRevenue}
                 onChange={(event) => updateField('annualRevenue', event.target.value)}
+                placeholder="e.g. 1250000"
+                isPrefilled={Boolean(prefilledFields.annualRevenue)}
+                isTouched={Boolean(touchedFields.annualRevenue)}
               />
             </label>
             <label>
               COGS Amount
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.cogsAmount}
                 onChange={(event) => updateField('cogsAmount', event.target.value)}
+                placeholder="e.g. 700000"
+                isPrefilled={Boolean(prefilledFields.cogsAmount)}
+                isTouched={Boolean(touchedFields.cogsAmount)}
               />
             </label>
           </div>
@@ -307,11 +410,14 @@ export default function BreakevenWizard({ clientId }) {
           <div className="wizard-fields">
             <label>
               Fixed Expenses (Annual)
-              <input
+              <WorksheetInput
                 type="number"
                 min="0"
                 value={form.fixedExpensesAmount}
                 onChange={(event) => updateField('fixedExpensesAmount', event.target.value)}
+                placeholder="e.g. 320000"
+                isPrefilled={Boolean(prefilledFields.fixedExpensesAmount)}
+                isTouched={Boolean(touchedFields.fixedExpensesAmount)}
               />
             </label>
           </div>
@@ -321,20 +427,26 @@ export default function BreakevenWizard({ clientId }) {
           <div className="wizard-fields">
             <label>
               Work Days Per Year
-              <input
+              <WorksheetInput
                 type="number"
                 min="1"
                 value={form.workDaysPerYear}
                 onChange={(event) => updateField('workDaysPerYear', event.target.value)}
+                placeholder="e.g. 250"
+                isPrefilled={Boolean(prefilledFields.workDaysPerYear)}
+                isTouched={Boolean(touchedFields.workDaysPerYear)}
               />
             </label>
             <label>
               Work Hours Per Day
-              <input
+              <WorksheetInput
                 type="number"
                 min="1"
                 value={form.workHoursPerDay}
                 onChange={(event) => updateField('workHoursPerDay', event.target.value)}
+                placeholder="e.g. 8"
+                isPrefilled={Boolean(prefilledFields.workHoursPerDay)}
+                isTouched={Boolean(touchedFields.workHoursPerDay)}
               />
             </label>
           </div>
@@ -387,6 +499,7 @@ export default function BreakevenWizard({ clientId }) {
         </div>
 
         {error ? <p className="wizard-error">{error}</p> : null}
+        {pullError ? <p className="wizard-error">{pullError}</p> : null}
         {pdfError ? <p className="wizard-error">{pdfError}</p> : null}
       </form>
 

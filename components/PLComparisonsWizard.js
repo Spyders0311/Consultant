@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import WorksheetInput from '@/components/worksheet/WorksheetInput';
 
 const steps = [
   { id: 'grid', title: 'Enter 4 Years', hint: 'Input revenue and expense buckets by year.' },
@@ -9,13 +10,12 @@ const steps = [
 ];
 
 function makeDefaultYears() {
-  const currentYear = new Date().getFullYear();
   return Array.from({ length: 4 }, (_, idx) => ({
-    year: currentYear - (3 - idx),
-    revenue: 0,
-    cogs: 0,
-    operatingExpenses: 0,
-    otherExpenses: 0,
+    year: '',
+    revenue: '',
+    cogs: '',
+    operatingExpenses: '',
+    otherExpenses: '',
   }));
 }
 
@@ -119,9 +119,6 @@ export default function PLComparisonsWizard({ clientId }) {
         if (cancelled) return;
 
         setRuns(fetchedRuns);
-        if (fetchedRuns.length > 0) {
-          loadRun(fetchedRuns[0]);
-        }
       } catch (err) {
         if (!cancelled) {
           setError(err.message || 'Unable to load P&L comparison history.');
@@ -313,43 +310,48 @@ export default function PLComparisonsWizard({ clientId }) {
                 {years.map((row, idx) => (
                   <tr key={`${row.year}-${idx}`}>
                     <td>
-                      <input
+                      <WorksheetInput
                         type="number"
                         min="1900"
                         value={row.year}
                         onChange={(event) => updateYearCell(idx, 'year', event.target.value)}
+                        placeholder="e.g. 2026"
                       />
                     </td>
                     <td>
-                      <input
+                      <WorksheetInput
                         type="number"
                         min="0"
                         value={row.revenue}
                         onChange={(event) => updateYearCell(idx, 'revenue', event.target.value)}
+                        placeholder="e.g. 1250000"
                       />
                     </td>
                     <td>
-                      <input
+                      <WorksheetInput
                         type="number"
                         min="0"
                         value={row.cogs}
                         onChange={(event) => updateYearCell(idx, 'cogs', event.target.value)}
+                        placeholder="e.g. 700000"
                       />
                     </td>
                     <td>
-                      <input
+                      <WorksheetInput
                         type="number"
                         min="0"
                         value={row.operatingExpenses}
                         onChange={(event) => updateYearCell(idx, 'operatingExpenses', event.target.value)}
+                        placeholder="e.g. 220000"
                       />
                     </td>
                     <td>
-                      <input
+                      <WorksheetInput
                         type="number"
                         min="0"
                         value={row.otherExpenses}
                         onChange={(event) => updateYearCell(idx, 'otherExpenses', event.target.value)}
+                        placeholder="e.g. 80000"
                       />
                     </td>
                   </tr>
