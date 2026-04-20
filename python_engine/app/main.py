@@ -14,6 +14,8 @@ from .models import (
     BasicClientInfoResult,
     BreakevenInput,
     BreakevenResult,
+    CurrentFinancialInformationInput,
+    CurrentFinancialInformationResult,
     PLComparisonsInput,
     WorkingCapitalInput,
     WorkingCapitalResult,
@@ -261,6 +263,75 @@ def calculate_working_capital(payload: dict):
                 "netWorkingCapital": net_working_capital,
                 "cashConversionCycle": cash_conversion_cycle,
                 "workingCapitalPercentOfRevenue": working_capital_percent_of_revenue,
+                "warnings": warnings,
+            }
+        )
+        return {"ok": True, "result": result.model_dump(by_alias=True)}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/current-financial-information/calculate")
+def calculate_current_financial_information(payload: dict):
+    try:
+        validated = CurrentFinancialInformationInput.model_validate(payload)
+
+        annual_revenue = float(validated.annual_revenue)
+        annual_cogs = float(validated.annual_cogs)
+        annual_fixed_expenses = float(validated.annual_fixed_expenses)
+        dso = float(validated.days_sales_outstanding)
+        dio = float(validated.days_inventory_on_hand)
+        dpo = float(validated.days_payables_outstanding)
+        work_days = float(validated.work_days_per_year)
+        work_hours = float(validated.work_hours_per_day)
+
+        gross_margin_amount = annual_revenue - annual_cogs
+        gross_margin_percent = (gross_margin_amount / annual_revenue * 100) if annual_revenue > 0 else 0.0
+
+        warnings: list[str] = []
+
+        if annual_revenue <= 0:
+            warnings.append("Annual revenue is zero. Margin percent and working capital intensity are less meaningful.")
+        if annual_cogs > annual_revenue:
+            warnings.append("Annual COGS exceeds annual revenue. Gross margin is negative.")
+
+        breakeven_revenue = None
+        contribution_margin_ratio = gross_margin_percent / 100
+        if contribution_margin_ratio <= 0:
+            warnings.append("Gross margin is zero or negative. Breakeven revenue cannot be computed.")
+        else:
+            breakeven_revenue = annual_fixed_expenses / contribution_margin_ratio
+
+        ar_investment = (annual_revenue / 365.0) * dso
+        inventory_investment = (annual_cogs / 365.0) * dio
+        ap_financing = (annual_cogs / 365.0) * dpo
+        net_working_capital = ar_investment + inventory_investment - ap_financing
+        cash_conversion_cycle = dso + dio - dpo
+
+        if cash_conversion_cycle < 0:
+            warnings.append("Cash conversion cycle is negative. Verify DPO and cycle assumptions.")
+
+        breakeven_daily = breakeven_revenue / work_days if breakeven_revenue is not None else None
+        breakeven_weekly = breakeven_daily * 5 if breakeven_daily is not None else None
+        breakeven_monthly = breakeven_revenue / 12 if breakeven_revenue is not None else None
+        breakeven_hourly = breakeven_daily / work_hours if breakeven_daily is not None else None
+
+        result = CurrentFinancialInformationResult.model_validate(
+            {
+                "grossMarginAmount": gross_margin_amount,
+                "grossMarginPercent": gross_margin_percent,
+                "breakevenRevenue": breakeven_revenue,
+                "arInvestment": ar_investment,
+                "inventoryInvestment": inventory_investment,
+                "apFinancing": ap_financing,
+                "netWorkingCapital": net_working_capital,
+                "cashConversionCycle": cash_conversion_cycle,
+                "breakevenDaily": breakeven_daily,
+                "breakevenWeekly": breakeven_weekly,
+                "breakevenMonthly": breakeven_monthly,
+                "breakevenHourly": breakeven_hourly,
                 "warnings": warnings,
             }
         )

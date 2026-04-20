@@ -102,6 +102,34 @@ class WorkingCapitalResult(BaseModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class CurrentFinancialInformationInput(BaseModel):
+    annual_revenue: float = Field(alias="annualRevenue", ge=0)
+    annual_cogs: float = Field(alias="annualCogs", ge=0)
+    annual_fixed_expenses: float = Field(alias="annualFixedExpenses", ge=0)
+    days_sales_outstanding: float = Field(alias="daysSalesOutstanding", ge=0)
+    days_inventory_on_hand: float = Field(alias="daysInventoryOnHand", ge=0)
+    days_payables_outstanding: float = Field(alias="daysPayablesOutstanding", ge=0)
+    work_days_per_year: float = Field(alias="workDaysPerYear", ge=1)
+    work_hours_per_day: float = Field(alias="workHoursPerDay", ge=1)
+    optional_notes: str = Field(alias="optionalNotes", default="", max_length=4000)
+
+
+class CurrentFinancialInformationResult(BaseModel):
+    gross_margin_amount: float = Field(alias="grossMarginAmount")
+    gross_margin_percent: float = Field(alias="grossMarginPercent")
+    breakeven_revenue: float | None = Field(alias="breakevenRevenue")
+    ar_investment: float = Field(alias="arInvestment")
+    inventory_investment: float = Field(alias="inventoryInvestment")
+    ap_financing: float = Field(alias="apFinancing")
+    net_working_capital: float = Field(alias="netWorkingCapital")
+    cash_conversion_cycle: float = Field(alias="cashConversionCycle")
+    breakeven_daily: float | None = Field(alias="breakevenDaily")
+    breakeven_weekly: float | None = Field(alias="breakevenWeekly")
+    breakeven_monthly: float | None = Field(alias="breakevenMonthly")
+    breakeven_hourly: float | None = Field(alias="breakevenHourly")
+    warnings: list[str] = Field(default_factory=list)
+
+
 class PLComparisonsYearInput(BaseModel):
     year: int = Field(ge=1900, le=3000)
     revenue: float = Field(ge=0)
