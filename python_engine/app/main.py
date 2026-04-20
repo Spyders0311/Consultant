@@ -10,6 +10,8 @@ from .models import (
     AnalystWizardInput,
     AnalystWizardResult,
     BalanceSheetComparisonsInput,
+    BasicClientInfoInput,
+    BasicClientInfoResult,
     BreakevenInput,
     BreakevenResult,
     PLComparisonsInput,
@@ -62,6 +64,29 @@ def health() -> dict:
     return {"ok": True, "engineVersion": ENGINE_VERSION}
 
 
+def _normalize_text(value: str) -> str | None:
+    normalized = " ".join((value or "").split()).strip()
+    return normalized or None
+
+
+def _normalize_email(value: str) -> str | None:
+    normalized = _normalize_text(value)
+    return normalized.lower() if normalized else None
+
+
+def _normalize_phone(value: str) -> str | None:
+    normalized = _normalize_text(value)
+    if not normalized:
+        return None
+
+    digits = "".join(ch for ch in normalized if ch.isdigit())
+    if len(digits) == 10:
+        return f"({digits[0:3]}) {digits[3:6]}-{digits[6:10]}"
+    if len(digits) == 11 and digits.startswith("1"):
+        return f"+1 ({digits[1:4]}) {digits[4:7]}-{digits[7:11]}"
+    return normalized
+
+
 @app.post("/api/v1/analyst/calculate")
 def calculate(payload: dict):
     try:
@@ -82,6 +107,63 @@ def calculate(payload: dict):
                     "sheetCount": WORKBOOK_CONTEXT.sheet_count,
                     "sheetNamesSample": WORKBOOK_CONTEXT.sheet_names[:10],
                 },
+            }
+        )
+        return {"ok": True, "result": result.model_dump(by_alias=True)}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/basic-client-info/calculate")
+def calculate_basic_client_info(payload: dict):
+    try:
+        validated = BasicClientInfoInput.model_validate(payload)
+
+        normalized = {
+            "companyName": _normalize_text(validated.company_name),
+            "industry": _normalize_text(validated.industry),
+            "primaryContactName": _normalize_text(validated.primary_contact_name),
+            "primaryContactEmail": _normalize_email(validated.primary_contact_email),
+            "primaryContactPhone": _normalize_phone(validated.primary_contact_phone),
+            "locationCity": _normalize_text(validated.location_city),
+            "locationState": _normalize_text(validated.location_state),
+            "notes": _normalize_text(validated.notes),
+        }
+
+        warnings: list[str] = []
+        if not normalized["primaryContactName"]:
+            warnings.append("Primary contact name is missing.")
+        if not normalized["primaryContactEmail"]:
+            warnings.append("Primary contact email is missing.")
+        if not normalized["primaryContactPhone"]:
+            warnings.append("Primary contact phone is missing.")
+
+        location = "n/a"
+        if normalized["locationCity"] and normalized["locationState"]:
+            location = f"{normalized['locationCity']}, {normalized['locationState']}"
+        elif normalized["locationCity"]:
+            location = normalized["locationCity"]
+        elif normalized["locationState"]:
+            location = normalized["locationState"]
+
+        summary_lines = [
+            f"Company: {normalized['companyName'] or 'n/a'}",
+            f"Industry: {normalized['industry'] or 'n/a'}",
+            f"Primary Contact: {normalized['primaryContactName'] or 'n/a'}",
+            f"Contact Email: {normalized['primaryContactEmail'] or 'n/a'}",
+            f"Contact Phone: {normalized['primaryContactPhone'] or 'n/a'}",
+            f"Location: {location}",
+        ]
+        if normalized["notes"]:
+            summary_lines.append(f"Notes: {normalized['notes']}")
+
+        result = BasicClientInfoResult.model_validate(
+            {
+                **normalized,
+                "summaryBlock": "\n".join(summary_lines),
+                "warnings": warnings,
             }
         )
         return {"ok": True, "result": result.model_dump(by_alias=True)}

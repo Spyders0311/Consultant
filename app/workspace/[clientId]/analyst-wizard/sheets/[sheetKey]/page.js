@@ -1,16 +1,34 @@
 import worksheetCatalog from '@/knowledge/workbooks/worksheet_catalog.json';
+import BasicClientInfoWizard from '@/components/BasicClientInfoWizard';
 import BalanceSheetComparisonsWizard from '@/components/BalanceSheetComparisonsWizard';
 import BreakevenWizard from '@/components/BreakevenWizard';
 import PLComparisonsWizard from '@/components/PLComparisonsWizard';
 import WorkingCapitalWizard from '@/components/WorkingCapitalWizard';
+import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 
 export default async function AnalystWizardSheetPlaceholderPage({ params }) {
   const { sheetKey, clientId } = await params;
   const worksheet = worksheetCatalog.find((entry) => entry.key === sheetKey);
+  let initialClientInfo = null;
 
   if (!worksheet) {
     notFound();
+  }
+
+  if (sheetKey === 'basic-client-info') {
+    const supabase = await createClient();
+    const { data: client } = await supabase
+      .from('clients')
+      .select('company_name, industry')
+      .eq('id', clientId)
+      .maybeSingle();
+
+    initialClientInfo = {
+      companyName: client?.company_name || '',
+      industry: client?.industry || '',
+    };
+    return <BasicClientInfoWizard clientId={clientId} initialClientInfo={initialClientInfo} />;
   }
 
   if (sheetKey === 'breakeven-analysis') {

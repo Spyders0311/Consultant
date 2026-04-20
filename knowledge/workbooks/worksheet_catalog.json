@@ -368,7 +368,7 @@
   {
     "key": "current-financial-information",
     "sheetName": "CURRENT FINANCIAL INFORMATION",
-    "category": "bms-forms",
+    "category": "analyst-wizard",
     "priorityRank": 100
   },
   {

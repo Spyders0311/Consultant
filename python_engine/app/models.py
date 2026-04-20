@@ -131,3 +131,27 @@ class BalanceSheetComparisonsYearInput(BaseModel):
 
 class BalanceSheetComparisonsInput(BaseModel):
     years: list[BalanceSheetComparisonsYearInput] = Field(min_length=1, max_length=10)
+
+
+class BasicClientInfoInput(BaseModel):
+    company_name: str = Field(alias="companyName", default="", max_length=160)
+    industry: str = Field(default="", max_length=120)
+    primary_contact_name: str = Field(alias="primaryContactName", default="", max_length=120)
+    primary_contact_email: str = Field(alias="primaryContactEmail", default="", max_length=200)
+    primary_contact_phone: str = Field(alias="primaryContactPhone", default="", max_length=40)
+    location_city: str = Field(alias="locationCity", default="", max_length=120)
+    location_state: str = Field(alias="locationState", default="", max_length=120)
+    notes: str = Field(default="", max_length=4000)
+
+
+class BasicClientInfoResult(BaseModel):
+    company_name: str | None = Field(alias="companyName")
+    industry: str | None
+    primary_contact_name: str | None = Field(alias="primaryContactName")
+    primary_contact_email: str | None = Field(alias="primaryContactEmail")
+    primary_contact_phone: str | None = Field(alias="primaryContactPhone")
+    location_city: str | None = Field(alias="locationCity")
+    location_state: str | None = Field(alias="locationState")
+    notes: str | None
+    summary_block: str = Field(alias="summaryBlock")
+    warnings: list[str] = Field(default_factory=list)
