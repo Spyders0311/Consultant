@@ -16,6 +16,8 @@ from .models import (
     BreakevenResult,
     CurrentFinancialInformationInput,
     CurrentFinancialInformationResult,
+    FiveYearProjectionsInput,
+    FiveYearProjectionsResult,
     PLComparisonsInput,
     WorkingCapitalInput,
     WorkingCapitalResult,
@@ -332,6 +334,79 @@ def calculate_current_financial_information(payload: dict):
                 "breakevenWeekly": breakeven_weekly,
                 "breakevenMonthly": breakeven_monthly,
                 "breakevenHourly": breakeven_hourly,
+                "warnings": warnings,
+            }
+        )
+        return {"ok": True, "result": result.model_dump(by_alias=True)}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/five-year-projections/calculate")
+def calculate_five_year_projections(payload: dict):
+    try:
+        validated = FiveYearProjectionsInput.model_validate(payload)
+
+        base_year = int(validated.base_year)
+        initial_revenue = float(validated.base_revenue)
+        revenue_growth_rate = float(validated.revenue_growth_percent) / 100.0
+        cogs_rate = float(validated.base_cogs_percent) / 100.0
+        initial_fixed_expenses = float(validated.base_fixed_expenses)
+        fixed_expense_growth_rate = float(validated.fixed_expense_growth_percent) / 100.0
+        tax_rate = (
+            None if validated.tax_rate_percent is None else float(validated.tax_rate_percent) / 100.0
+        )
+
+        warnings: list[str] = []
+        if initial_revenue == 0:
+            warnings.append("Base revenue is zero. Margin metrics and earnings may be less meaningful.")
+        if tax_rate is None:
+            warnings.append("Tax rate not provided. Taxes and net income were omitted.")
+
+        years: list[dict] = []
+
+        for offset in range(5):
+            year = base_year + offset
+            revenue = initial_revenue * ((1 + revenue_growth_rate) ** offset)
+            cogs = revenue * cogs_rate
+            gross_profit = revenue - cogs
+            gross_margin_pct = (gross_profit / revenue * 100) if revenue > 0 else None
+
+            fixed_expenses = initial_fixed_expenses * ((1 + fixed_expense_growth_rate) ** offset)
+            ebitda = gross_profit - fixed_expenses
+            ebitda_margin_pct = (ebitda / revenue * 100) if revenue > 0 else None
+
+            taxes = None
+            net_income = None
+            if tax_rate is not None:
+                taxes = max(0.0, ebitda * tax_rate)
+                net_income = ebitda - taxes
+
+            years.append(
+                {
+                    "year": year,
+                    "revenue": revenue,
+                    "cogs": cogs,
+                    "grossProfit": gross_profit,
+                    "grossMarginPct": gross_margin_pct,
+                    "fixedExpenses": fixed_expenses,
+                    "ebitda": ebitda,
+                    "ebitdaMarginPct": ebitda_margin_pct,
+                    "taxes": taxes,
+                    "netIncome": net_income,
+                }
+            )
+
+        if all((row.get("ebitda") or 0) < 0 for row in years):
+            warnings.append("EBITDA is negative in every projected year. Review pricing, COGS, and fixed cost inputs.")
+        if any((row.get("grossMarginPct") or 0) < 0 for row in years):
+            warnings.append("Gross margin is negative in at least one projected year.")
+
+        result = FiveYearProjectionsResult.model_validate(
+            {
+                "years": years,
                 "warnings": warnings,
             }
         )

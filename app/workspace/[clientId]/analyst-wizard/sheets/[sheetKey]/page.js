@@ -3,6 +3,7 @@ import BasicClientInfoWizard from '@/components/BasicClientInfoWizard';
 import BalanceSheetComparisonsWizard from '@/components/BalanceSheetComparisonsWizard';
 import BreakevenWizard from '@/components/BreakevenWizard';
 import CurrentFinancialInformationWizard from '@/components/CurrentFinancialInformationWizard';
+import FiveYearProjectionsWizard from '@/components/FiveYearProjectionsWizard';
 import PLComparisonsWizard from '@/components/PLComparisonsWizard';
 import WorkingCapitalWizard from '@/components/WorkingCapitalWizard';
 import { createClient } from '@/lib/supabase/server';
@@ -46,6 +47,9 @@ export default async function AnalystWizardSheetPlaceholderPage({ params }) {
   }
   if (sheetKey === 'current-financial-information') {
     return <CurrentFinancialInformationWizard clientId={clientId} />;
+  }
+  if (sheetKey === '5-year-projections') {
+    return <FiveYearProjectionsWizard clientId={clientId} />;
   }
 
   return (

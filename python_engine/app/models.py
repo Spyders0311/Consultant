@@ -102,6 +102,34 @@ class WorkingCapitalResult(BaseModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+class FiveYearProjectionsInput(BaseModel):
+    base_year: int = Field(alias="baseYear", ge=1900, le=3000)
+    base_revenue: float = Field(alias="baseRevenue", ge=0)
+    revenue_growth_percent: float = Field(alias="revenueGrowthPercent", ge=-100, le=500)
+    base_cogs_percent: float = Field(alias="baseCogsPercent", ge=0, le=100)
+    base_fixed_expenses: float = Field(alias="baseFixedExpenses", ge=0)
+    fixed_expense_growth_percent: float = Field(alias="fixedExpenseGrowthPercent", ge=-100, le=500)
+    tax_rate_percent: float | None = Field(alias="taxRatePercent", ge=0, le=100, default=None)
+
+
+class FiveYearProjectionRow(BaseModel):
+    year: int
+    revenue: float
+    cogs: float
+    gross_profit: float = Field(alias="grossProfit")
+    gross_margin_pct: float | None = Field(alias="grossMarginPct")
+    fixed_expenses: float = Field(alias="fixedExpenses")
+    ebitda: float
+    ebitda_margin_pct: float | None = Field(alias="ebitdaMarginPct")
+    taxes: float | None = None
+    net_income: float | None = Field(alias="netIncome", default=None)
+
+
+class FiveYearProjectionsResult(BaseModel):
+    years: list[FiveYearProjectionRow] = Field(min_length=5, max_length=5)
+    warnings: list[str] = Field(default_factory=list)
+
+
 class CurrentFinancialInformationInput(BaseModel):
     annual_revenue: float = Field(alias="annualRevenue", ge=0)
     annual_cogs: float = Field(alias="annualCogs", ge=0)
