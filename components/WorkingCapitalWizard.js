@@ -3,18 +3,17 @@
 import { useEffect, useMemo, useState } from 'react';
 
 const steps = [
-  { id: 'revenue', title: 'Revenue & COGS', hint: 'Define annual sales and direct costs.' },
-  { id: 'fixed', title: 'Fixed Expenses', hint: 'Set annual overhead that must be covered.' },
-  { id: 'capacity', title: 'Work Capacity', hint: 'Convert annual breakeven into daily/hourly targets.' },
+  { id: 'annual', title: 'Annual Inputs', hint: 'Set annual revenue and COGS.' },
+  { id: 'days', title: 'Cycle Days', hint: 'Set DSO, DIO, and DPO assumptions.' },
   { id: 'review', title: 'Review & Run', hint: 'Confirm assumptions and run calculation.' },
 ];
 
 const defaultForm = {
   annualRevenue: 1250000,
-  cogsAmount: 700000,
-  fixedExpensesAmount: 320000,
-  workDaysPerYear: 250,
-  workHoursPerDay: 8,
+  annualCogs: 700000,
+  daysSalesOutstanding: 45,
+  daysInventoryOnHand: 38,
+  daysPayablesOutstanding: 30,
 };
 
 function parseNumber(value) {
@@ -27,6 +26,11 @@ function currency(value) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(
     Number(value),
   );
+}
+
+function number(value, maximumFractionDigits = 1) {
+  if (value === null || value === undefined || Number.isNaN(Number(value))) return 'n/a';
+  return new Intl.NumberFormat('en-US', { maximumFractionDigits }).format(Number(value));
 }
 
 function percent(value) {
@@ -44,7 +48,7 @@ function formatRunTimestamp(value) {
   });
 }
 
-export default function BreakevenWizard({ clientId }) {
+export default function WorkingCapitalWizard({ clientId }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [form, setForm] = useState(defaultForm);
   const [loading, setLoading] = useState(false);
@@ -59,9 +63,14 @@ export default function BreakevenWizard({ clientId }) {
   const progress = ((stepIndex + 1) / steps.length) * 100;
 
   const canAdvance = useMemo(() => {
-    if (stepIndex === 0) return parseNumber(form.annualRevenue) > 0;
-    if (stepIndex === 1) return parseNumber(form.fixedExpensesAmount) >= 0;
-    if (stepIndex === 2) return parseNumber(form.workDaysPerYear) > 0 && parseNumber(form.workHoursPerDay) > 0;
+    if (stepIndex === 0) return parseNumber(form.annualRevenue) >= 0 && parseNumber(form.annualCogs) >= 0;
+    if (stepIndex === 1) {
+      return (
+        parseNumber(form.daysSalesOutstanding) >= 0 &&
+        parseNumber(form.daysInventoryOnHand) >= 0 &&
+        parseNumber(form.daysPayablesOutstanding) >= 0
+      );
+    }
     return true;
   }, [form, stepIndex]);
 
@@ -95,12 +104,12 @@ export default function BreakevenWizard({ clientId }) {
       if (!clientId) return;
       setRunsLoading(true);
       try {
-        const response = await fetch(`/api/worksheets/breakeven/runs?client_id=${encodeURIComponent(clientId)}`, {
+        const response = await fetch(`/api/worksheets/working-capital/runs?client_id=${encodeURIComponent(clientId)}`, {
           cache: 'no-store',
         });
         const data = await response.json();
         if (!response.ok || !data.ok) {
-          throw new Error(data.error || 'Unable to load breakeven history.');
+          throw new Error(data.error || 'Unable to load working capital history.');
         }
 
         const fetchedRuns = data.runs || [];
@@ -111,7 +120,7 @@ export default function BreakevenWizard({ clientId }) {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err.message || 'Unable to load breakeven history.');
+          setError(err.message || 'Unable to load working capital history.');
         }
       } finally {
         if (!cancelled) {
@@ -135,25 +144,25 @@ export default function BreakevenWizard({ clientId }) {
     try {
       const payload = {
         annualRevenue: parseNumber(form.annualRevenue),
-        cogsAmount: parseNumber(form.cogsAmount),
-        fixedExpensesAmount: parseNumber(form.fixedExpensesAmount),
-        workDaysPerYear: parseNumber(form.workDaysPerYear),
-        workHoursPerDay: parseNumber(form.workHoursPerDay),
+        annualCogs: parseNumber(form.annualCogs),
+        daysSalesOutstanding: parseNumber(form.daysSalesOutstanding),
+        daysInventoryOnHand: parseNumber(form.daysInventoryOnHand),
+        daysPayablesOutstanding: parseNumber(form.daysPayablesOutstanding),
       };
 
-      const calculationResponse = await fetch('/api/worksheets/breakeven/calculate', {
+      const calculationResponse = await fetch('/api/worksheets/working-capital/calculate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       const calculationData = await calculationResponse.json();
       if (!calculationResponse.ok || !calculationData.ok) {
-        throw new Error(calculationData.error || 'Breakeven calculation failed.');
+        throw new Error(calculationData.error || 'Working capital calculation failed.');
       }
 
       setResult(calculationData.result);
 
-      const runResponse = await fetch('/api/worksheets/breakeven/runs', {
+      const runResponse = await fetch('/api/worksheets/working-capital/runs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ client_id: clientId, inputs: payload, outputs: calculationData.result }),
@@ -172,7 +181,7 @@ export default function BreakevenWizard({ clientId }) {
       setRunId(savedRun.id);
       setRuns((prev) => [savedRun, ...prev.filter((run) => run.id !== savedRun.id)].slice(0, 10));
     } catch (err) {
-      setError(err.message || 'Unable to complete breakeven run.');
+      setError(err.message || 'Unable to complete working capital run.');
     } finally {
       setLoading(false);
     }
@@ -188,7 +197,7 @@ export default function BreakevenWizard({ clientId }) {
       const response = await fetch('/api/pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'breakeven', result: { ...result, clientId, runId } }),
+        body: JSON.stringify({ model: 'working-capital', result: { ...result, clientId, runId } }),
       });
 
       if (!response.ok) {
@@ -205,7 +214,7 @@ export default function BreakevenWizard({ clientId }) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'bms-breakeven-analysis-report.pdf';
+      link.download = 'bms-working-capital-analysis-report.pdf';
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -221,11 +230,11 @@ export default function BreakevenWizard({ clientId }) {
     <section className="wizard-shell">
       <header className="wizard-header">
         <p className="wizard-kicker">Analyst Program</p>
-        <h1>Breakeven Analysis</h1>
-        <p>Walk through assumptions, run protected backend calculations, and export a consultant-ready PDF.</p>
+        <h1>Working Capital Analysis</h1>
+        <p>Model cash tied up in receivables and inventory, offset by payables financing, then export to PDF.</p>
       </header>
 
-      <section className="wizard-history" aria-label="Breakeven run history">
+      <section className="wizard-history" aria-label="Working capital run history">
         <div className="wizard-history-actions">
           <button
             type="button"
@@ -292,12 +301,12 @@ export default function BreakevenWizard({ clientId }) {
               />
             </label>
             <label>
-              COGS Amount
+              Annual COGS
               <input
                 type="number"
                 min="0"
-                value={form.cogsAmount}
-                onChange={(event) => updateField('cogsAmount', event.target.value)}
+                value={form.annualCogs}
+                onChange={(event) => updateField('annualCogs', event.target.value)}
               />
             </label>
           </div>
@@ -306,59 +315,55 @@ export default function BreakevenWizard({ clientId }) {
         {stepIndex === 1 && (
           <div className="wizard-fields">
             <label>
-              Fixed Expenses (Annual)
+              Days Sales Outstanding (DSO)
               <input
                 type="number"
                 min="0"
-                value={form.fixedExpensesAmount}
-                onChange={(event) => updateField('fixedExpensesAmount', event.target.value)}
+                value={form.daysSalesOutstanding}
+                onChange={(event) => updateField('daysSalesOutstanding', event.target.value)}
+              />
+            </label>
+            <label>
+              Days Inventory On Hand (DIO)
+              <input
+                type="number"
+                min="0"
+                value={form.daysInventoryOnHand}
+                onChange={(event) => updateField('daysInventoryOnHand', event.target.value)}
+              />
+            </label>
+            <label>
+              Days Payables Outstanding (DPO)
+              <input
+                type="number"
+                min="0"
+                value={form.daysPayablesOutstanding}
+                onChange={(event) => updateField('daysPayablesOutstanding', event.target.value)}
               />
             </label>
           </div>
         )}
 
         {stepIndex === 2 && (
-          <div className="wizard-fields">
-            <label>
-              Work Days Per Year
-              <input
-                type="number"
-                min="1"
-                value={form.workDaysPerYear}
-                onChange={(event) => updateField('workDaysPerYear', event.target.value)}
-              />
-            </label>
-            <label>
-              Work Hours Per Day
-              <input
-                type="number"
-                min="1"
-                value={form.workHoursPerDay}
-                onChange={(event) => updateField('workHoursPerDay', event.target.value)}
-              />
-            </label>
-          </div>
-        )}
-
-        {stepIndex === 3 && (
           <div className="client-review-grid">
             <article>
               <span>Annual Revenue</span>
               <strong>{currency(form.annualRevenue)}</strong>
             </article>
             <article>
-              <span>COGS</span>
-              <strong>{currency(form.cogsAmount)}</strong>
+              <span>Annual COGS</span>
+              <strong>{currency(form.annualCogs)}</strong>
             </article>
             <article>
-              <span>Fixed Expenses</span>
-              <strong>{currency(form.fixedExpensesAmount)}</strong>
-            </article>
-            <article>
-              <span>Work Capacity</span>
+              <span>Cash Conversion Cycle Inputs</span>
               <strong>
-                {parseNumber(form.workDaysPerYear)} days x {parseNumber(form.workHoursPerDay)} hrs
+                DSO {number(form.daysSalesOutstanding)} + DIO {number(form.daysInventoryOnHand)} - DPO{' '}
+                {number(form.daysPayablesOutstanding)}
               </strong>
+            </article>
+            <article>
+              <span>Current Run</span>
+              <strong>{runId ? `Loaded run ${runId.slice(0, 8)}...` : 'New run (unsaved)'}</strong>
             </article>
           </div>
         )}
@@ -378,7 +383,7 @@ export default function BreakevenWizard({ clientId }) {
             </button>
           ) : (
             <button type="submit" disabled={loading}>
-              {loading ? 'Running...' : 'Run Breakeven Analysis'}
+              {loading ? 'Running...' : 'Run Working Capital Analysis'}
             </button>
           )}
           <button type="button" disabled={!result || pdfLoading} onClick={downloadPdf}>
@@ -394,46 +399,38 @@ export default function BreakevenWizard({ clientId }) {
         <section className="wizard-result">
           <div className="wizard-kpis">
             <article>
-              <span>Gross Margin ($)</span>
-              <strong>{currency(result.grossMarginAmount)}</strong>
+              <span>A/R Investment</span>
+              <strong>{currency(result.arInvestment)}</strong>
             </article>
             <article>
-              <span>Gross Margin (%)</span>
-              <strong>{percent(result.grossMarginPercent)}</strong>
+              <span>Inventory Investment</span>
+              <strong>{currency(result.inventoryInvestment)}</strong>
             </article>
             <article>
-              <span>Breakeven Revenue</span>
-              <strong>{currency(result.breakevenRevenue)}</strong>
+              <span>A/P Financing</span>
+              <strong>{currency(result.apFinancing)}</strong>
             </article>
             <article>
-              <span>Breakeven % of Current Revenue</span>
-              <strong>{percent(result.breakevenPercent)}</strong>
+              <span>Net Working Capital</span>
+              <strong>{currency(result.netWorkingCapital)}</strong>
             </article>
           </div>
 
           <div className="wizard-kpis">
             <article>
-              <span>Breakeven Monthly</span>
-              <strong>{currency(result.breakevenMonthly)}</strong>
+              <span>Cash Conversion Cycle</span>
+              <strong>{number(result.cashConversionCycle, 2)} days</strong>
             </article>
             <article>
-              <span>Breakeven Weekly</span>
-              <strong>{currency(result.breakevenWeekly)}</strong>
-            </article>
-            <article>
-              <span>Breakeven Daily</span>
-              <strong>{currency(result.breakevenDaily)}</strong>
-            </article>
-            <article>
-              <span>Breakeven Hourly</span>
-              <strong>{currency(result.breakevenHourly)}</strong>
+              <span>Working Capital % of Revenue</span>
+              <strong>{percent(result.workingCapitalPercentOfRevenue)}</strong>
             </article>
           </div>
 
-          {(result.notes || []).length > 0 ? (
+          {(result.warnings || []).length > 0 ? (
             <ul className="warnings">
-              {result.notes.map((note) => (
-                <li key={note}>{note}</li>
+              {result.warnings.map((warning) => (
+                <li key={warning}>{warning}</li>
               ))}
             </ul>
           ) : null}

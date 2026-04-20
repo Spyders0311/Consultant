@@ -6,7 +6,14 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from .calculation_service import run_projection
-from .models import AnalystWizardInput, AnalystWizardResult, BreakevenInput, BreakevenResult
+from .models import (
+    AnalystWizardInput,
+    AnalystWizardResult,
+    BreakevenInput,
+    BreakevenResult,
+    WorkingCapitalInput,
+    WorkingCapitalResult,
+)
 from .spreadsheet_context import WorkbookContext, load_workbook_context
 
 ENGINE_VERSION = "1.0.0"
@@ -128,6 +135,49 @@ def calculate_breakeven(payload: dict):
                 "breakevenDaily": breakeven_daily,
                 "breakevenHourly": breakeven_hourly,
                 "notes": warnings,
+            }
+        )
+        return {"ok": True, "result": result.model_dump(by_alias=True)}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/working-capital/calculate")
+def calculate_working_capital(payload: dict):
+    try:
+        validated = WorkingCapitalInput.model_validate(payload)
+
+        annual_revenue = float(validated.annual_revenue)
+        annual_cogs = float(validated.annual_cogs)
+        dso = float(validated.days_sales_outstanding)
+        dio = float(validated.days_inventory_on_hand)
+        dpo = float(validated.days_payables_outstanding)
+
+        ar_investment = (annual_revenue / 365.0) * dso
+        inventory_investment = (annual_cogs / 365.0) * dio
+        ap_financing = (annual_cogs / 365.0) * dpo
+        net_working_capital = ar_investment + inventory_investment - ap_financing
+        cash_conversion_cycle = dso + dio - dpo
+
+        warnings: list[str] = []
+        if annual_revenue <= 0:
+            warnings.append("Annual revenue is zero. Working capital as a percent of revenue cannot be computed.")
+
+        working_capital_percent_of_revenue = (
+            (net_working_capital / annual_revenue) * 100 if annual_revenue > 0 else None
+        )
+
+        result = WorkingCapitalResult.model_validate(
+            {
+                "arInvestment": ar_investment,
+                "inventoryInvestment": inventory_investment,
+                "apFinancing": ap_financing,
+                "netWorkingCapital": net_working_capital,
+                "cashConversionCycle": cash_conversion_cycle,
+                "workingCapitalPercentOfRevenue": working_capital_percent_of_revenue,
+                "warnings": warnings,
             }
         )
         return {"ok": True, "result": result.model_dump(by_alias=True)}

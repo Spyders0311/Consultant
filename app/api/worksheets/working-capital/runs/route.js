@@ -27,7 +27,7 @@ export async function GET(request) {
   const limit = parseLimit(searchParams.get('limit'));
 
   const { data, error } = await supabase
-    .from('client_breakeven_runs')
+    .from('client_working_capital_runs')
     .select('id, created_at, inputs, outputs')
     .eq('client_id', clientId)
     .order('created_at', { ascending: false })
@@ -35,7 +35,7 @@ export async function GET(request) {
 
   if (error) {
     return NextResponse.json(
-      { ok: false, error: error.message || 'Failed to load breakeven runs.' },
+      { ok: false, error: error.message || 'Failed to load working capital runs.' },
       { status: 500 },
     );
   }
@@ -73,14 +73,14 @@ export async function POST(request) {
   };
 
   const { data, error } = await supabase
-    .from('client_breakeven_runs')
+    .from('client_working_capital_runs')
     .insert(insertPayload)
     .select('id')
     .single();
 
   if (error) {
     return NextResponse.json(
-      { ok: false, error: error.message || 'Failed to save breakeven run.' },
+      { ok: false, error: error.message || 'Failed to save working capital run.' },
       { status: 500 },
     );
   }

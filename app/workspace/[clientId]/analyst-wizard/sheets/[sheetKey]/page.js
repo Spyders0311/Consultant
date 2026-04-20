@@ -1,5 +1,6 @@
 import worksheetCatalog from '@/knowledge/workbooks/worksheet_catalog.json';
 import BreakevenWizard from '@/components/BreakevenWizard';
+import WorkingCapitalWizard from '@/components/WorkingCapitalWizard';
 import { notFound } from 'next/navigation';
 
 export default async function AnalystWizardSheetPlaceholderPage({ params }) {
@@ -12,6 +13,9 @@ export default async function AnalystWizardSheetPlaceholderPage({ params }) {
 
   if (sheetKey === 'breakeven-analysis') {
     return <BreakevenWizard clientId={clientId} />;
+  }
+  if (sheetKey === 'working-capital-analysis') {
+    return <WorkingCapitalWizard clientId={clientId} />;
   }
 
   return (

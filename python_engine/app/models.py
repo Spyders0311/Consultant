@@ -82,3 +82,21 @@ class BreakevenResult(BaseModel):
     breakeven_daily: float | None = Field(alias="breakevenDaily")
     breakeven_hourly: float | None = Field(alias="breakevenHourly")
     notes: list[str] = Field(default_factory=list)
+
+
+class WorkingCapitalInput(BaseModel):
+    annual_revenue: float = Field(alias="annualRevenue", ge=0)
+    annual_cogs: float = Field(alias="annualCogs", ge=0)
+    days_sales_outstanding: float = Field(alias="daysSalesOutstanding", ge=0)
+    days_inventory_on_hand: float = Field(alias="daysInventoryOnHand", ge=0)
+    days_payables_outstanding: float = Field(alias="daysPayablesOutstanding", ge=0)
+
+
+class WorkingCapitalResult(BaseModel):
+    ar_investment: float = Field(alias="arInvestment")
+    inventory_investment: float = Field(alias="inventoryInvestment")
+    ap_financing: float = Field(alias="apFinancing")
+    net_working_capital: float = Field(alias="netWorkingCapital")
+    cash_conversion_cycle: float = Field(alias="cashConversionCycle")
+    working_capital_percent_of_revenue: float | None = Field(alias="workingCapitalPercentOfRevenue")
+    warnings: list[str] = Field(default_factory=list)
