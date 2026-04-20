@@ -112,3 +112,22 @@ class PLComparisonsYearInput(BaseModel):
 
 class PLComparisonsInput(BaseModel):
     years: list[PLComparisonsYearInput] = Field(min_length=1, max_length=10)
+
+
+class BalanceSheetComparisonsYearInput(BaseModel):
+    year: int = Field(ge=1900, le=3000)
+    cash: float = Field(ge=0)
+    ar: float = Field(ge=0)
+    inventory: float = Field(ge=0)
+    other_current_assets: float = Field(alias="otherCurrentAssets", ge=0)
+    fixed_assets: float = Field(alias="fixedAssets", ge=0)
+    other_assets: float = Field(alias="otherAssets", ge=0)
+    ap: float = Field(ge=0)
+    other_current_liabilities: float = Field(alias="otherCurrentLiabilities", ge=0)
+    long_term_debt: float = Field(alias="longTermDebt", ge=0)
+    other_liabilities: float = Field(alias="otherLiabilities", ge=0)
+    equity: float = Field(ge=0)
+
+
+class BalanceSheetComparisonsInput(BaseModel):
+    years: list[BalanceSheetComparisonsYearInput] = Field(min_length=1, max_length=10)

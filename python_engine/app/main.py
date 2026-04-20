@@ -9,6 +9,7 @@ from .calculation_service import run_projection
 from .models import (
     AnalystWizardInput,
     AnalystWizardResult,
+    BalanceSheetComparisonsInput,
     BreakevenInput,
     BreakevenResult,
     PLComparisonsInput,
@@ -239,6 +240,76 @@ def calculate_pl_comparisons(payload: dict):
             "years": per_year,
         }
         return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/balance-sheet-comparisons/calculate")
+def calculate_balance_sheet_comparisons(payload: dict):
+    try:
+        validated = BalanceSheetComparisonsInput.model_validate(payload)
+
+        sorted_years = sorted(validated.years, key=lambda row: row.year)
+        per_year: list[dict] = []
+
+        for row in sorted_years:
+            cash = float(row.cash)
+            ar = float(row.ar)
+            inventory = float(row.inventory)
+            other_current_assets = float(row.other_current_assets)
+            fixed_assets = float(row.fixed_assets)
+            other_assets = float(row.other_assets)
+            ap = float(row.ap)
+            other_current_liabilities = float(row.other_current_liabilities)
+            long_term_debt = float(row.long_term_debt)
+            other_liabilities = float(row.other_liabilities)
+            equity = float(row.equity)
+
+            total_current_assets = cash + ar + inventory + other_current_assets
+            total_assets = total_current_assets + fixed_assets + other_assets
+            total_current_liabilities = ap + other_current_liabilities
+            total_liabilities = total_current_liabilities + long_term_debt + other_liabilities
+            working_capital = total_current_assets - total_current_liabilities
+
+            warnings: list[str] = []
+            current_ratio = None
+            if total_current_liabilities > 0:
+                current_ratio = total_current_assets / total_current_liabilities
+            else:
+                warnings.append("Current liabilities are zero; current ratio is not defined.")
+
+            debt_to_equity = None
+            if equity > 0:
+                debt_to_equity = total_liabilities / equity
+            else:
+                warnings.append("Equity is zero; debt-to-equity ratio is not defined.")
+
+            balance_difference = total_assets - (total_liabilities + equity)
+            if abs(balance_difference) > 0.01:
+                warnings.append(
+                    "Balance sheet does not balance (Assets != Liabilities + Equity)."
+                )
+
+            per_year.append(
+                {
+                    "year": row.year,
+                    "totalCurrentAssets": total_current_assets,
+                    "totalAssets": total_assets,
+                    "totalCurrentLiabilities": total_current_liabilities,
+                    "totalLiabilities": total_liabilities,
+                    "workingCapital": working_capital,
+                    "currentRatio": current_ratio,
+                    "debtToEquity": debt_to_equity,
+                    "checks": {
+                        "balanceDifference": balance_difference,
+                    },
+                    "warnings": warnings,
+                }
+            )
+
+        return {"ok": True, "result": {"years": per_year}}
     except ValidationError as error:
         return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
     except Exception as error:  # noqa: BLE001

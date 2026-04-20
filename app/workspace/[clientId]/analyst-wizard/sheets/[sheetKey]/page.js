@@ -1,4 +1,5 @@
 import worksheetCatalog from '@/knowledge/workbooks/worksheet_catalog.json';
+import BalanceSheetComparisonsWizard from '@/components/BalanceSheetComparisonsWizard';
 import BreakevenWizard from '@/components/BreakevenWizard';
 import PLComparisonsWizard from '@/components/PLComparisonsWizard';
 import WorkingCapitalWizard from '@/components/WorkingCapitalWizard';
@@ -20,6 +21,9 @@ export default async function AnalystWizardSheetPlaceholderPage({ params }) {
   }
   if (sheetKey === 'p-l-comparisons') {
     return <PLComparisonsWizard clientId={clientId} />;
+  }
+  if (sheetKey === 'balance-sht-comparisons') {
+    return <BalanceSheetComparisonsWizard clientId={clientId} />;
   }
 
   return (
