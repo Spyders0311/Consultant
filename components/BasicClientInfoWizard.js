@@ -10,10 +10,9 @@ const steps = [
 ];
 
 function normalizePrefill(initialClientInfo) {
-  void initialClientInfo;
   return {
-    companyName: '',
-    industry: '',
+    companyName: initialClientInfo?.companyName || '',
+    industry: initialClientInfo?.industry || '',
     primaryContactName: '',
     primaryContactEmail: '',
     primaryContactPhone: '',
@@ -85,10 +84,6 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
     setError('');
     setPdfError('');
   }
-
-  useEffect(() => {
-    setForm((prev) => ({ ...normalizePrefill(initialClientInfo), ...prev }));
-  }, [initialClientInfo]);
 
   useEffect(() => {
     let cancelled = false;

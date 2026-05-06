@@ -1,8 +1,12 @@
 import Link from 'next/link';
+import CriticalWorkbookCoverage from '@/components/CriticalWorkbookCoverage';
+import ResourceLibrary from '@/components/ResourceLibrary';
+import { getResourceSection } from '@/lib/bmsResourceCatalog';
 import worksheetCatalog from '@/knowledge/workbooks/worksheet_catalog.json';
 
 export default async function WorkspaceAnalystWizardPage({ params }) {
   const { clientId } = await params;
+  const section = getResourceSection('analyst-wizard', clientId);
   const wizardSheets = worksheetCatalog.filter((entry) => entry.category === 'analyst-wizard');
   const coreSheets = wizardSheets.filter((entry) => entry.priorityRank > 0);
   const otherSheets = wizardSheets.filter((entry) => entry.priorityRank <= 0);
@@ -44,6 +48,11 @@ export default async function WorkspaceAnalystWizardPage({ params }) {
           </li>
         ))}
       </ul>
+
+      <div className="resource-library-divider" />
+      <CriticalWorkbookCoverage clientId={clientId} />
+      <div className="resource-library-divider" />
+      <ResourceLibrary section={section} compact />
     </section>
   );
 }

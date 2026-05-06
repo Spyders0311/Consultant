@@ -68,6 +68,13 @@ class BreakevenInput(BaseModel):
     annual_revenue: float = Field(alias="annualRevenue", ge=0)
     cogs_amount: float = Field(alias="cogsAmount", ge=0)
     fixed_expenses_amount: float = Field(alias="fixedExpensesAmount", ge=0)
+    profit_amount: float | None = Field(alias="profitAmount", ge=0, default=None)
+    labor_amount: float | None = Field(alias="laborAmount", ge=0, default=None)
+    indirect_costs_amount: float | None = Field(alias="indirectCostsAmount", ge=0, default=None)
+    general_administrative_costs_amount: float | None = Field(
+        alias="generalAdministrativeCostsAmount", ge=0, default=None
+    )
+    months_in_period: float | None = Field(alias="monthsInPeriod", ge=1, le=60, default=None)
     work_days_per_year: float = Field(alias="workDaysPerYear", ge=1, default=250)
     work_hours_per_day: float = Field(alias="workHoursPerDay", ge=1, default=8)
 
@@ -75,12 +82,20 @@ class BreakevenInput(BaseModel):
 class BreakevenResult(BaseModel):
     gross_margin_amount: float = Field(alias="grossMarginAmount")
     gross_margin_percent: float = Field(alias="grossMarginPercent")
+    net_profit_amount: float | None = Field(alias="netProfitAmount", default=None)
+    variable_costs_amount: float | None = Field(alias="variableCostsAmount", default=None)
+    fixed_costs_amount: float | None = Field(alias="fixedCostsAmount", default=None)
+    other_costs_amount: float | None = Field(alias="otherCostsAmount", default=None)
     breakeven_revenue: float | None = Field(alias="breakevenRevenue")
     breakeven_percent: float | None = Field(alias="breakevenPercent")
     breakeven_monthly: float | None = Field(alias="breakevenMonthly")
     breakeven_weekly: float | None = Field(alias="breakevenWeekly")
     breakeven_daily: float | None = Field(alias="breakevenDaily")
     breakeven_hourly: float | None = Field(alias="breakevenHourly")
+    total_days_in_period: float | None = Field(alias="totalDaysInPeriod", default=None)
+    breakeven_days: float | None = Field(alias="breakevenDays", default=None)
+    targeted_work_days: float | None = Field(alias="targetedWorkDays", default=None)
+    formula_basis: str = Field(alias="formulaBasis")
     notes: list[str] = Field(default_factory=list)
 
 
@@ -189,6 +204,18 @@ class BalanceSheetComparisonsInput(BaseModel):
     years: list[BalanceSheetComparisonsYearInput] = Field(min_length=1, max_length=10)
 
 
+class AdvancedAnalystSheetInput(BaseModel):
+    sheet_key: str = Field(alias="sheetKey", min_length=1, max_length=80)
+    inputs: dict[str, object] = Field(default_factory=dict)
+
+
+class AdvancedAnalystSheetResult(BaseModel):
+    sheet_key: str = Field(alias="sheetKey")
+    summary: dict[str, object] = Field(default_factory=dict)
+    rows: list[dict[str, object]] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
 class BasicClientInfoInput(BaseModel):
     company_name: str = Field(alias="companyName", default="", max_length=160)
     industry: str = Field(default="", max_length=120)
@@ -210,4 +237,85 @@ class BasicClientInfoResult(BaseModel):
     location_state: str | None = Field(alias="locationState")
     notes: str | None
     summary_block: str = Field(alias="summaryBlock")
+    warnings: list[str] = Field(default_factory=list)
+
+
+class WeeklyCashFlowWeekInput(BaseModel):
+    week_label: str = Field(alias="weekLabel", min_length=1, max_length=40)
+    cash_receipts: float = Field(alias="cashReceipts", ge=0)
+    new_sales: float = Field(alias="newSales", ge=0, default=0)
+    payroll: float = Field(ge=0, default=0)
+    materials: float = Field(ge=0, default=0)
+    rent_utilities: float = Field(alias="rentUtilities", ge=0, default=0)
+    loan_payments: float = Field(alias="loanPayments", ge=0, default=0)
+    credit_card_payments: float = Field(alias="creditCardPayments", ge=0, default=0)
+    other_disbursements: float = Field(alias="otherDisbursements", ge=0, default=0)
+
+
+class WeeklyCashFlowInput(BaseModel):
+    beginning_cash: float = Field(alias="beginningCash", ge=0)
+    line_of_credit_limit: float = Field(alias="lineOfCreditLimit", ge=0, default=0)
+    beginning_line_of_credit_balance: float = Field(alias="beginningLineOfCreditBalance", ge=0, default=0)
+    minimum_cash_reserve: float = Field(alias="minimumCashReserve", ge=0, default=0)
+    weeks: list[WeeklyCashFlowWeekInput] = Field(min_length=1, max_length=13)
+    notes: str = Field(default="", max_length=4000)
+
+
+class WeeklyCashFlowWeekResult(BaseModel):
+    week_label: str = Field(alias="weekLabel")
+    beginning_cash: float = Field(alias="beginningCash")
+    cash_receipts: float = Field(alias="cashReceipts")
+    new_sales: float = Field(alias="newSales")
+    total_disbursements: float = Field(alias="totalDisbursements")
+    net_cash_flow: float = Field(alias="netCashFlow")
+    line_of_credit_draw: float = Field(alias="lineOfCreditDraw")
+    line_of_credit_repayment: float = Field(alias="lineOfCreditRepayment")
+    ending_line_of_credit_balance: float = Field(alias="endingLineOfCreditBalance")
+    ending_cash: float = Field(alias="endingCash")
+    remaining_line_of_credit: float = Field(alias="remainingLineOfCredit")
+    reserve_shortfall: float = Field(alias="reserveShortfall")
+
+
+class WeeklyCashFlowResult(BaseModel):
+    weeks: list[WeeklyCashFlowWeekResult]
+    total_receipts: float = Field(alias="totalReceipts")
+    total_disbursements: float = Field(alias="totalDisbursements")
+    ending_cash: float = Field(alias="endingCash")
+    ending_line_of_credit_balance: float = Field(alias="endingLineOfCreditBalance")
+    lowest_cash_balance: float = Field(alias="lowestCashBalance")
+    peak_line_of_credit_use: float = Field(alias="peakLineOfCreditUse")
+    warnings: list[str] = Field(default_factory=list)
+
+
+class FlexibleBudgetVarianceInput(BaseModel):
+    period_label: str = Field(alias="periodLabel", min_length=1, max_length=80)
+    budget_revenue: float = Field(alias="budgetRevenue", ge=0)
+    actual_revenue: float = Field(alias="actualRevenue", ge=0)
+    budget_cogs_percent: float = Field(alias="budgetCogsPercent", ge=0, le=100)
+    actual_cogs: float = Field(alias="actualCogs", ge=0)
+    budget_variable_expense_percent: float = Field(alias="budgetVariableExpensePercent", ge=0, le=100, default=0)
+    actual_variable_expenses: float = Field(alias="actualVariableExpenses", ge=0, default=0)
+    budget_fixed_expenses: float = Field(alias="budgetFixedExpenses", ge=0)
+    actual_fixed_expenses: float = Field(alias="actualFixedExpenses", ge=0)
+    notes: str = Field(default="", max_length=4000)
+
+
+class FlexibleBudgetVarianceRow(BaseModel):
+    line_item: str = Field(alias="lineItem")
+    static_budget: float = Field(alias="staticBudget")
+    flexible_budget: float = Field(alias="flexibleBudget")
+    actual: float
+    variance: float
+    variance_percent: float | None = Field(alias="variancePercent")
+    favorable: bool
+
+
+class FlexibleBudgetVarianceResult(BaseModel):
+    period_label: str = Field(alias="periodLabel")
+    rows: list[FlexibleBudgetVarianceRow]
+    sales_volume_variance: float = Field(alias="salesVolumeVariance")
+    flexible_budget_operating_income: float = Field(alias="flexibleBudgetOperatingIncome")
+    actual_operating_income: float = Field(alias="actualOperatingIncome")
+    operating_income_variance: float = Field(alias="operatingIncomeVariance")
+    operating_income_variance_percent: float | None = Field(alias="operatingIncomeVariancePercent")
     warnings: list[str] = Field(default_factory=list)

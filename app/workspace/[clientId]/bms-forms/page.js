@@ -1,15 +1,18 @@
-export default function WorkspaceBmsFormsPage() {
+import ResourceLibrary from '@/components/ResourceLibrary';
+import { getResourceSection } from '@/lib/bmsResourceCatalog';
+
+export default async function WorkspaceBmsFormsPage({ params }) {
+  const { clientId } = await params;
+  const section = getResourceSection('bms-forms', clientId);
+
   return (
     <section className="panel">
       <h2>BMS Forms</h2>
       <p>
-        BMS forms worksheet. Client-facing and internal forms that live alongside the rest of this workspace.
+        Client-facing and internal forms that live alongside the rest of this workspace. Agreements and confidential
+        templates are marked for review before they become customer-ready forms.
       </p>
-      <ul>
-        <li>Project intake + approvals</li>
-        <li>Change requests + sign-offs</li>
-        <li>Completion checklist + handoff notes</li>
-      </ul>
+      <ResourceLibrary section={section} compact />
     </section>
   );
 }

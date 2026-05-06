@@ -5,23 +5,34 @@ import WorksheetInput from '@/components/worksheet/WorksheetInput';
 import usePrefillableForm from '@/lib/client/usePrefillableForm';
 
 const steps = [
-  { id: 'revenue', title: 'Revenue & COGS', hint: 'Define annual sales and direct costs.' },
-  { id: 'fixed', title: 'Fixed Expenses', hint: 'Set annual overhead that must be covered.' },
-  { id: 'capacity', title: 'Work Capacity', hint: 'Convert annual breakeven into daily/hourly targets.' },
+  { id: 'revenue', title: 'Revenue & Direct Costs', hint: 'Define sales, COGS, labor, and profit.' },
+  { id: 'fixed', title: 'Fixed & Indirect Costs', hint: 'Split costs the way the BMS workbook does.' },
+  { id: 'capacity', title: 'Period & Capacity', hint: 'Convert breakeven into period, daily, and hourly targets.' },
   { id: 'review', title: 'Review & Run', hint: 'Confirm assumptions and run calculation.' },
 ];
 
 const defaultForm = {
   annualRevenue: '',
   cogsAmount: '',
+  profitAmount: '',
+  laborAmount: '',
   fixedExpensesAmount: '',
-  workDaysPerYear: '',
-  workHoursPerDay: '',
+  indirectCostsAmount: '',
+  generalAdministrativeCostsAmount: '',
+  monthsInPeriod: '12',
+  workDaysPerYear: '250',
+  workHoursPerDay: '8',
 };
 
 function parseNumber(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function parseOptionalNumber(value) {
+  if (value === '' || value === null || value === undefined) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 function isFiniteNumber(value) {
@@ -84,7 +95,13 @@ export default function BreakevenWizard({ clientId }) {
 
   const canAdvance = useMemo(() => {
     if (stepIndex === 0) return parseNumber(form.annualRevenue) > 0;
-    if (stepIndex === 1) return parseNumber(form.fixedExpensesAmount) >= 0;
+    if (stepIndex === 1) {
+      return (
+        parseNumber(form.fixedExpensesAmount) >= 0 ||
+        parseNumber(form.indirectCostsAmount) >= 0 ||
+        parseNumber(form.generalAdministrativeCostsAmount) >= 0
+      );
+    }
     if (stepIndex === 2) return parseNumber(form.workDaysPerYear) > 0 && parseNumber(form.workHoursPerDay) > 0;
     return true;
   }, [form, stepIndex]);
@@ -195,9 +212,15 @@ export default function BreakevenWizard({ clientId }) {
       }
 
       if (isFiniteNumber(latestYear.operatingExpenses) && isFiniteNumber(latestYear.otherExpenses)) {
-        patch.fixedExpensesAmount = Number(latestYear.operatingExpenses) + Number(latestYear.otherExpenses);
+        patch.indirectCostsAmount = Number(latestYear.operatingExpenses);
+        patch.generalAdministrativeCostsAmount = Number(latestYear.otherExpenses);
+        patch.fixedExpensesAmount = Number(latestYear.otherExpenses);
       } else {
-        missingFields.push('Fixed Expenses (Operating + Other)');
+        missingFields.push('Indirect and G&A costs');
+      }
+
+      if (isFiniteNumber(latestYear.netProfit)) {
+        patch.profitAmount = Number(latestYear.netProfit);
       }
 
       if (Object.keys(patch).length === 0) {
@@ -228,7 +251,12 @@ export default function BreakevenWizard({ clientId }) {
       const payload = {
         annualRevenue: parseNumber(form.annualRevenue),
         cogsAmount: parseNumber(form.cogsAmount),
+        profitAmount: parseOptionalNumber(form.profitAmount),
+        laborAmount: parseOptionalNumber(form.laborAmount),
         fixedExpensesAmount: parseNumber(form.fixedExpensesAmount),
+        indirectCostsAmount: parseOptionalNumber(form.indirectCostsAmount),
+        generalAdministrativeCostsAmount: parseOptionalNumber(form.generalAdministrativeCostsAmount),
+        monthsInPeriod: parseOptionalNumber(form.monthsInPeriod),
         workDaysPerYear: parseNumber(form.workDaysPerYear),
         workHoursPerDay: parseNumber(form.workHoursPerDay),
       };
@@ -315,7 +343,10 @@ export default function BreakevenWizard({ clientId }) {
       <header className="wizard-header">
         <p className="wizard-kicker">Analyst Program</p>
         <h1>Breakeven Analysis</h1>
-        <p>Walk through assumptions, run protected backend calculations, and export a consultant-ready PDF.</p>
+        <p>
+          Source-aligned BMS breakeven workflow. The app rebuilds the workbook formulas server-side and keeps the
+          original spreadsheets as provenance.
+        </p>
       </header>
 
       <div className="wizard-progress" aria-hidden="true">
@@ -372,21 +403,69 @@ export default function BreakevenWizard({ clientId }) {
                 isTouched={Boolean(touchedFields.cogsAmount)}
               />
             </label>
+            <label>
+              Net Profit
+              <WorksheetInput
+                type="number"
+                min="0"
+                value={form.profitAmount}
+                onChange={(event) => updateField('profitAmount', event.target.value)}
+                placeholder="Optional, from BMS standalone breakeven"
+                isPrefilled={Boolean(prefilledFields.profitAmount)}
+                isTouched={Boolean(touchedFields.profitAmount)}
+              />
+            </label>
+            <label>
+              Direct Labor
+              <WorksheetInput
+                type="number"
+                min="0"
+                value={form.laborAmount}
+                onChange={(event) => updateField('laborAmount', event.target.value)}
+                placeholder="Optional direct labor"
+                isPrefilled={Boolean(prefilledFields.laborAmount)}
+                isTouched={Boolean(touchedFields.laborAmount)}
+              />
+            </label>
           </div>
         )}
 
         {stepIndex === 1 && (
           <div className="wizard-fields">
             <label>
-              Fixed Expenses (Annual)
+              Fixed Expenses
               <WorksheetInput
                 type="number"
                 min="0"
                 value={form.fixedExpensesAmount}
                 onChange={(event) => updateField('fixedExpensesAmount', event.target.value)}
-                placeholder="e.g. 320000"
+                placeholder="Standalone fixed cost bucket"
                 isPrefilled={Boolean(prefilledFields.fixedExpensesAmount)}
                 isTouched={Boolean(touchedFields.fixedExpensesAmount)}
+              />
+            </label>
+            <label>
+              Indirect Costs
+              <WorksheetInput
+                type="number"
+                min="0"
+                value={form.indirectCostsAmount}
+                onChange={(event) => updateField('indirectCostsAmount', event.target.value)}
+                placeholder="Analyst Program L3"
+                isPrefilled={Boolean(prefilledFields.indirectCostsAmount)}
+                isTouched={Boolean(touchedFields.indirectCostsAmount)}
+              />
+            </label>
+            <label>
+              General & Administrative Costs
+              <WorksheetInput
+                type="number"
+                min="0"
+                value={form.generalAdministrativeCostsAmount}
+                onChange={(event) => updateField('generalAdministrativeCostsAmount', event.target.value)}
+                placeholder="Analyst Program L4"
+                isPrefilled={Boolean(prefilledFields.generalAdministrativeCostsAmount)}
+                isTouched={Boolean(touchedFields.generalAdministrativeCostsAmount)}
               />
             </label>
           </div>
@@ -394,6 +473,18 @@ export default function BreakevenWizard({ clientId }) {
 
         {stepIndex === 2 && (
           <div className="wizard-fields">
+            <label>
+              Months In Period
+              <WorksheetInput
+                type="number"
+                min="1"
+                value={form.monthsInPeriod}
+                onChange={(event) => updateField('monthsInPeriod', event.target.value)}
+                placeholder="e.g. 12"
+                isPrefilled={Boolean(prefilledFields.monthsInPeriod)}
+                isTouched={Boolean(touchedFields.monthsInPeriod)}
+              />
+            </label>
             <label>
               Work Days Per Year
               <WorksheetInput
@@ -436,9 +527,16 @@ export default function BreakevenWizard({ clientId }) {
               <strong>{currency(form.fixedExpensesAmount)}</strong>
             </article>
             <article>
+              <span>Indirect / G&A</span>
+              <strong>
+                {currency(form.indirectCostsAmount)} / {currency(form.generalAdministrativeCostsAmount)}
+              </strong>
+            </article>
+            <article>
               <span>Work Capacity</span>
               <strong>
-                {parseNumber(form.workDaysPerYear)} days x {parseNumber(form.workHoursPerDay)} hrs
+                {parseNumber(form.monthsInPeriod)} months · {parseNumber(form.workDaysPerYear)} days x{' '}
+                {parseNumber(form.workHoursPerDay)} hrs
               </strong>
             </article>
           </div>
@@ -495,6 +593,25 @@ export default function BreakevenWizard({ clientId }) {
 
           <div className="wizard-kpis">
             <article>
+              <span>Net Profit</span>
+              <strong>{currency(result.netProfitAmount)}</strong>
+            </article>
+            <article>
+              <span>Variable Costs</span>
+              <strong>{currency(result.variableCostsAmount)}</strong>
+            </article>
+            <article>
+              <span>Fixed Costs</span>
+              <strong>{currency(result.fixedCostsAmount)}</strong>
+            </article>
+            <article>
+              <span>Breakeven Days</span>
+              <strong>{result.breakevenDays === null || result.breakevenDays === undefined ? 'n/a' : Number(result.breakevenDays).toFixed(1)}</strong>
+            </article>
+          </div>
+
+          <div className="wizard-kpis">
+            <article>
               <span>Breakeven Monthly</span>
               <strong>{currency(result.breakevenMonthly)}</strong>
             </article>
@@ -511,6 +628,8 @@ export default function BreakevenWizard({ clientId }) {
               <strong>{currency(result.breakevenHourly)}</strong>
             </article>
           </div>
+
+          <p className="wizard-meta">Formula basis: {result.formulaBasis}</p>
 
           {(result.notes || []).length > 0 ? (
             <ul className="warnings">
