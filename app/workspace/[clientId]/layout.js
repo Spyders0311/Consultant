@@ -1,8 +1,8 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { isConsultant } from '@/lib/supabase/auth';
-import WorkspaceTabNav from '@/components/WorkspaceTabNav';
+import WorkspaceShell from '@/components/shell/WorkspaceShell';
+import { getAllWorksheets, getWorksheetGroups } from '@/lib/worksheets/registry';
 
 export default async function WorkspaceLayout({ children, params }) {
   const supabase = await createClient();
@@ -19,36 +19,42 @@ export default async function WorkspaceLayout({ children, params }) {
   }
 
   const { clientId } = await params;
-  const { data: client } = await supabase
+  const { data: clients } = await supabase
     .from('clients')
     .select('id, company_name')
-    .eq('id', clientId)
     .eq('consultant_id', user.id)
-    .maybeSingle();
+    .order('created_at', { ascending: false });
 
+  const client = (clients || []).find((row) => row.id === clientId);
   if (!client) {
     redirect('/dashboard/clients');
   }
 
-  return (
-    <main className="portal-wrap workspace-shell">
-      <section className="workspace-header">
-        <div>
-          <p className="eyebrow">Client Workspace</p>
-          <h1>{client.company_name || 'Untitled client'}</h1>
-        </div>
-        <div className="actions" style={{ margin: 0 }}>
-          <Link href="/dashboard/clients" className="tab workspace-back-link">
-            Back to Clients
-          </Link>
-          <Link href="/settings" className="tab workspace-back-link">
-            Settings
-          </Link>
-        </div>
-      </section>
+  const allWorksheets = getAllWorksheets();
+  const worksheets = allWorksheets.map(({ key, displayName, group, status }) => ({
+    key,
+    displayName,
+    group,
+    status,
+  }));
+  const navGroups = getWorksheetGroups({ liveOnly: true }).map((group) => ({
+    name: group.name,
+    worksheets: group.worksheets.map(({ key, displayName }) => ({ key, displayName })),
+  }));
+  const sheetNames = Object.fromEntries(allWorksheets.map((entry) => [entry.key, entry.displayName]));
 
-      <WorkspaceTabNav clientId={clientId} />
+  return (
+    <WorkspaceShell
+      clientId={clientId}
+      clientName={client.company_name || 'Untitled client'}
+      clients={clients || []}
+      navGroups={navGroups}
+      worksheets={worksheets}
+      totalWorksheets={worksheets.length}
+      sheetNames={sheetNames}
+      userEmail={user.email}
+    >
       {children}
-    </main>
+    </WorkspaceShell>
   );
 }

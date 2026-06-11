@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { isConsultant } from '@/lib/supabase/auth';
+import PortalTopbar from '@/components/shell/PortalTopbar';
 import SettingsForm from '@/components/SettingsForm';
 
 export const metadata = {
@@ -23,20 +23,17 @@ export default async function SettingsPage() {
   }
 
   return (
-    <main className="portal-wrap">
-      <section className="panel">
-        <p className="eyebrow">Account</p>
-        <h1>Settings</h1>
-        <p>Update your consultant profile details used across PDFs and the portal UI.</p>
+    <>
+      <PortalTopbar userEmail={user.email} />
+      <main className="portal-wrap">
+        <section className="panel">
+          <p className="eyebrow">Account</p>
+          <h1>Settings</h1>
+          <p>Update your consultant profile details used across PDFs and the portal UI.</p>
 
-        <div className="actions">
-          <Link href="/dashboard/clients" className="tab active">
-            Back to Clients
-          </Link>
-        </div>
-
-        <SettingsForm />
-      </section>
-    </main>
+          <SettingsForm />
+        </section>
+      </main>
+    </>
   );
 }

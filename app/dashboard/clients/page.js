@@ -45,7 +45,7 @@ export default async function ClientsPage() {
         <h1>Clients</h1>
         <p>Review your client records and open each profile for full details.</p>
         <div className="actions">
-          <Link href="/dashboard/clients/new" className="tab active">
+          <Link href="/dashboard/clients/new" className="btn btn-primary">
             Create New Client
           </Link>
         </div>
