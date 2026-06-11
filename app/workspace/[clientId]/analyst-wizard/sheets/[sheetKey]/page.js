@@ -1,8 +1,6 @@
 import AdvancedAnalystSheetWizard from '@/components/AdvancedAnalystSheetWizard';
 import BalanceSheetComparisonsWizard from '@/components/BalanceSheetComparisonsWizard';
 import BreakevenWizard from '@/components/BreakevenWizard';
-import CurrentFinancialInformationWizard from '@/components/CurrentFinancialInformationWizard';
-import FiveYearProjectionsWizard from '@/components/FiveYearProjectionsWizard';
 import PLComparisonsWizard from '@/components/PLComparisonsWizard';
 import WorkbookPortWizard from '@/components/WorkbookPortWizard';
 import WorksheetWizard from '@/components/wizard/WorksheetWizard';
@@ -61,12 +59,6 @@ export default async function AnalystWizardSheetPage({ params }) {
   }
   if (sheetKey === 'balance-sht-comparisons') {
     return <BalanceSheetComparisonsWizard clientId={clientId} />;
-  }
-  if (sheetKey === 'current-financial-information') {
-    return <CurrentFinancialInformationWizard clientId={clientId} />;
-  }
-  if (sheetKey === '5-year-projections') {
-    return <FiveYearProjectionsWizard clientId={clientId} />;
   }
   if (worksheet.component === 'advanced-analyst-sheet') {
     return <AdvancedAnalystSheetWizard clientId={clientId} sheetKey={sheetKey} />;
