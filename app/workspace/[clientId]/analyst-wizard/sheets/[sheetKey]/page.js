@@ -1,5 +1,4 @@
 import AdvancedAnalystSheetWizard from '@/components/AdvancedAnalystSheetWizard';
-import BasicClientInfoWizard from '@/components/BasicClientInfoWizard';
 import BalanceSheetComparisonsWizard from '@/components/BalanceSheetComparisonsWizard';
 import BreakevenWizard from '@/components/BreakevenWizard';
 import CurrentFinancialInformationWizard from '@/components/CurrentFinancialInformationWizard';
@@ -38,22 +37,21 @@ export default async function AnalystWizardSheetPage({ params }) {
   // if-chain below shrinks as each remaining wizard migrates.
   const wizardConfig = getWizardConfig(sheetKey);
   if (wizardConfig) {
-    return <WorksheetWizard config={wizardConfig} clientId={clientId} />;
-  }
+    let initialData = null;
+    if (sheetKey === 'basic-client-info') {
+      const supabase = await createClient();
+      const { data: client } = await supabase
+        .from('clients')
+        .select('company_name, industry')
+        .eq('id', clientId)
+        .maybeSingle();
 
-  if (sheetKey === 'basic-client-info') {
-    const supabase = await createClient();
-    const { data: client } = await supabase
-      .from('clients')
-      .select('company_name, industry')
-      .eq('id', clientId)
-      .maybeSingle();
-
-    const initialClientInfo = {
-      companyName: client?.company_name || '',
-      industry: client?.industry || '',
-    };
-    return <BasicClientInfoWizard clientId={clientId} initialClientInfo={initialClientInfo} />;
+      initialData = {
+        companyName: client?.company_name || '',
+        industry: client?.industry || '',
+      };
+    }
+    return <WorksheetWizard config={wizardConfig} clientId={clientId} initialData={initialData} />;
   }
 
   if (sheetKey === 'breakeven-analysis') {

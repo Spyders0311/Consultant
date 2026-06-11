@@ -52,8 +52,8 @@ function normalizePayload(config, form) {
   return payload;
 }
 
-function mergeRunForm(config, inputs) {
-  const base = makeDefaultForm(config);
+function mergeRunForm(config, inputs, initialData) {
+  const base = makeDefaultForm(config, initialData);
   const merged = { ...base, ...(inputs || {}) };
   for (const key of Object.keys(config.collections || {})) {
     merged[key] = Array.isArray(inputs?.[key]) ? inputs[key] : base[key];
@@ -130,7 +130,7 @@ export default function WorksheetWizard({ config, clientId, initialData }) {
 
   function loadRun(run) {
     if (!run) return;
-    resetForm(mergeRunForm(config, run.inputs));
+    resetForm(mergeRunForm(config, run.inputs, initialData));
     setResult(run.outputs || null);
     setRunId(run.id || '');
     setStepIndex(steps.length - 1);
