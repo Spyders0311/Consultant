@@ -1,0 +1,10 @@
+{
+  "portSlug": "f-1200-ar-turns",
+  "title": "F-1200 AR Turns Worksheet",
+  "sourcePath": "Spreadsheets/Financial Tools/F-1200  AR Turns Worksheet.xls",
+  "sheetCount": 1,
+  "formulaCount": 11,
+  "sheets": ["Sheet1"],
+  "inputs": ["annualCreditSales", "averageArBalance", "beginningArBalance", "endingArBalance", "daysPerYear"],
+  "outputs": ["arTurns", "avgCollectionPeriodDays"]
+}

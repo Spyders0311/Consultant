@@ -8,8 +8,10 @@ import FlexibleBudgetVarianceWizard from '@/components/FlexibleBudgetVarianceWiz
 import FiveYearProjectionsWizard from '@/components/FiveYearProjectionsWizard';
 import PLComparisonsWizard from '@/components/PLComparisonsWizard';
 import WeeklyCashFlowWizard from '@/components/WeeklyCashFlowWizard';
+import WorkbookPortWizard from '@/components/WorkbookPortWizard';
 import WorkingCapitalWizard from '@/components/WorkingCapitalWizard';
 import { createClient } from '@/lib/supabase/server';
+import { WORKBOOK_PORT_KEYS } from '@/lib/workbookPortKeys';
 import { notFound } from 'next/navigation';
 
 const customWorksheets = {
@@ -23,6 +25,51 @@ const customWorksheets = {
     sheetName: 'FLEXIBLE BUDGET / VARIANCE',
     category: 'analysis',
   },
+  'bms-marketing-forecast': {
+    key: 'bms-marketing-forecast',
+    sheetName: 'BMS MARKETING FORECAST',
+    category: 'marketing',
+  },
+  'dashboard-gantt-chart': {
+    key: 'dashboard-gantt-chart',
+    sheetName: 'DASHBOARD GANTT CHART',
+    category: 'analysis',
+  },
+  'flex-budget-worksheet': {
+    key: 'flex-budget-worksheet',
+    sheetName: 'FLEX BUDGET WORKSHEET',
+    category: 'analysis',
+  },
+  'sales-pipeline-forecast': {
+    key: 'sales-pipeline-forecast',
+    sheetName: 'SALES PIPELINE FORECAST',
+    category: 'marketing',
+  },
+  'cash-flow-forecast-worksheet': {
+    key: 'cash-flow-forecast-worksheet',
+    sheetName: 'CASH FLOW FORECAST WORKSHEET',
+    category: 'analysis',
+  },
+  'f-1200-ar-turns': {
+    key: 'f-1200-ar-turns',
+    sheetName: 'F-1200 AR TURNS WORKSHEET',
+    category: 'analysis',
+  },
+  'inventory-turn-calculation': {
+    key: 'inventory-turn-calculation',
+    sheetName: 'INVENTORY TURN CALCULATION',
+    category: 'analysis',
+  },
+  'cost-vs-sales-increase': {
+    key: 'cost-vs-sales-increase',
+    sheetName: 'COST VS SALES INCREASE',
+    category: 'analysis',
+  },
+  'f-300a-overhead-calcs': {
+    key: 'f-300a-overhead-calcs',
+    sheetName: 'F-300A OVERHEAD CALCS',
+    category: 'analysis',
+  },
 };
 
 const advancedAnalystSheetKeys = new Set([
@@ -33,6 +80,8 @@ const advancedAnalystSheetKeys = new Set([
   'z-score-private-heavy-assets',
   'comparative-activity-ratios',
 ]);
+
+const workbookPortKeys = WORKBOOK_PORT_KEYS;
 
 export default async function AnalystWizardSheetPlaceholderPage({ params }) {
   const { sheetKey, clientId } = await params;
@@ -84,6 +133,9 @@ export default async function AnalystWizardSheetPlaceholderPage({ params }) {
   }
   if (advancedAnalystSheetKeys.has(sheetKey)) {
     return <AdvancedAnalystSheetWizard clientId={clientId} sheetKey={sheetKey} />;
+  }
+  if (workbookPortKeys.has(sheetKey)) {
+    return <WorkbookPortWizard clientId={clientId} workbookKey={sheetKey} />;
   }
 
   return (

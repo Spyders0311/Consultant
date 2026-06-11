@@ -954,8 +954,26 @@ td {
   margin: 14px 0;
 }
 
-.worksheet-grid-table input {
+.worksheet-grid-table input,
+.worksheet-grid-table select {
   min-width: 110px;
+}
+
+.workbook-port-collection {
+  margin-top: 16px;
+}
+
+.workbook-port-collection-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.workbook-port-collection-header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 18px;
 }
 
 .run-history {

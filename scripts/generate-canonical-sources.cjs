@@ -10,6 +10,36 @@ const workbookExtensions = new Set(['.xls', '.xlsx', '.xlsm', '.xlsb', '.csv']);
 const documentExtensions = new Set(['.doc', '.docx', '.pdf', '.pptx']);
 
 const implementedWorkbookRoutes = {
+  'bms-marketing-forecast': {
+    match: /bms marketing forecast/i,
+    title: 'BMS Marketing Forecast',
+    appRoute: '/workspace/[clientId]/analyst-wizard/sheets/bms-marketing-forecast',
+    calculationEndpoint: '/api/worksheets/workbook-ports/calculate',
+  },
+  'dashboard-gantt-chart': {
+    match: /f[-\s]*1600d/i,
+    title: 'Dashboard Gantt Chart',
+    appRoute: '/workspace/[clientId]/analyst-wizard/sheets/dashboard-gantt-chart',
+    calculationEndpoint: '/api/worksheets/workbook-ports/calculate',
+  },
+  'flex-budget-worksheet': {
+    match: /f-700a|flex budget worksheet/i,
+    title: 'Flex Budget Worksheet',
+    appRoute: '/workspace/[clientId]/analyst-wizard/sheets/flex-budget-worksheet',
+    calculationEndpoint: '/api/worksheets/workbook-ports/calculate',
+  },
+  'sales-pipeline-forecast': {
+    match: /f-700e|sales pipeline forecast/i,
+    title: 'Sales Pipeline Forecast',
+    appRoute: '/workspace/[clientId]/analyst-wizard/sheets/sales-pipeline-forecast',
+    calculationEndpoint: '/api/worksheets/workbook-ports/calculate',
+  },
+  'cash-flow-forecast-worksheet': {
+    match: /f-900a|cash flow forecast worksheet/i,
+    title: 'Cash Flow Forecast Worksheet',
+    appRoute: '/workspace/[clientId]/analyst-wizard/sheets/cash-flow-forecast-worksheet',
+    calculationEndpoint: '/api/worksheets/workbook-ports/calculate',
+  },
   'weekly-cash-flow': {
     match: /f-900b\s*-\s*cash flow spreadsheet/i,
     title: 'Weekly Cash Flow Forecast',
@@ -21,6 +51,30 @@ const implementedWorkbookRoutes = {
     title: 'Flexible Budget / Variance',
     appRoute: '/workspace/[clientId]/analyst-wizard/sheets/flexible-budget-variance',
     calculationEndpoint: '/api/worksheets/flexible-budget-variance/calculate',
+  },
+  'f-1200-ar-turns': {
+    match: /f[-\s]*1200|ar turns worksheet/i,
+    title: 'F-1200 AR Turns Worksheet',
+    appRoute: '/workspace/[clientId]/analyst-wizard/sheets/f-1200-ar-turns',
+    calculationEndpoint: '/api/worksheets/workbook-ports/calculate',
+  },
+  'inventory-turn-calculation': {
+    match: /inventory turn calculation/i,
+    title: 'Inventory Turn Calculation',
+    appRoute: '/workspace/[clientId]/analyst-wizard/sheets/inventory-turn-calculation',
+    calculationEndpoint: '/api/worksheets/workbook-ports/calculate',
+  },
+  'cost-vs-sales-increase': {
+    match: /cost vs sales increase/i,
+    title: 'Cost vs Sales Increase',
+    appRoute: '/workspace/[clientId]/analyst-wizard/sheets/cost-vs-sales-increase',
+    calculationEndpoint: '/api/worksheets/workbook-ports/calculate',
+  },
+  'f-300a-overhead-calcs': {
+    match: /f[-\s]*300a|overhead calcs/i,
+    title: 'F-300a Overhead Calcs',
+    appRoute: '/workspace/[clientId]/analyst-wizard/sheets/f-300a-overhead-calcs',
+    calculationEndpoint: '/api/worksheets/workbook-ports/calculate',
   },
 };
 

@@ -2,7 +2,14 @@ node_modules
 .next
 .DS_Store
 .env
+.env.local
 npm-debug.log*
+
+# Local source workbooks (provenance only, not tracked)
+Spreadsheets/
+
+# Supabase CLI temp files
+supabase/.temp/
 
 # Python
 __pycache__/

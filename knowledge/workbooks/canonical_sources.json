@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-05T19:49:59.261Z",
+  "generatedAt": "2026-06-09T20:14:52.403Z",
   "generatedFrom": [
     "knowledge/workbooks/spreadsheets_folder_audit.json",
     "knowledge/workbooks/documents_folder_audit.json"
@@ -14,8 +14,8 @@
     "duplicatesHidden": 104,
     "reviewRequired": 57,
     "downloadAllowed": 84,
-    "liveWorkbookPorts": 2,
-    "nextWorkbookPorts": 5,
+    "liveWorkbookPorts": 12,
+    "nextWorkbookPorts": 0,
     "byBusinessArea": {
       "analysis": 56,
       "analyst-wizard": 2,
@@ -807,6 +807,145 @@
       }
     },
     {
+      "key": "cash-flow-forecast-worksheet-d3c0c22c28",
+      "title": "Cash Flow Forecast Worksheet",
+      "businessArea": "analysis",
+      "sourceType": "document",
+      "canonicalPath": "Spreadsheets/Financial Tools/F-900  Cash Flow Forecasting for F-900a.docx",
+      "duplicatePaths": [
+        "Spreadsheets/BMS Consulting  Tool box-20260423T191629Z-3-001/BMS Consulting  Tool box/F-900  Cash Flow Forecasting for F-900a.docx",
+        "Spreadsheets/BMS Consulting  Tool box-20260423T191640Z-3-001/BMS Consulting  Tool box/F-900  Cash Flow Forecasting for F-900a.docx",
+        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-900  Cash Flow Forecasting for F-900a.docx"
+      ],
+      "duplicateCount": 3,
+      "originalCategory": "financial-tools",
+      "extension": ".docx",
+      "sizeBytes": 411274,
+      "sha256": "d3c0c22c28cae3bafd935a253185b8d708c984b349b689161b7520269f96c733",
+      "tags": [
+        "analysis",
+        "financial-tools",
+        "cash flow",
+        "budget",
+        "employee"
+      ],
+      "access": {
+        "audience": "consultant",
+        "reviewRequired": true,
+        "reviewReasons": [
+          "Confidential content"
+        ],
+        "previewAllowed": false,
+        "downloadAllowed": false
+      },
+      "workbook": null,
+      "document": {
+        "wordCountApprox": 1104,
+        "keywordHits": [
+          "cash flow",
+          "budget",
+          "employee"
+        ],
+        "textSample": "INTRODUCTION The purpose of this standard procedure is to establish a method for the review and forecasting of cash requirements for the sample worksheet F-900a . CONCEPT Cash planning is one of management s most important, ongoing duties. The budgeting of incoming and outgoing cash results in the following benefits: It gives management an early warning of upcoming difficulties with cash availability. It shows manage",
+        "parseWarning": null
+      },
+      "porting": null
+    },
+    {
+      "key": "cash-flow-forecast-worksheet-e800747c25",
+      "title": "Cash Flow Forecast Worksheet",
+      "businessArea": "analysis",
+      "sourceType": "workbook",
+      "canonicalPath": "Spreadsheets/Financial Tools/F-900a  Cash Flow Forecast worksheet.xls",
+      "duplicatePaths": [
+        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-900a  Cash Flow Forecast worksheet.xls"
+      ],
+      "duplicateCount": 1,
+      "originalCategory": "financial-tools",
+      "extension": ".xls",
+      "sizeBytes": 87040,
+      "sha256": "e800747c25a77476fbb26af484dbd3a043bdf565c3cf58704298cc4d8591af00",
+      "tags": [
+        "analysis",
+        "financial-tools"
+      ],
+      "access": {
+        "audience": "consultant",
+        "reviewRequired": false,
+        "reviewReasons": [],
+        "previewAllowed": false,
+        "downloadAllowed": true
+      },
+      "workbook": {
+        "sheetCount": 3,
+        "formulaCount": 1023,
+        "valueCellCount": 1137,
+        "definedNameCount": 3,
+        "hiddenSheetCount": 0,
+        "hasVbaProject": false,
+        "externalReferenceCount": 0,
+        "crossSheetReferenceCount": 4,
+        "parseWarning": null,
+        "usefulSheets": [
+          {
+            "name": "Accounts Receivable Activity",
+            "ref": "A1:V58",
+            "formulaCount": 560,
+            "labelSample": [
+              "RECEIVE",
+              "RECEIVE",
+              "RECEIVE",
+              "RECEIVE",
+              "RECEIVE",
+              "RECEIVE",
+              "RECEIVE",
+              "RECEIVE"
+            ]
+          },
+          {
+            "name": "Accounts Payable Activity",
+            "ref": "A1:V101",
+            "formulaCount": 410,
+            "labelSample": [
+              "PAY",
+              "PAY",
+              "PAY",
+              "PAY",
+              "PAY",
+              "PAY",
+              "PAY",
+              "PAY"
+            ]
+          },
+          {
+            "name": "Projected Cash Activity",
+            "ref": "A1:IV51",
+            "formulaCount": 53,
+            "labelSample": [
+              "CASH FLOW ANALYSIS",
+              "WEEK ENDING",
+              "WEEK ENDING",
+              "WEEK ENDING",
+              "WEEK ENDING",
+              "WEEK ENDING",
+              "WEEK ENDING",
+              "WEEK ENDING"
+            ]
+          }
+        ]
+      },
+      "document": null,
+      "porting": {
+        "priority": "live",
+        "rank": 14,
+        "implementationStatus": "live",
+        "appRoute": "/workspace/[clientId]/analyst-wizard/sheets/cash-flow-forecast-worksheet",
+        "calculationEndpoint": "/api/worksheets/workbook-ports/calculate",
+        "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
+        "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
+      }
+    },
+    {
       "key": "cbs-breakeven-analysis-tool-07e0433967",
       "title": "CBS Breakeven Analysis Tool",
       "businessArea": "analysis",
@@ -992,11 +1131,11 @@
       },
       "document": null,
       "porting": {
-        "priority": "candidate",
+        "priority": "live",
         "rank": null,
-        "implementationStatus": "not-started",
-        "appRoute": null,
-        "calculationEndpoint": null,
+        "implementationStatus": "live",
+        "appRoute": "/workspace/[clientId]/analyst-wizard/sheets/cost-vs-sales-increase",
+        "calculationEndpoint": "/api/worksheets/workbook-ports/calculate",
         "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
         "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
       }
@@ -1056,11 +1195,11 @@
       },
       "document": null,
       "porting": {
-        "priority": "candidate",
+        "priority": "live",
         "rank": null,
-        "implementationStatus": "not-started",
-        "appRoute": null,
-        "calculationEndpoint": null,
+        "implementationStatus": "live",
+        "appRoute": "/workspace/[clientId]/analyst-wizard/sheets/cost-vs-sales-increase",
+        "calculationEndpoint": "/api/worksheets/workbook-ports/calculate",
         "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
         "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
       }
@@ -1101,6 +1240,115 @@
         "parseWarning": null
       },
       "porting": null
+    },
+    {
+      "key": "dashboard-gantt-chart-298c2ecb40",
+      "title": "Dashboard Gantt Chart",
+      "businessArea": "analysis",
+      "sourceType": "workbook",
+      "canonicalPath": "Spreadsheets/Financial Tools/F-1600d Dashboard Gantt-Chart.xlsx",
+      "duplicatePaths": [
+        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-1600d Dashboard Gantt-Chart.xlsx"
+      ],
+      "duplicateCount": 1,
+      "originalCategory": "financial-tools",
+      "extension": ".xlsx",
+      "sizeBytes": 246206,
+      "sha256": "298c2ecb40b46ccaeb821a78ed1680e746ba64fb761be2b15875072ee6fbebbe",
+      "tags": [
+        "analysis",
+        "financial-tools"
+      ],
+      "access": {
+        "audience": "consultant",
+        "reviewRequired": false,
+        "reviewReasons": [],
+        "previewAllowed": false,
+        "downloadAllowed": true
+      },
+      "workbook": {
+        "sheetCount": 4,
+        "formulaCount": 7216,
+        "valueCellCount": 8145,
+        "definedNameCount": 5,
+        "hiddenSheetCount": 1,
+        "hasVbaProject": false,
+        "externalReferenceCount": 3,
+        "crossSheetReferenceCount": 1,
+        "parseWarning": null,
+        "usefulSheets": [
+          {
+            "name": "Gantt Chart",
+            "ref": "A1:BW111",
+            "formulaCount": 7215,
+            "labelSample": [
+              "Gantt Chart",
+              "Category",
+              "Activity",
+              "Person",
+              "Start",
+              "End",
+              "%",
+              "Plan"
+            ]
+          },
+          {
+            "name": "Calculations",
+            "ref": "B5:I57",
+            "formulaCount": 1,
+            "labelSample": [
+              "Category",
+              "Activity",
+              "Min of Start Date",
+              "Max of End Date",
+              "Start Date",
+              "Deployment",
+              "Act 016",
+              "Act 025"
+            ]
+          },
+          {
+            "name": "Data",
+            "ref": "A1:L126",
+            "formulaCount": 0,
+            "labelSample": [
+              "People & Task Data",
+              "Person",
+              "Team",
+              "Activity",
+              "Category",
+              "Owner",
+              "Start Date",
+              "End Date"
+            ]
+          },
+          {
+            "name": "Issues",
+            "ref": "A1:G29",
+            "formulaCount": 0,
+            "labelSample": [
+              "Issue Tracker",
+              "Issue",
+              "Assigned to",
+              "Priority",
+              "Date opened",
+              "Date Closed",
+              "Keyboard scanner won't open up",
+              "Bruce Wayne"
+            ]
+          }
+        ]
+      },
+      "document": null,
+      "porting": {
+        "priority": "live",
+        "rank": 4,
+        "implementationStatus": "live",
+        "appRoute": "/workspace/[clientId]/analyst-wizard/sheets/dashboard-gantt-chart",
+        "calculationEndpoint": "/api/worksheets/workbook-ports/calculate",
+        "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
+        "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
+      }
     },
     {
       "key": "f-100-breakeven-32dc69af0c",
@@ -1613,70 +1861,6 @@
       }
     },
     {
-      "key": "f-1200-ar-turns-worksheet-652d275edd",
-      "title": "F 1200 AR Turns Worksheet",
-      "businessArea": "analysis",
-      "sourceType": "workbook",
-      "canonicalPath": "Spreadsheets/Financial Tools/F-1200  AR Turns Worksheet.xls",
-      "duplicatePaths": [
-        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-1200  AR Turns Worksheet.xls"
-      ],
-      "duplicateCount": 1,
-      "originalCategory": "financial-tools",
-      "extension": ".xls",
-      "sizeBytes": 28672,
-      "sha256": "652d275edd0f90620495d5e7a98f0af050503ff6af3bf8982b551a14f75dc2bd",
-      "tags": [
-        "analysis",
-        "financial-tools"
-      ],
-      "access": {
-        "audience": "consultant",
-        "reviewRequired": false,
-        "reviewReasons": [],
-        "previewAllowed": false,
-        "downloadAllowed": true
-      },
-      "workbook": {
-        "sheetCount": 1,
-        "formulaCount": 11,
-        "valueCellCount": 46,
-        "definedNameCount": 0,
-        "hiddenSheetCount": 0,
-        "hasVbaProject": false,
-        "externalReferenceCount": 0,
-        "crossSheetReferenceCount": 0,
-        "parseWarning": null,
-        "usefulSheets": [
-          {
-            "name": "Sheet1",
-            "ref": "A1:H21",
-            "formulaCount": 11,
-            "labelSample": [
-              "AR Turns and Balance Calculation Worksheet",
-              "Annual Sales (Credit)",
-              "=",
-              "AR Turns",
-              "This form provides examples",
-              "Avg AR Balance",
-              "Of how to calculate various",
-              "Accounts Receivable tracking"
-            ]
-          }
-        ]
-      },
-      "document": null,
-      "porting": {
-        "priority": "candidate",
-        "rank": null,
-        "implementationStatus": "not-started",
-        "appRoute": null,
-        "calculationEndpoint": null,
-        "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
-        "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
-      }
-    },
-    {
       "key": "f-1400-cpa-service-comparison-a8c7445012",
       "title": "F 1400 CPA Service Comparison",
       "businessArea": "analysis",
@@ -1743,115 +1927,6 @@
         "parseWarning": null
       },
       "porting": null
-    },
-    {
-      "key": "f-1600d-dashboard-gantt-chart-298c2ecb40",
-      "title": "F 1600d Dashboard Gantt Chart",
-      "businessArea": "analysis",
-      "sourceType": "workbook",
-      "canonicalPath": "Spreadsheets/Financial Tools/F-1600d Dashboard Gantt-Chart.xlsx",
-      "duplicatePaths": [
-        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-1600d Dashboard Gantt-Chart.xlsx"
-      ],
-      "duplicateCount": 1,
-      "originalCategory": "financial-tools",
-      "extension": ".xlsx",
-      "sizeBytes": 246206,
-      "sha256": "298c2ecb40b46ccaeb821a78ed1680e746ba64fb761be2b15875072ee6fbebbe",
-      "tags": [
-        "analysis",
-        "financial-tools"
-      ],
-      "access": {
-        "audience": "consultant",
-        "reviewRequired": false,
-        "reviewReasons": [],
-        "previewAllowed": false,
-        "downloadAllowed": true
-      },
-      "workbook": {
-        "sheetCount": 4,
-        "formulaCount": 7216,
-        "valueCellCount": 8145,
-        "definedNameCount": 5,
-        "hiddenSheetCount": 1,
-        "hasVbaProject": false,
-        "externalReferenceCount": 3,
-        "crossSheetReferenceCount": 1,
-        "parseWarning": null,
-        "usefulSheets": [
-          {
-            "name": "Gantt Chart",
-            "ref": "A1:BW111",
-            "formulaCount": 7215,
-            "labelSample": [
-              "Gantt Chart",
-              "Category",
-              "Activity",
-              "Person",
-              "Start",
-              "End",
-              "%",
-              "Plan"
-            ]
-          },
-          {
-            "name": "Calculations",
-            "ref": "B5:I57",
-            "formulaCount": 1,
-            "labelSample": [
-              "Category",
-              "Activity",
-              "Min of Start Date",
-              "Max of End Date",
-              "Start Date",
-              "Deployment",
-              "Act 016",
-              "Act 025"
-            ]
-          },
-          {
-            "name": "Data",
-            "ref": "A1:L126",
-            "formulaCount": 0,
-            "labelSample": [
-              "People & Task Data",
-              "Person",
-              "Team",
-              "Activity",
-              "Category",
-              "Owner",
-              "Start Date",
-              "End Date"
-            ]
-          },
-          {
-            "name": "Issues",
-            "ref": "A1:G29",
-            "formulaCount": 0,
-            "labelSample": [
-              "Issue Tracker",
-              "Issue",
-              "Assigned to",
-              "Priority",
-              "Date opened",
-              "Date Closed",
-              "Keyboard scanner won't open up",
-              "Bruce Wayne"
-            ]
-          }
-        ]
-      },
-      "document": null,
-      "porting": {
-        "priority": "next",
-        "rank": 4,
-        "implementationStatus": "not-started",
-        "appRoute": null,
-        "calculationEndpoint": null,
-        "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
-        "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
-      }
     },
     {
       "key": "f-1600e-dashboard-gantt-chart-6f4df0e031",
@@ -2267,70 +2342,6 @@
       "porting": null
     },
     {
-      "key": "f-300a-overhead-calcs-565e12b9a2",
-      "title": "F 300a Overhead Calcs",
-      "businessArea": "analysis",
-      "sourceType": "workbook",
-      "canonicalPath": "Spreadsheets/Financial Tools/F-300a - Overhead Calcs.xls",
-      "duplicatePaths": [
-        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-300a - Overhead Calcs.xls"
-      ],
-      "duplicateCount": 1,
-      "originalCategory": "financial-tools",
-      "extension": ".xls",
-      "sizeBytes": 30208,
-      "sha256": "565e12b9a29a3c1ec964ed49164ea324a95dafd013103623696820cb097f0aaf",
-      "tags": [
-        "analysis",
-        "financial-tools"
-      ],
-      "access": {
-        "audience": "consultant",
-        "reviewRequired": false,
-        "reviewReasons": [],
-        "previewAllowed": false,
-        "downloadAllowed": true
-      },
-      "workbook": {
-        "sheetCount": 1,
-        "formulaCount": 12,
-        "valueCellCount": 35,
-        "definedNameCount": 1,
-        "hiddenSheetCount": 0,
-        "hasVbaProject": false,
-        "externalReferenceCount": 0,
-        "crossSheetReferenceCount": 0,
-        "parseWarning": null,
-        "usefulSheets": [
-          {
-            "name": "Sheet1",
-            "ref": "A1:G34",
-            "formulaCount": 12,
-            "labelSample": [
-              "G-340A",
-              "Ray-Mac Mechanical, Inc.",
-              "OVERHEAD FACTORING",
-              "FIGURES BASED ON ANNUAL BUDGET FOR FY 2004",
-              "TOTAL REVENUE ( R )",
-              "TOTAL OVERHEAD, OR FIXED COSTS ( FC )",
-              "TOTAL MATERIAL COSTS",
-              "TOTAL DIRECT LABOR COSTS"
-            ]
-          }
-        ]
-      },
-      "document": null,
-      "porting": {
-        "priority": "candidate",
-        "rank": null,
-        "implementationStatus": "not-started",
-        "appRoute": null,
-        "calculationEndpoint": null,
-        "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
-        "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
-      }
-    },
-    {
       "key": "f-400a-accounting-process-e48a846a95",
       "title": "F 400a Accounting Process",
       "businessArea": "analysis",
@@ -2685,85 +2696,6 @@
       "porting": null
     },
     {
-      "key": "f-700a-flex-budget-worksheet-32bd47bd2c",
-      "title": "F 700a Flex Budget Worksheet",
-      "businessArea": "analysis",
-      "sourceType": "workbook",
-      "canonicalPath": "Spreadsheets/Financial Tools/F-700a - Flex Budget Worksheet.xlsx",
-      "duplicatePaths": [
-        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-700a - Flex Budget Worksheet.xlsx"
-      ],
-      "duplicateCount": 1,
-      "originalCategory": "financial-tools",
-      "extension": ".xlsx",
-      "sizeBytes": 65764,
-      "sha256": "32bd47bd2ce397d48c9ad263f55852f10dcbbd91ce9178aabac6c95c33396748",
-      "tags": [
-        "analysis",
-        "financial-tools"
-      ],
-      "access": {
-        "audience": "consultant",
-        "reviewRequired": false,
-        "reviewReasons": [],
-        "previewAllowed": false,
-        "downloadAllowed": true
-      },
-      "workbook": {
-        "sheetCount": 2,
-        "formulaCount": 1334,
-        "valueCellCount": 1841,
-        "definedNameCount": 2,
-        "hiddenSheetCount": 0,
-        "hasVbaProject": false,
-        "externalReferenceCount": 0,
-        "crossSheetReferenceCount": 0,
-        "parseWarning": null,
-        "usefulSheets": [
-          {
-            "name": "Monthly Budget",
-            "ref": "A1:S76",
-            "formulaCount": 912,
-            "labelSample": [
-              "OPERATING INCOME (LOSS)",
-              "Annual 2018",
-              "Total",
-              "Monthly",
-              "January",
-              "February",
-              "March",
-              "April"
-            ]
-          },
-          {
-            "name": "Annual Budget",
-            "ref": "A1:BM201",
-            "formulaCount": 422,
-            "labelSample": [
-              "Variables",
-              "M.B. McKee Company",
-              "Summary Table for Budget",
-              "Income Tax Rate",
-              "GROWTH %",
-              "Annual",
-              "Monthly",
-              "Weekly"
-            ]
-          }
-        ]
-      },
-      "document": null,
-      "porting": {
-        "priority": "next",
-        "rank": 12,
-        "implementationStatus": "not-started",
-        "appRoute": null,
-        "calculationEndpoint": null,
-        "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
-        "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
-      }
-    },
-    {
       "key": "f-700b-budget-planning-worksheet-0a15b7504d",
       "title": "F 700b Budget Planning Worksheet",
       "businessArea": "analysis",
@@ -2964,51 +2896,6 @@
       "porting": null
     },
     {
-      "key": "f-900-cash-flow-forecasting-for-f-900a-d3c0c22c28",
-      "title": "F 900 Cash Flow Forecasting for F 900a",
-      "businessArea": "analysis",
-      "sourceType": "document",
-      "canonicalPath": "Spreadsheets/Financial Tools/F-900  Cash Flow Forecasting for F-900a.docx",
-      "duplicatePaths": [
-        "Spreadsheets/BMS Consulting  Tool box-20260423T191629Z-3-001/BMS Consulting  Tool box/F-900  Cash Flow Forecasting for F-900a.docx",
-        "Spreadsheets/BMS Consulting  Tool box-20260423T191640Z-3-001/BMS Consulting  Tool box/F-900  Cash Flow Forecasting for F-900a.docx",
-        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-900  Cash Flow Forecasting for F-900a.docx"
-      ],
-      "duplicateCount": 3,
-      "originalCategory": "financial-tools",
-      "extension": ".docx",
-      "sizeBytes": 411274,
-      "sha256": "d3c0c22c28cae3bafd935a253185b8d708c984b349b689161b7520269f96c733",
-      "tags": [
-        "analysis",
-        "financial-tools",
-        "cash flow",
-        "budget",
-        "employee"
-      ],
-      "access": {
-        "audience": "consultant",
-        "reviewRequired": true,
-        "reviewReasons": [
-          "Confidential content"
-        ],
-        "previewAllowed": false,
-        "downloadAllowed": false
-      },
-      "workbook": null,
-      "document": {
-        "wordCountApprox": 1104,
-        "keywordHits": [
-          "cash flow",
-          "budget",
-          "employee"
-        ],
-        "textSample": "INTRODUCTION The purpose of this standard procedure is to establish a method for the review and forecasting of cash requirements for the sample worksheet F-900a . CONCEPT Cash planning is one of management s most important, ongoing duties. The budgeting of incoming and outgoing cash results in the following benefits: It gives management an early warning of upcoming difficulties with cash availability. It shows manage",
-        "parseWarning": null
-      },
-      "porting": null
-    },
-    {
       "key": "f-900-cash-flow-procedure-for-f-900b-7791c029d1",
       "title": "F 900 Cash Flow Procedure for F 900b",
       "businessArea": "analysis",
@@ -3084,19 +2971,19 @@
       "porting": null
     },
     {
-      "key": "f-900a-cash-flow-forecast-worksheet-e800747c25",
-      "title": "F 900a Cash Flow Forecast worksheet",
+      "key": "f-1200-ar-turns-652d275edd",
+      "title": "F-1200 AR Turns Worksheet",
       "businessArea": "analysis",
       "sourceType": "workbook",
-      "canonicalPath": "Spreadsheets/Financial Tools/F-900a  Cash Flow Forecast worksheet.xls",
+      "canonicalPath": "Spreadsheets/Financial Tools/F-1200  AR Turns Worksheet.xls",
       "duplicatePaths": [
-        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-900a  Cash Flow Forecast worksheet.xls"
+        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-1200  AR Turns Worksheet.xls"
       ],
       "duplicateCount": 1,
       "originalCategory": "financial-tools",
       "extension": ".xls",
-      "sizeBytes": 87040,
-      "sha256": "e800747c25a77476fbb26af484dbd3a043bdf565c3cf58704298cc4d8591af00",
+      "sizeBytes": 28672,
+      "sha256": "652d275edd0f90620495d5e7a98f0af050503ff6af3bf8982b551a14f75dc2bd",
       "tags": [
         "analysis",
         "financial-tools"
@@ -3109,70 +2996,183 @@
         "downloadAllowed": true
       },
       "workbook": {
-        "sheetCount": 3,
-        "formulaCount": 1023,
-        "valueCellCount": 1137,
-        "definedNameCount": 3,
+        "sheetCount": 1,
+        "formulaCount": 11,
+        "valueCellCount": 46,
+        "definedNameCount": 0,
         "hiddenSheetCount": 0,
         "hasVbaProject": false,
         "externalReferenceCount": 0,
-        "crossSheetReferenceCount": 4,
+        "crossSheetReferenceCount": 0,
         "parseWarning": null,
         "usefulSheets": [
           {
-            "name": "Accounts Receivable Activity",
-            "ref": "A1:V58",
-            "formulaCount": 560,
+            "name": "Sheet1",
+            "ref": "A1:H21",
+            "formulaCount": 11,
             "labelSample": [
-              "RECEIVE",
-              "RECEIVE",
-              "RECEIVE",
-              "RECEIVE",
-              "RECEIVE",
-              "RECEIVE",
-              "RECEIVE",
-              "RECEIVE"
-            ]
-          },
-          {
-            "name": "Accounts Payable Activity",
-            "ref": "A1:V101",
-            "formulaCount": 410,
-            "labelSample": [
-              "PAY",
-              "PAY",
-              "PAY",
-              "PAY",
-              "PAY",
-              "PAY",
-              "PAY",
-              "PAY"
-            ]
-          },
-          {
-            "name": "Projected Cash Activity",
-            "ref": "A1:IV51",
-            "formulaCount": 53,
-            "labelSample": [
-              "CASH FLOW ANALYSIS",
-              "WEEK ENDING",
-              "WEEK ENDING",
-              "WEEK ENDING",
-              "WEEK ENDING",
-              "WEEK ENDING",
-              "WEEK ENDING",
-              "WEEK ENDING"
+              "AR Turns and Balance Calculation Worksheet",
+              "Annual Sales (Credit)",
+              "=",
+              "AR Turns",
+              "This form provides examples",
+              "Avg AR Balance",
+              "Of how to calculate various",
+              "Accounts Receivable tracking"
             ]
           }
         ]
       },
       "document": null,
       "porting": {
-        "priority": "next",
-        "rank": 14,
-        "implementationStatus": "not-started",
-        "appRoute": null,
-        "calculationEndpoint": null,
+        "priority": "live",
+        "rank": null,
+        "implementationStatus": "live",
+        "appRoute": "/workspace/[clientId]/analyst-wizard/sheets/f-1200-ar-turns",
+        "calculationEndpoint": "/api/worksheets/workbook-ports/calculate",
+        "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
+        "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
+      }
+    },
+    {
+      "key": "f-300a-overhead-calcs-565e12b9a2",
+      "title": "F-300a Overhead Calcs",
+      "businessArea": "analysis",
+      "sourceType": "workbook",
+      "canonicalPath": "Spreadsheets/Financial Tools/F-300a - Overhead Calcs.xls",
+      "duplicatePaths": [
+        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-300a - Overhead Calcs.xls"
+      ],
+      "duplicateCount": 1,
+      "originalCategory": "financial-tools",
+      "extension": ".xls",
+      "sizeBytes": 30208,
+      "sha256": "565e12b9a29a3c1ec964ed49164ea324a95dafd013103623696820cb097f0aaf",
+      "tags": [
+        "analysis",
+        "financial-tools"
+      ],
+      "access": {
+        "audience": "consultant",
+        "reviewRequired": false,
+        "reviewReasons": [],
+        "previewAllowed": false,
+        "downloadAllowed": true
+      },
+      "workbook": {
+        "sheetCount": 1,
+        "formulaCount": 12,
+        "valueCellCount": 35,
+        "definedNameCount": 1,
+        "hiddenSheetCount": 0,
+        "hasVbaProject": false,
+        "externalReferenceCount": 0,
+        "crossSheetReferenceCount": 0,
+        "parseWarning": null,
+        "usefulSheets": [
+          {
+            "name": "Sheet1",
+            "ref": "A1:G34",
+            "formulaCount": 12,
+            "labelSample": [
+              "G-340A",
+              "Ray-Mac Mechanical, Inc.",
+              "OVERHEAD FACTORING",
+              "FIGURES BASED ON ANNUAL BUDGET FOR FY 2004",
+              "TOTAL REVENUE ( R )",
+              "TOTAL OVERHEAD, OR FIXED COSTS ( FC )",
+              "TOTAL MATERIAL COSTS",
+              "TOTAL DIRECT LABOR COSTS"
+            ]
+          }
+        ]
+      },
+      "document": null,
+      "porting": {
+        "priority": "live",
+        "rank": null,
+        "implementationStatus": "live",
+        "appRoute": "/workspace/[clientId]/analyst-wizard/sheets/f-300a-overhead-calcs",
+        "calculationEndpoint": "/api/worksheets/workbook-ports/calculate",
+        "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
+        "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
+      }
+    },
+    {
+      "key": "flex-budget-worksheet-32bd47bd2c",
+      "title": "Flex Budget Worksheet",
+      "businessArea": "analysis",
+      "sourceType": "workbook",
+      "canonicalPath": "Spreadsheets/Financial Tools/F-700a - Flex Budget Worksheet.xlsx",
+      "duplicatePaths": [
+        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-700a - Flex Budget Worksheet.xlsx"
+      ],
+      "duplicateCount": 1,
+      "originalCategory": "financial-tools",
+      "extension": ".xlsx",
+      "sizeBytes": 65764,
+      "sha256": "32bd47bd2ce397d48c9ad263f55852f10dcbbd91ce9178aabac6c95c33396748",
+      "tags": [
+        "analysis",
+        "financial-tools"
+      ],
+      "access": {
+        "audience": "consultant",
+        "reviewRequired": false,
+        "reviewReasons": [],
+        "previewAllowed": false,
+        "downloadAllowed": true
+      },
+      "workbook": {
+        "sheetCount": 2,
+        "formulaCount": 1334,
+        "valueCellCount": 1841,
+        "definedNameCount": 2,
+        "hiddenSheetCount": 0,
+        "hasVbaProject": false,
+        "externalReferenceCount": 0,
+        "crossSheetReferenceCount": 0,
+        "parseWarning": null,
+        "usefulSheets": [
+          {
+            "name": "Monthly Budget",
+            "ref": "A1:S76",
+            "formulaCount": 912,
+            "labelSample": [
+              "OPERATING INCOME (LOSS)",
+              "Annual 2018",
+              "Total",
+              "Monthly",
+              "January",
+              "February",
+              "March",
+              "April"
+            ]
+          },
+          {
+            "name": "Annual Budget",
+            "ref": "A1:BM201",
+            "formulaCount": 422,
+            "labelSample": [
+              "Variables",
+              "M.B. McKee Company",
+              "Summary Table for Budget",
+              "Income Tax Rate",
+              "GROWTH %",
+              "Annual",
+              "Monthly",
+              "Weekly"
+            ]
+          }
+        ]
+      },
+      "document": null,
+      "porting": {
+        "priority": "live",
+        "rank": 12,
+        "implementationStatus": "live",
+        "appRoute": "/workspace/[clientId]/analyst-wizard/sheets/flex-budget-worksheet",
+        "calculationEndpoint": "/api/worksheets/workbook-ports/calculate",
         "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
         "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
       }
@@ -3389,7 +3389,7 @@
     },
     {
       "key": "inventory-turn-calculation-3bbd6d98f1",
-      "title": "Inventory Turn calculation",
+      "title": "Inventory Turn Calculation",
       "businessArea": "analysis",
       "sourceType": "workbook",
       "canonicalPath": "Spreadsheets/BMS Consulting  Tool box-20260423T191629Z-3-001/BMS Consulting  Tool box/Inventory Turn calculation.xls",
@@ -3442,11 +3442,11 @@
       },
       "document": null,
       "porting": {
-        "priority": "candidate",
+        "priority": "live",
         "rank": null,
-        "implementationStatus": "not-started",
-        "appRoute": null,
-        "calculationEndpoint": null,
+        "implementationStatus": "live",
+        "appRoute": "/workspace/[clientId]/analyst-wizard/sheets/inventory-turn-calculation",
+        "calculationEndpoint": "/api/worksheets/workbook-ports/calculate",
         "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
         "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
       }
@@ -7025,11 +7025,11 @@
       },
       "document": null,
       "porting": {
-        "priority": "next",
+        "priority": "live",
         "rank": 5,
-        "implementationStatus": "not-started",
-        "appRoute": null,
-        "calculationEndpoint": null,
+        "implementationStatus": "live",
+        "appRoute": "/workspace/[clientId]/analyst-wizard/sheets/bms-marketing-forecast",
+        "calculationEndpoint": "/api/worksheets/workbook-ports/calculate",
         "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
         "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
       }
@@ -7771,175 +7771,6 @@
       "porting": null
     },
     {
-      "key": "f-700e-sales-pipeline-forecast-form-7f0b72fa5b",
-      "title": "F 700e Sales Pipeline Forecast form",
-      "businessArea": "marketing",
-      "sourceType": "workbook",
-      "canonicalPath": "Spreadsheets/Financial Tools/F-700e Sales Pipeline Forecast form.xlsx",
-      "duplicatePaths": [
-        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-700e Sales Pipeline Forecast form.xlsx"
-      ],
-      "duplicateCount": 1,
-      "originalCategory": "financial-tools",
-      "extension": ".xlsx",
-      "sizeBytes": 48511,
-      "sha256": "7f0b72fa5b1d58170d6990908e5406c3e09e8bb0cb7ecb89335dcf3885d31c5d",
-      "tags": [
-        "marketing",
-        "financial-tools"
-      ],
-      "access": {
-        "audience": "consultant",
-        "reviewRequired": false,
-        "reviewReasons": [],
-        "previewAllowed": false,
-        "downloadAllowed": true
-      },
-      "workbook": {
-        "sheetCount": 8,
-        "formulaCount": 1680,
-        "valueCellCount": 1792,
-        "definedNameCount": 0,
-        "hiddenSheetCount": 0,
-        "hasVbaProject": false,
-        "externalReferenceCount": 0,
-        "crossSheetReferenceCount": 0,
-        "parseWarning": null,
-        "usefulSheets": [
-          {
-            "name": "Product 1",
-            "ref": "A1:DC13",
-            "formulaCount": 210,
-            "labelSample": [
-              "DATES",
-              "Sales Revenues Actual",
-              "Sales Revenues Forecasted",
-              "Sales Orders Actual",
-              "Sales Orders Forecasted",
-              "Forecast % Increase Revenue",
-              "Forecasted Increase # Orders",
-              "Shaded cells have formulas, do not key over them"
-            ]
-          },
-          {
-            "name": "Product 2",
-            "ref": "A1:DC13",
-            "formulaCount": 210,
-            "labelSample": [
-              "DATES",
-              "Sales Revenues Actual",
-              "Sales Revenues Forecasted",
-              "Sales Orders Actual",
-              "Sales Orders Forecasted",
-              "Forecast % Increase Revenue",
-              "Forecasted Increase # Orders",
-              "Shaded cells have formulas, do not key over them"
-            ]
-          },
-          {
-            "name": "Product 3",
-            "ref": "A1:DC13",
-            "formulaCount": 210,
-            "labelSample": [
-              "DATES",
-              "Sales Revenues Actual",
-              "Sales Revenues Forecasted",
-              "Sales Orders Actual",
-              "Sales Orders Forecasted",
-              "Forecast % Increase Revenue",
-              "Forecasted Increase # Orders",
-              "Shaded cells have formulas, do not key over them"
-            ]
-          },
-          {
-            "name": "Product 4",
-            "ref": "A1:DC13",
-            "formulaCount": 210,
-            "labelSample": [
-              "DATES",
-              "Sales Revenues Actual",
-              "Sales Revenues Forecasted",
-              "Sales Orders Actual",
-              "Sales Orders Forecasted",
-              "Forecast % Increase Revenue",
-              "Forecasted Increase # Orders",
-              "Shaded cells have formulas, do not key over them"
-            ]
-          },
-          {
-            "name": "Product 5",
-            "ref": "A1:DC13",
-            "formulaCount": 210,
-            "labelSample": [
-              "DATES",
-              "Sales Revenues Actual",
-              "Sales Revenues Forecasted",
-              "Sales Orders Actual",
-              "Sales Orders Forecasted",
-              "Forecast % Increase Revenue",
-              "Forecasted Increase # Orders",
-              "Shaded cells have formulas, do not key over them"
-            ]
-          },
-          {
-            "name": "Product 6",
-            "ref": "A1:DC13",
-            "formulaCount": 210,
-            "labelSample": [
-              "DATES",
-              "Sales Revenues Actual",
-              "Sales Revenues Forecasted",
-              "Sales Orders Actual",
-              "Sales Orders Forecasted",
-              "Forecast % Increase Revenue",
-              "Forecasted Increase # Orders",
-              "Shaded cells have formulas, do not key over them"
-            ]
-          },
-          {
-            "name": "Product 7",
-            "ref": "A1:DC13",
-            "formulaCount": 210,
-            "labelSample": [
-              "DATES",
-              "Sales Revenues Actual",
-              "Sales Revenues Forecasted",
-              "Sales Orders Actual",
-              "Sales Orders Forecasted",
-              "Forecast % Increase Revenue",
-              "Forecasted Increase # Orders",
-              "Shaded cells have formulas, do not key over them"
-            ]
-          },
-          {
-            "name": "Product 8",
-            "ref": "A1:DC13",
-            "formulaCount": 210,
-            "labelSample": [
-              "DATES",
-              "Sales Revenues Actual",
-              "Sales Revenues Forecasted",
-              "Sales Orders Actual",
-              "Sales Orders Forecasted",
-              "Forecast % Increase Revenue",
-              "Forecasted Increase # Orders",
-              "Shaded cells have formulas, do not key over them"
-            ]
-          }
-        ]
-      },
-      "document": null,
-      "porting": {
-        "priority": "next",
-        "rank": 10,
-        "implementationStatus": "not-started",
-        "appRoute": null,
-        "calculationEndpoint": null,
-        "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
-        "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
-      }
-    },
-    {
       "key": "gr-institutional-68edda948f",
       "title": "GR Institutional",
       "businessArea": "marketing",
@@ -8264,6 +8095,175 @@
         "parseWarning": null
       },
       "porting": null
+    },
+    {
+      "key": "sales-pipeline-forecast-7f0b72fa5b",
+      "title": "Sales Pipeline Forecast",
+      "businessArea": "marketing",
+      "sourceType": "workbook",
+      "canonicalPath": "Spreadsheets/Financial Tools/F-700e Sales Pipeline Forecast form.xlsx",
+      "duplicatePaths": [
+        "Spreadsheets/Financial Tools (Unzipped Files)-20260423T191643Z-3-001/Financial Tools (Unzipped Files)/F-700e Sales Pipeline Forecast form.xlsx"
+      ],
+      "duplicateCount": 1,
+      "originalCategory": "financial-tools",
+      "extension": ".xlsx",
+      "sizeBytes": 48511,
+      "sha256": "7f0b72fa5b1d58170d6990908e5406c3e09e8bb0cb7ecb89335dcf3885d31c5d",
+      "tags": [
+        "marketing",
+        "financial-tools"
+      ],
+      "access": {
+        "audience": "consultant",
+        "reviewRequired": false,
+        "reviewReasons": [],
+        "previewAllowed": false,
+        "downloadAllowed": true
+      },
+      "workbook": {
+        "sheetCount": 8,
+        "formulaCount": 1680,
+        "valueCellCount": 1792,
+        "definedNameCount": 0,
+        "hiddenSheetCount": 0,
+        "hasVbaProject": false,
+        "externalReferenceCount": 0,
+        "crossSheetReferenceCount": 0,
+        "parseWarning": null,
+        "usefulSheets": [
+          {
+            "name": "Product 1",
+            "ref": "A1:DC13",
+            "formulaCount": 210,
+            "labelSample": [
+              "DATES",
+              "Sales Revenues Actual",
+              "Sales Revenues Forecasted",
+              "Sales Orders Actual",
+              "Sales Orders Forecasted",
+              "Forecast % Increase Revenue",
+              "Forecasted Increase # Orders",
+              "Shaded cells have formulas, do not key over them"
+            ]
+          },
+          {
+            "name": "Product 2",
+            "ref": "A1:DC13",
+            "formulaCount": 210,
+            "labelSample": [
+              "DATES",
+              "Sales Revenues Actual",
+              "Sales Revenues Forecasted",
+              "Sales Orders Actual",
+              "Sales Orders Forecasted",
+              "Forecast % Increase Revenue",
+              "Forecasted Increase # Orders",
+              "Shaded cells have formulas, do not key over them"
+            ]
+          },
+          {
+            "name": "Product 3",
+            "ref": "A1:DC13",
+            "formulaCount": 210,
+            "labelSample": [
+              "DATES",
+              "Sales Revenues Actual",
+              "Sales Revenues Forecasted",
+              "Sales Orders Actual",
+              "Sales Orders Forecasted",
+              "Forecast % Increase Revenue",
+              "Forecasted Increase # Orders",
+              "Shaded cells have formulas, do not key over them"
+            ]
+          },
+          {
+            "name": "Product 4",
+            "ref": "A1:DC13",
+            "formulaCount": 210,
+            "labelSample": [
+              "DATES",
+              "Sales Revenues Actual",
+              "Sales Revenues Forecasted",
+              "Sales Orders Actual",
+              "Sales Orders Forecasted",
+              "Forecast % Increase Revenue",
+              "Forecasted Increase # Orders",
+              "Shaded cells have formulas, do not key over them"
+            ]
+          },
+          {
+            "name": "Product 5",
+            "ref": "A1:DC13",
+            "formulaCount": 210,
+            "labelSample": [
+              "DATES",
+              "Sales Revenues Actual",
+              "Sales Revenues Forecasted",
+              "Sales Orders Actual",
+              "Sales Orders Forecasted",
+              "Forecast % Increase Revenue",
+              "Forecasted Increase # Orders",
+              "Shaded cells have formulas, do not key over them"
+            ]
+          },
+          {
+            "name": "Product 6",
+            "ref": "A1:DC13",
+            "formulaCount": 210,
+            "labelSample": [
+              "DATES",
+              "Sales Revenues Actual",
+              "Sales Revenues Forecasted",
+              "Sales Orders Actual",
+              "Sales Orders Forecasted",
+              "Forecast % Increase Revenue",
+              "Forecasted Increase # Orders",
+              "Shaded cells have formulas, do not key over them"
+            ]
+          },
+          {
+            "name": "Product 7",
+            "ref": "A1:DC13",
+            "formulaCount": 210,
+            "labelSample": [
+              "DATES",
+              "Sales Revenues Actual",
+              "Sales Revenues Forecasted",
+              "Sales Orders Actual",
+              "Sales Orders Forecasted",
+              "Forecast % Increase Revenue",
+              "Forecasted Increase # Orders",
+              "Shaded cells have formulas, do not key over them"
+            ]
+          },
+          {
+            "name": "Product 8",
+            "ref": "A1:DC13",
+            "formulaCount": 210,
+            "labelSample": [
+              "DATES",
+              "Sales Revenues Actual",
+              "Sales Revenues Forecasted",
+              "Sales Orders Actual",
+              "Sales Orders Forecasted",
+              "Forecast % Increase Revenue",
+              "Forecasted Increase # Orders",
+              "Shaded cells have formulas, do not key over them"
+            ]
+          }
+        ]
+      },
+      "document": null,
+      "porting": {
+        "priority": "live",
+        "rank": 10,
+        "implementationStatus": "live",
+        "appRoute": "/workspace/[clientId]/analyst-wizard/sheets/sales-pipeline-forecast",
+        "calculationEndpoint": "/api/worksheets/workbook-ports/calculate",
+        "sourceManifest": "knowledge/workbooks/spreadsheets_folder_audit.json",
+        "approach": "Use workbook manifests for discovery, then rebuild required calculations in reviewed server-side worksheet modules with saved client runs."
+      }
     }
   ]
 }

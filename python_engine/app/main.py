@@ -25,10 +25,13 @@ from .models import (
     PLComparisonsInput,
     WeeklyCashFlowInput,
     WeeklyCashFlowResult,
+    WorkbookPortInput,
+    WorkbookPortResult,
     WorkingCapitalInput,
     WorkingCapitalResult,
 )
 from .spreadsheet_context import WorkbookContext, load_workbook_context
+from .workbook_ports import calculate_workbook_port as run_workbook_port
 
 ENGINE_VERSION = "1.0.0"
 
@@ -1169,6 +1172,36 @@ def calculate_flexible_budget_variance(payload: dict):
                     flexible_budget_operating_income,
                 ),
                 "warnings": warnings,
+            }
+        )
+        return {"ok": True, "result": result.model_dump(by_alias=True)}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/workbook-ports/calculate")
+def calculate_workbook_port(payload: dict):
+    try:
+        validated = WorkbookPortInput.model_validate(payload)
+        workbook_key = validated.workbook_key
+        inputs = validated.inputs
+
+        try:
+            computed = run_workbook_port(workbook_key, inputs)
+        except KeyError:
+            return JSONResponse(
+                status_code=404,
+                content={"ok": False, "error": f"Unsupported workbook port: {workbook_key}"},
+            )
+
+        result = WorkbookPortResult.model_validate(
+            {
+                "workbookKey": workbook_key,
+                "summary": computed.get("summary", {}),
+                "rows": computed.get("rows", []),
+                "warnings": computed.get("warnings", []),
             }
         )
         return {"ok": True, "result": result.model_dump(by_alias=True)}

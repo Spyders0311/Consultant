@@ -1,0 +1,10 @@
+{
+  "portSlug": "inventory-turn-calculation",
+  "title": "Inventory Turn Calculation",
+  "sourcePath": "Spreadsheets/BMS Consulting  Tool box-20260423T191629Z-3-001/BMS Consulting  Tool box/Inventory Turn calculation.xls",
+  "sheetCount": 1,
+  "formulaCount": 12,
+  "sheets": ["inventory turn calculation"],
+  "inputs": ["costOfSales", "averageInventory", "beginningInventory", "endingInventory", "daysPerYear"],
+  "outputs": ["inventoryTurnsPerYear", "averageDaysHeld"]
+}

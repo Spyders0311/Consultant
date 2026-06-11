@@ -1,0 +1,10 @@
+{
+  "portSlug": "f-300a-overhead-calcs",
+  "title": "F-300a Overhead Calcs",
+  "sourcePath": "Spreadsheets/Financial Tools/F-300a - Overhead Calcs.xls",
+  "sheetCount": 1,
+  "formulaCount": 12,
+  "sheets": ["Sheet1"],
+  "inputs": ["totalRevenue", "totalOverhead", "totalMaterialCosts", "totalDirectLaborCosts"],
+  "outputs": ["overheadFactorOnDirect", "burdenedDirectCost", "grossProfit"]
+}

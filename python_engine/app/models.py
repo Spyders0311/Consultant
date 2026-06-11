@@ -319,3 +319,15 @@ class FlexibleBudgetVarianceResult(BaseModel):
     operating_income_variance: float = Field(alias="operatingIncomeVariance")
     operating_income_variance_percent: float | None = Field(alias="operatingIncomeVariancePercent")
     warnings: list[str] = Field(default_factory=list)
+
+
+class WorkbookPortInput(BaseModel):
+    workbook_key: str = Field(alias="workbookKey", min_length=1, max_length=120)
+    inputs: dict[str, object] = Field(default_factory=dict)
+
+
+class WorkbookPortResult(BaseModel):
+    workbook_key: str = Field(alias="workbookKey")
+    summary: dict[str, object] = Field(default_factory=dict)
+    rows: list[dict[str, object]] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)

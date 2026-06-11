@@ -1,0 +1,10 @@
+{
+  "portSlug": "cost-vs-sales-increase",
+  "title": "Cost vs Sales Increase",
+  "sourcePath": "Spreadsheets/BMS Consulting  Tool box-20260423T191629Z-3-001/BMS Consulting  Tool box/Cost vs Sales Increase.xls",
+  "sheetCount": 1,
+  "formulaCount": 14,
+  "sheets": ["Sheet1"],
+  "inputs": ["currentSales", "salesIncreasePercent", "variableCostPercent", "fixedExpenses"],
+  "outputs": ["newSales", "newProfit", "profitChange"]
+}
