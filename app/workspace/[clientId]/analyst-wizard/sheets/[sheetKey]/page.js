@@ -5,7 +5,6 @@ import CurrentFinancialInformationWizard from '@/components/CurrentFinancialInfo
 import FiveYearProjectionsWizard from '@/components/FiveYearProjectionsWizard';
 import PLComparisonsWizard from '@/components/PLComparisonsWizard';
 import WorkbookPortWizard from '@/components/WorkbookPortWizard';
-import WorkingCapitalWizard from '@/components/WorkingCapitalWizard';
 import WorksheetWizard from '@/components/wizard/WorksheetWizard';
 import ComingSoonPanel from '@/components/hub/ComingSoonPanel';
 import { createClient } from '@/lib/supabase/server';
@@ -56,9 +55,6 @@ export default async function AnalystWizardSheetPage({ params }) {
 
   if (sheetKey === 'breakeven-analysis') {
     return <BreakevenWizard clientId={clientId} />;
-  }
-  if (sheetKey === 'working-capital-analysis') {
-    return <WorkingCapitalWizard clientId={clientId} />;
   }
   if (sheetKey === 'p-l-comparisons') {
     return <PLComparisonsWizard clientId={clientId} />;

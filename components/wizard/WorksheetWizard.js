@@ -8,9 +8,9 @@ import RunHistoryPanel from '@/components/wizard/RunHistoryPanel';
 import usePrefillableForm from '@/lib/client/usePrefillableForm';
 import useWorksheetRuns from '@/lib/client/useWorksheetRuns';
 import usePdfDownload from '@/lib/client/usePdfDownload';
-import { currency, parseNumber, parseOptionalNumber, percent, formatRunTimestamp } from '@/lib/format';
+import { currency, formatNumber, parseNumber, parseOptionalNumber, percent, formatRunTimestamp } from '@/lib/format';
 
-const helpers = { num: parseNumber, opt: parseOptionalNumber, currency, percent };
+const helpers = { num: parseNumber, opt: parseOptionalNumber, currency, percent, formatNumber };
 
 function makeDefaultForm(config, initialData) {
   const form = {};
@@ -185,6 +185,16 @@ export default function WorksheetWizard({ config, clientId, initialData }) {
     setError('');
 
     try {
+      // Fully custom pulls (multi-source, fallbacks) implement execute();
+      // the engine still owns loading, error, and audit state.
+      if (action.execute) {
+        const outcome = await action.execute({ clientId, applyPrefill, helpers });
+        if (outcome?.warning) setPullError(outcome.warning);
+        if (outcome?.audit) setPullAudit(outcome.audit);
+        setStepIndex(0);
+        return;
+      }
+
       const params = new URLSearchParams({ client_id: clientId, ...(action.params || {}), limit: '1' });
       const response = await fetch(`${action.endpoint}?${params.toString()}`, { cache: 'no-store' });
       const data = await response.json();
@@ -338,7 +348,7 @@ export default function WorksheetWizard({ config, clientId, initialData }) {
                 />
               );
             })}
-            {step.review ? <ReviewGrid items={config.review(form, helpers)} /> : null}
+            {step.review ? <ReviewGrid items={config.review(form, helpers, { runId })} /> : null}
           </>
         )}
 
