@@ -1,4 +1,3 @@
-import AdvancedAnalystSheetWizard from '@/components/AdvancedAnalystSheetWizard';
 import WorkbookPortWizard from '@/components/WorkbookPortWizard';
 import WorksheetWizard from '@/components/wizard/WorksheetWizard';
 import ComingSoonPanel from '@/components/hub/ComingSoonPanel';
@@ -48,9 +47,6 @@ export default async function AnalystWizardSheetPage({ params }) {
     return <WorksheetWizard config={wizardConfig} clientId={clientId} initialData={initialData} />;
   }
 
-  if (worksheet.component === 'advanced-analyst-sheet') {
-    return <AdvancedAnalystSheetWizard clientId={clientId} sheetKey={sheetKey} />;
-  }
   if (worksheet.component === 'workbook-port') {
     return <WorkbookPortWizard clientId={clientId} workbookKey={sheetKey} />;
   }

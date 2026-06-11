@@ -48,13 +48,20 @@ export default function ResultsSection({ results, result, runId }) {
       {tables.map((table) => {
         const rows = getPath(result, table.rowsKey) || [];
         if (!rows.length) return null;
+        const columns = table.dynamicColumns
+          ? Object.keys(rows[0] || {}).map((key) => ({
+              key,
+              label: key,
+              format: (value) => formatValue(value, typeof value === 'number' ? 'decimal' : 'text'),
+            }))
+          : table.columns;
         return (
           <div className="table-wrap" key={table.rowsKey}>
             {table.title ? <h3>{table.title}</h3> : null}
             <table>
               <thead>
                 <tr>
-                  {table.columns.map((column) => (
+                  {columns.map((column) => (
                     <th key={column.key}>{column.label}</th>
                   ))}
                 </tr>
@@ -62,7 +69,7 @@ export default function ResultsSection({ results, result, runId }) {
               <tbody>
                 {rows.map((row, index) => (
                   <tr key={`${table.rowsKey}-${index + 1}`}>
-                    {table.columns.map((column) => (
+                    {columns.map((column) => (
                       <td key={column.key} className={column.type && column.type !== 'text' ? 'cell-num' : undefined}>
                         {display(getPath(row, column.key), column)}
                       </td>
