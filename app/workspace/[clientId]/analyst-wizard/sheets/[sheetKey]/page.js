@@ -1,4 +1,3 @@
-import worksheetCatalog from '@/knowledge/workbooks/worksheet_catalog.json';
 import AdvancedAnalystSheetWizard from '@/components/AdvancedAnalystSheetWizard';
 import BasicClientInfoWizard from '@/components/BasicClientInfoWizard';
 import BalanceSheetComparisonsWizard from '@/components/BalanceSheetComparisonsWizard';
@@ -10,86 +9,29 @@ import PLComparisonsWizard from '@/components/PLComparisonsWizard';
 import WeeklyCashFlowWizard from '@/components/WeeklyCashFlowWizard';
 import WorkbookPortWizard from '@/components/WorkbookPortWizard';
 import WorkingCapitalWizard from '@/components/WorkingCapitalWizard';
+import ComingSoonPanel from '@/components/hub/ComingSoonPanel';
 import { createClient } from '@/lib/supabase/server';
-import { WORKBOOK_PORT_KEYS } from '@/lib/workbookPortKeys';
+import { getWorksheet, getWorksheetGroups } from '@/lib/worksheets/registry';
 import { notFound } from 'next/navigation';
 
-const customWorksheets = {
-  'weekly-cash-flow': {
-    key: 'weekly-cash-flow',
-    sheetName: 'WEEKLY CASH FLOW FORECAST',
-    category: 'analysis',
-  },
-  'flexible-budget-variance': {
-    key: 'flexible-budget-variance',
-    sheetName: 'FLEXIBLE BUDGET / VARIANCE',
-    category: 'analysis',
-  },
-  'bms-marketing-forecast': {
-    key: 'bms-marketing-forecast',
-    sheetName: 'BMS MARKETING FORECAST',
-    category: 'marketing',
-  },
-  'dashboard-gantt-chart': {
-    key: 'dashboard-gantt-chart',
-    sheetName: 'DASHBOARD GANTT CHART',
-    category: 'analysis',
-  },
-  'flex-budget-worksheet': {
-    key: 'flex-budget-worksheet',
-    sheetName: 'FLEX BUDGET WORKSHEET',
-    category: 'analysis',
-  },
-  'sales-pipeline-forecast': {
-    key: 'sales-pipeline-forecast',
-    sheetName: 'SALES PIPELINE FORECAST',
-    category: 'marketing',
-  },
-  'cash-flow-forecast-worksheet': {
-    key: 'cash-flow-forecast-worksheet',
-    sheetName: 'CASH FLOW FORECAST WORKSHEET',
-    category: 'analysis',
-  },
-  'f-1200-ar-turns': {
-    key: 'f-1200-ar-turns',
-    sheetName: 'F-1200 AR TURNS WORKSHEET',
-    category: 'analysis',
-  },
-  'inventory-turn-calculation': {
-    key: 'inventory-turn-calculation',
-    sheetName: 'INVENTORY TURN CALCULATION',
-    category: 'analysis',
-  },
-  'cost-vs-sales-increase': {
-    key: 'cost-vs-sales-increase',
-    sheetName: 'COST VS SALES INCREASE',
-    category: 'analysis',
-  },
-  'f-300a-overhead-calcs': {
-    key: 'f-300a-overhead-calcs',
-    sheetName: 'F-300A OVERHEAD CALCS',
-    category: 'analysis',
-  },
-};
-
-const advancedAnalystSheetKeys = new Set([
-  '12-month-p-l-comparisons',
-  'p-l-comparisons-min-max',
-  'misc-direct-expenses',
-  'misc-indirect-expenses',
-  'z-score-private-heavy-assets',
-  'comparative-activity-ratios',
-]);
-
-const workbookPortKeys = WORKBOOK_PORT_KEYS;
-
-export default async function AnalystWizardSheetPlaceholderPage({ params }) {
+export default async function AnalystWizardSheetPage({ params }) {
   const { sheetKey, clientId } = await params;
-  const worksheet = worksheetCatalog.find((entry) => entry.key === sheetKey) || customWorksheets[sheetKey];
-  let initialClientInfo = null;
+  const worksheet = getWorksheet(sheetKey);
 
   if (!worksheet) {
     notFound();
+  }
+
+  if (worksheet.status !== 'live') {
+    const group = getWorksheetGroups({ liveOnly: true }).find(
+      (entry) => entry.name === worksheet.group,
+    );
+    const alternatives = (group?.worksheets || [])
+      .filter((entry) => entry.key !== sheetKey)
+      .slice(0, 3)
+      .map(({ key, displayName }) => ({ key, displayName }));
+
+    return <ComingSoonPanel worksheet={worksheet} clientId={clientId} alternatives={alternatives} />;
   }
 
   if (sheetKey === 'basic-client-info') {
@@ -100,7 +42,7 @@ export default async function AnalystWizardSheetPlaceholderPage({ params }) {
       .eq('id', clientId)
       .maybeSingle();
 
-    initialClientInfo = {
+    const initialClientInfo = {
       companyName: client?.company_name || '',
       industry: client?.industry || '',
     };
@@ -131,17 +73,12 @@ export default async function AnalystWizardSheetPlaceholderPage({ params }) {
   if (sheetKey === 'flexible-budget-variance') {
     return <FlexibleBudgetVarianceWizard clientId={clientId} />;
   }
-  if (advancedAnalystSheetKeys.has(sheetKey)) {
+  if (worksheet.component === 'advanced-analyst-sheet') {
     return <AdvancedAnalystSheetWizard clientId={clientId} sheetKey={sheetKey} />;
   }
-  if (workbookPortKeys.has(sheetKey)) {
+  if (worksheet.component === 'workbook-port') {
     return <WorkbookPortWizard clientId={clientId} workbookKey={sheetKey} />;
   }
 
-  return (
-    <section className="panel">
-      <h2>{worksheet.sheetName}</h2>
-      <p>Coming soon.</p>
-    </section>
-  );
+  notFound();
 }

@@ -1,58 +1,65 @@
 import Link from 'next/link';
 import CriticalWorkbookCoverage from '@/components/CriticalWorkbookCoverage';
 import ResourceLibrary from '@/components/ResourceLibrary';
+import RecentRunsStrip from '@/components/hub/RecentRunsStrip';
+import WorksheetHubList from '@/components/hub/WorksheetHubList';
+import Icon from '@/components/ui/Icon';
 import { getResourceSection } from '@/lib/bmsResourceCatalog';
-import worksheetCatalog from '@/knowledge/workbooks/worksheet_catalog.json';
+import { getAllWorksheets, getWorksheetGroups } from '@/lib/worksheets/registry';
 
 export default async function WorkspaceAnalystWizardPage({ params }) {
   const { clientId } = await params;
   const section = getResourceSection('analyst-wizard', clientId);
-  const wizardSheets = worksheetCatalog.filter((entry) => entry.category === 'analyst-wizard');
-  const coreSheets = wizardSheets.filter((entry) => entry.priorityRank > 0);
-  const otherSheets = wizardSheets.filter((entry) => entry.priorityRank <= 0);
+
+  const groups = getWorksheetGroups().map((group) => ({
+    name: group.name,
+    worksheets: group.worksheets.map(({ key, displayName, status, priorityRank }) => ({
+      key,
+      displayName,
+      status,
+      priorityRank,
+    })),
+  }));
+  const sheetNames = Object.fromEntries(
+    getAllWorksheets().map((entry) => [entry.key, entry.displayName]),
+  );
 
   return (
-    <section className="panel worksheet-picker">
-      <h2>Analyst Wizard Worksheets</h2>
-      <p>Select a worksheet to continue. Core worksheets are listed first.</p>
+    <>
+      <section className="panel hub-header">
+        <div>
+          <p className="eyebrow">Analyst Program</p>
+          <h2>Worksheets</h2>
+          <p>
+            Guided versions of the BMS analyst workbook. Live worksheets calculate server-side and
+            save every run to this client&apos;s history.
+          </p>
+        </div>
+        <Link href={`/workspace/${clientId}/analyst-wizard/guided-intake`} className="hub-cta">
+          <span className="hub-cta-icon">
+            <Icon name="play" size={18} />
+          </span>
+          <span>
+            <strong>Start Guided Intake</strong>
+            <span className="hub-cta-copy">
+              Walk through company profile, financials, and assumptions in one flow.
+            </span>
+          </span>
+          <Icon name="chevron-right" size={16} />
+        </Link>
+      </section>
 
-      <ul className="worksheet-list">
-        <li>
-          <Link href={`/workspace/${clientId}/analyst-wizard/guided-intake`} className="worksheet-link worksheet-link-core">
-            Guided Intake Wizard
-          </Link>
-        </li>
-      </ul>
+      <RecentRunsStrip clientId={clientId} sheetNames={sheetNames} />
 
-      {coreSheets.length > 0 ? <h3>Core worksheets</h3> : null}
-      <ul className="worksheet-list">
-        {coreSheets.map((entry) => (
-          <li key={entry.key}>
-            <Link
-              href={`/workspace/${clientId}/analyst-wizard/sheets/${entry.key}`}
-              className="worksheet-link worksheet-link-core"
-            >
-              {entry.sheetName}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <section className="panel">
+        <WorksheetHubList clientId={clientId} groups={groups} />
+      </section>
 
-      {otherSheets.length > 0 ? <h3>All worksheets</h3> : null}
-      <ul className="worksheet-list">
-        {otherSheets.map((entry) => (
-          <li key={entry.key}>
-            <Link href={`/workspace/${clientId}/analyst-wizard/sheets/${entry.key}`} className="worksheet-link">
-              {entry.sheetName}
-            </Link>
-          </li>
-        ))}
-      </ul>
-
-      <div className="resource-library-divider" />
-      <CriticalWorkbookCoverage clientId={clientId} />
-      <div className="resource-library-divider" />
-      <ResourceLibrary section={section} compact />
-    </section>
+      <section className="panel">
+        <CriticalWorkbookCoverage clientId={clientId} />
+        <div className="resource-library-divider" />
+        <ResourceLibrary section={section} compact />
+      </section>
+    </>
   );
 }
