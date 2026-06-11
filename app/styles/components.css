@@ -1,0 +1,193 @@
+/* Shared component classes for the going-forward design system. */
+
+/* Surfaces */
+.surface-panel {
+  background: var(--surface-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.surface-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+/* Buttons — usable on <button> and <a> */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--text-invert);
+}
+
+.btn-primary:not(:disabled):hover {
+  filter: brightness(1.12);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border-strong);
+}
+
+.btn-ghost:not(:disabled):hover {
+  color: var(--text-primary);
+  border-color: var(--accent-strong);
+  filter: none;
+}
+
+.btn-subtle {
+  background: var(--surface-3);
+  color: var(--text-primary);
+}
+
+.btn-subtle:not(:disabled):hover {
+  filter: brightness(1.15);
+}
+
+.btn-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: #f8717140;
+}
+
+.btn-sm {
+  padding: 6px 10px;
+  font-size: var(--text-xs);
+}
+
+/* Badges — the five canonical status variants */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border-radius: var(--radius-full);
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.badge-live {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.badge-soon {
+  background: var(--surface-3);
+  color: var(--text-muted);
+}
+
+.badge-port {
+  background: var(--info-soft);
+  color: var(--info);
+}
+
+.badge-review {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.badge-core {
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+/* Form primitives */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--space-3);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.worksheet-input.prefilled {
+  border-color: var(--success);
+  background: var(--success-soft);
+  box-shadow: 0 0 0 1px #34d39940 inset;
+}
+
+/* KPI cards */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.kpi-grid article {
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+}
+
+.kpi-grid span {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.kpi-grid strong {
+  font-size: var(--text-lg);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tables */
+.table-wrap {
+  overflow: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.cell-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Icons */
+.icon {
+  flex-shrink: 0;
+  vertical-align: -2px;
+}
+
+@media (max-width: 900px) {
+  .form-grid,
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1279px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
