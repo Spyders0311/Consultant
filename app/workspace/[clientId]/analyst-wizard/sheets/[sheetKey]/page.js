@@ -1,7 +1,5 @@
 import AdvancedAnalystSheetWizard from '@/components/AdvancedAnalystSheetWizard';
-import BalanceSheetComparisonsWizard from '@/components/BalanceSheetComparisonsWizard';
 import BreakevenWizard from '@/components/BreakevenWizard';
-import PLComparisonsWizard from '@/components/PLComparisonsWizard';
 import WorkbookPortWizard from '@/components/WorkbookPortWizard';
 import WorksheetWizard from '@/components/wizard/WorksheetWizard';
 import ComingSoonPanel from '@/components/hub/ComingSoonPanel';
@@ -53,12 +51,6 @@ export default async function AnalystWizardSheetPage({ params }) {
 
   if (sheetKey === 'breakeven-analysis') {
     return <BreakevenWizard clientId={clientId} />;
-  }
-  if (sheetKey === 'p-l-comparisons') {
-    return <PLComparisonsWizard clientId={clientId} />;
-  }
-  if (sheetKey === 'balance-sht-comparisons') {
-    return <BalanceSheetComparisonsWizard clientId={clientId} />;
   }
   if (worksheet.component === 'advanced-analyst-sheet') {
     return <AdvancedAnalystSheetWizard clientId={clientId} sheetKey={sheetKey} />;

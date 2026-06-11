@@ -37,7 +37,7 @@ export default function ResultsSection({ results, result, runId }) {
       {kpis.length ? (
         <div className="wizard-kpis">
           {kpis.map((kpi) => (
-            <article key={kpi.key}>
+            <article key={`${kpi.key}:${kpi.label}`}>
               <span>{kpi.label}</span>
               <strong>{display(getPath(result, kpi.key), kpi)}</strong>
             </article>
