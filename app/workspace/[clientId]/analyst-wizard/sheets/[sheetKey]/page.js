@@ -1,5 +1,4 @@
 import AdvancedAnalystSheetWizard from '@/components/AdvancedAnalystSheetWizard';
-import BreakevenWizard from '@/components/BreakevenWizard';
 import WorkbookPortWizard from '@/components/WorkbookPortWizard';
 import WorksheetWizard from '@/components/wizard/WorksheetWizard';
 import ComingSoonPanel from '@/components/hub/ComingSoonPanel';
@@ -49,9 +48,6 @@ export default async function AnalystWizardSheetPage({ params }) {
     return <WorksheetWizard config={wizardConfig} clientId={clientId} initialData={initialData} />;
   }
 
-  if (sheetKey === 'breakeven-analysis') {
-    return <BreakevenWizard clientId={clientId} />;
-  }
   if (worksheet.component === 'advanced-analyst-sheet') {
     return <AdvancedAnalystSheetWizard clientId={clientId} sheetKey={sheetKey} />;
   }
