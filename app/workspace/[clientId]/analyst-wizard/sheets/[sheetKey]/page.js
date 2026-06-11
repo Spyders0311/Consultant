@@ -1,4 +1,3 @@
-import WorkbookPortWizard from '@/components/WorkbookPortWizard';
 import WorksheetWizard from '@/components/wizard/WorksheetWizard';
 import ComingSoonPanel from '@/components/hub/ComingSoonPanel';
 import { createClient } from '@/lib/supabase/server';
@@ -26,30 +25,26 @@ export default async function AnalystWizardSheetPage({ params }) {
     return <ComingSoonPanel worksheet={worksheet} clientId={clientId} alternatives={alternatives} />;
   }
 
-  // Sheets migrated onto the unified wizard render from their config; the
-  // if-chain below shrinks as each remaining wizard migrates.
   const wizardConfig = getWizardConfig(sheetKey);
-  if (wizardConfig) {
-    let initialData = null;
-    if (sheetKey === 'basic-client-info') {
-      const supabase = await createClient();
-      const { data: client } = await supabase
-        .from('clients')
-        .select('company_name, industry')
-        .eq('id', clientId)
-        .maybeSingle();
-
-      initialData = {
-        companyName: client?.company_name || '',
-        industry: client?.industry || '',
-      };
-    }
-    return <WorksheetWizard config={wizardConfig} clientId={clientId} initialData={initialData} />;
+  if (!wizardConfig) {
+    notFound();
   }
 
-  if (worksheet.component === 'workbook-port') {
-    return <WorkbookPortWizard clientId={clientId} workbookKey={sheetKey} />;
+  // Basic client info prefills company details from the client record.
+  let initialData = null;
+  if (sheetKey === 'basic-client-info') {
+    const supabase = await createClient();
+    const { data: client } = await supabase
+      .from('clients')
+      .select('company_name, industry')
+      .eq('id', clientId)
+      .maybeSingle();
+
+    initialData = {
+      companyName: client?.company_name || '',
+      industry: client?.industry || '',
+    };
   }
 
-  notFound();
+  return <WorksheetWizard config={wizardConfig} clientId={clientId} initialData={initialData} />;
 }
