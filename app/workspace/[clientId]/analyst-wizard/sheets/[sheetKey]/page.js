@@ -3,14 +3,15 @@ import BasicClientInfoWizard from '@/components/BasicClientInfoWizard';
 import BalanceSheetComparisonsWizard from '@/components/BalanceSheetComparisonsWizard';
 import BreakevenWizard from '@/components/BreakevenWizard';
 import CurrentFinancialInformationWizard from '@/components/CurrentFinancialInformationWizard';
-import FlexibleBudgetVarianceWizard from '@/components/FlexibleBudgetVarianceWizard';
 import FiveYearProjectionsWizard from '@/components/FiveYearProjectionsWizard';
 import PLComparisonsWizard from '@/components/PLComparisonsWizard';
 import WeeklyCashFlowWizard from '@/components/WeeklyCashFlowWizard';
 import WorkbookPortWizard from '@/components/WorkbookPortWizard';
 import WorkingCapitalWizard from '@/components/WorkingCapitalWizard';
+import WorksheetWizard from '@/components/wizard/WorksheetWizard';
 import ComingSoonPanel from '@/components/hub/ComingSoonPanel';
 import { createClient } from '@/lib/supabase/server';
+import { getWizardConfig } from '@/lib/worksheets/configs';
 import { getWorksheet, getWorksheetGroups } from '@/lib/worksheets/registry';
 import { notFound } from 'next/navigation';
 
@@ -32,6 +33,13 @@ export default async function AnalystWizardSheetPage({ params }) {
       .map(({ key, displayName }) => ({ key, displayName }));
 
     return <ComingSoonPanel worksheet={worksheet} clientId={clientId} alternatives={alternatives} />;
+  }
+
+  // Sheets migrated onto the unified wizard render from their config; the
+  // if-chain below shrinks as each remaining wizard migrates.
+  const wizardConfig = getWizardConfig(sheetKey);
+  if (wizardConfig) {
+    return <WorksheetWizard config={wizardConfig} clientId={clientId} />;
   }
 
   if (sheetKey === 'basic-client-info') {
@@ -69,9 +77,6 @@ export default async function AnalystWizardSheetPage({ params }) {
   }
   if (sheetKey === 'weekly-cash-flow') {
     return <WeeklyCashFlowWizard clientId={clientId} />;
-  }
-  if (sheetKey === 'flexible-budget-variance') {
-    return <FlexibleBudgetVarianceWizard clientId={clientId} />;
   }
   if (worksheet.component === 'advanced-analyst-sheet') {
     return <AdvancedAnalystSheetWizard clientId={clientId} sheetKey={sheetKey} />;
