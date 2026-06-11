@@ -5,7 +5,6 @@ import BreakevenWizard from '@/components/BreakevenWizard';
 import CurrentFinancialInformationWizard from '@/components/CurrentFinancialInformationWizard';
 import FiveYearProjectionsWizard from '@/components/FiveYearProjectionsWizard';
 import PLComparisonsWizard from '@/components/PLComparisonsWizard';
-import WeeklyCashFlowWizard from '@/components/WeeklyCashFlowWizard';
 import WorkbookPortWizard from '@/components/WorkbookPortWizard';
 import WorkingCapitalWizard from '@/components/WorkingCapitalWizard';
 import WorksheetWizard from '@/components/wizard/WorksheetWizard';
@@ -74,9 +73,6 @@ export default async function AnalystWizardSheetPage({ params }) {
   }
   if (sheetKey === '5-year-projections') {
     return <FiveYearProjectionsWizard clientId={clientId} />;
-  }
-  if (sheetKey === 'weekly-cash-flow') {
-    return <WeeklyCashFlowWizard clientId={clientId} />;
   }
   if (worksheet.component === 'advanced-analyst-sheet') {
     return <AdvancedAnalystSheetWizard clientId={clientId} sheetKey={sheetKey} />;
