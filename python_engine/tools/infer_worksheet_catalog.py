@@ -94,6 +94,10 @@ def main() -> None:
     catalog = build_catalog([str(name) for name in sheets])
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(catalog, indent=2) + "\n", encoding="utf-8")
+    print(
+        "Wrote base catalog. Run `npm run migrate:worksheet-catalog` to add hub metadata.",
+        file=__import__("sys").stderr,
+    )
 
 
 if __name__ == "__main__":

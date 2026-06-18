@@ -6,7 +6,20 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate:field-manifest": "python python_engine/tools/generate_sheet_field_manifest.py",
+    "check:fields": "python python_engine/tools/check_sheet_field_manifest.py",
+    "generate:incorporation-status": "python python_engine/tools/generate_incorporation_status.py",
+    "migrate:worksheet-catalog": "node scripts/migrate_worksheet_catalog.mjs",
+    "check:worksheet-catalog": "node scripts/migrate_worksheet_catalog.mjs --check",
+    "test": "node --import ./test/register-test-shims.mjs --test lib/**/*.test.js",
+    "test:hub-status": "node --test lib/server/hubStatus.test.js",
+    "test:required-fields": "node --test lib/worksheets/requiredFields.test.js",
+    "test:cfi-table": "node --test lib/worksheets/cfiTableModel.test.js",
+    "test:executive-analysis": "node --test lib/reports/executiveAnalysis.test.js lib/reports/executiveAnalysisModel.test.js",
+    "test:executive-analysis-pdf": "node --import ./test/register-test-shims.mjs --test lib/reports/executiveAnalysisPdf.test.js",
+    "sourcing:bms": "node scripts/bms-daily-candidate-sourcing.cjs",
+    "sourcing:bms:queries": "node scripts/bms-daily-candidate-sourcing.cjs --list-queries"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",

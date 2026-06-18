@@ -2,6 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import WorksheetInput from '@/components/worksheet/WorksheetInput';
+import { patchFinancialSnapshot } from '@/lib/client/patchFinancialSnapshot';
+import { buildSnapshotPatch } from '@/lib/worksheets/snapshotWriteFields';
+import { mapClientRowToApiClient } from '@/lib/worksheets/clientBaselines';
+import useWorksheetShellForm from '@/lib/client/useWorksheetShellForm';
+import useWorksheetShellRunLoader from '@/lib/client/useWorksheetShellRunLoader';
 
 const steps = [
   { id: 'grid', title: 'Enter 4 Years', hint: 'Input the core balance sheet lines by year.' },
@@ -14,13 +19,16 @@ const lineItems = [
   { key: 'ar', label: 'Accounts Receivable' },
   { key: 'inventory', label: 'Inventory' },
   { key: 'otherCurrentAssets', label: 'Other Current Assets' },
+  { key: 'intangibleAssets', label: 'Intangible Assets' },
   { key: 'fixedAssets', label: 'Fixed Assets' },
   { key: 'otherAssets', label: 'Other Assets' },
   { key: 'ap', label: 'Accounts Payable' },
+  { key: 'currentPortionLtd', label: 'Current Portion of LTD' },
   { key: 'otherCurrentLiabilities', label: 'Other Current Liabilities' },
   { key: 'longTermDebt', label: 'Long-Term Debt' },
   { key: 'otherLiabilities', label: 'Other Liabilities' },
-  { key: 'equity', label: 'Equity' },
+  { key: 'retainedEarnings', label: 'Retained Earnings (optional)' },
+  { key: 'equity', label: 'Total Equity' },
 ];
 
 function makeDefaultYears() {
@@ -30,12 +38,15 @@ function makeDefaultYears() {
     ar: '',
     inventory: '',
     otherCurrentAssets: '',
+    intangibleAssets: '',
     fixedAssets: '',
     otherAssets: '',
     ap: '',
+    currentPortionLtd: '',
     otherCurrentLiabilities: '',
     longTermDebt: '',
     otherLiabilities: '',
+    retainedEarnings: '',
     equity: '',
   }));
 }
@@ -67,7 +78,7 @@ function formatRunTimestamp(value) {
   });
 }
 
-export default function BalanceSheetComparisonsWizard({ clientId }) {
+export default function BalanceSheetComparisonsWizard({ clientId, clientRow = null }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [years, setYears] = useState(makeDefaultYears);
   const [loading, setLoading] = useState(false);
@@ -78,6 +89,9 @@ export default function BalanceSheetComparisonsWizard({ clientId }) {
   const [runsLoading, setRunsLoading] = useState(false);
   const [error, setError] = useState('');
   const [pdfError, setPdfError] = useState('');
+
+  const shellForm = useMemo(() => ({ years }), [years]);
+  useWorksheetShellForm(shellForm);
 
   const progress = ((stepIndex + 1) / steps.length) * 100;
 
@@ -100,12 +114,15 @@ export default function BalanceSheetComparisonsWizard({ clientId }) {
       ar: parseNumber(row?.ar),
       inventory: parseNumber(row?.inventory),
       otherCurrentAssets: parseNumber(row?.otherCurrentAssets),
+      intangibleAssets: parseNumber(row?.intangibleAssets),
       fixedAssets: parseNumber(row?.fixedAssets),
       otherAssets: parseNumber(row?.otherAssets),
       ap: parseNumber(row?.ap),
+      currentPortionLtd: parseNumber(row?.currentPortionLtd),
       otherCurrentLiabilities: parseNumber(row?.otherCurrentLiabilities),
       longTermDebt: parseNumber(row?.longTermDebt),
       otherLiabilities: parseNumber(row?.otherLiabilities),
+      retainedEarnings: row?.retainedEarnings === '' || row?.retainedEarnings == null ? null : parseNumber(row.retainedEarnings),
       equity: parseNumber(row?.equity),
     }));
 
@@ -123,6 +140,8 @@ export default function BalanceSheetComparisonsWizard({ clientId }) {
     setError('');
     setPdfError('');
   }
+
+  useWorksheetShellRunLoader(loadRun);
 
   function resetToNewRun() {
     setYears(makeDefaultYears());
@@ -186,12 +205,15 @@ export default function BalanceSheetComparisonsWizard({ clientId }) {
           ar: parseNumber(row.ar),
           inventory: parseNumber(row.inventory),
           otherCurrentAssets: parseNumber(row.otherCurrentAssets),
+          intangibleAssets: parseNumber(row.intangibleAssets),
           fixedAssets: parseNumber(row.fixedAssets),
           otherAssets: parseNumber(row.otherAssets),
           ap: parseNumber(row.ap),
+          currentPortionLtd: parseNumber(row.currentPortionLtd),
           otherCurrentLiabilities: parseNumber(row.otherCurrentLiabilities),
           longTermDebt: parseNumber(row.longTermDebt),
           otherLiabilities: parseNumber(row.otherLiabilities),
+          retainedEarnings: row.retainedEarnings === '' ? null : parseNumber(row.retainedEarnings),
           equity: parseNumber(row.equity),
         })),
       };
@@ -227,6 +249,11 @@ export default function BalanceSheetComparisonsWizard({ clientId }) {
       setRunId(savedRun.id);
       setRuns((prev) => [savedRun, ...prev.filter((run) => run.id !== savedRun.id)].slice(0, 10));
       setStepIndex(2);
+      await patchFinancialSnapshot(
+        clientId,
+        'balance-sht-comparisons',
+        buildSnapshotPatch('balance-sht-comparisons', payload, calculationData.result),
+      );
     } catch (err) {
       setError(err.message || 'Unable to complete balance sheet comparison run.');
     } finally {

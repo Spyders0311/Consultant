@@ -1,8 +1,15 @@
 'use client';
 
-export default function WorksheetInput({ isPrefilled = false, isTouched = false, className = '', ...props }) {
+export default function WorksheetInput({
+  isPrefilled = false,
+  isTouched = false,
+  isStale = false,
+  className = '',
+  ...props
+}) {
   const prefilledClass = isPrefilled && !isTouched ? 'prefilled' : '';
-  const mergedClassName = `worksheet-input ${prefilledClass} ${className}`.trim();
+  const staleClass = isStale ? 'stale-field' : '';
+  const mergedClassName = `worksheet-input ${prefilledClass} ${staleClass} ${className}`.trim();
 
   return <input {...props} className={mergedClassName} />;
 }

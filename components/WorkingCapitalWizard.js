@@ -3,10 +3,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import WorksheetInput from '@/components/worksheet/WorksheetInput';
 import usePrefillableForm from '@/lib/client/usePrefillableForm';
+import useFinancialSnapshotPrefill from '@/lib/client/useFinancialSnapshotPrefill';
+import useWorksheetStepDraft from '@/lib/client/useWorksheetStepDraft';
+import useWorksheetShellForm from '@/lib/client/useWorksheetShellForm';
+import useWorksheetShellRunLoader from '@/lib/client/useWorksheetShellRunLoader';
+import { patchFinancialSnapshot } from '@/lib/client/patchFinancialSnapshot';
+import { buildSnapshotPatch } from '@/lib/worksheets/snapshotWriteFields';
+import SnapshotStatusBanner from '@/components/worksheet/SnapshotStatusBanner';
+import PortBridgePanel from '@/components/worksheet/PortBridgePanel';
 
 const steps = [
   { id: 'annual', title: 'Annual Inputs', hint: 'Set annual revenue and COGS.' },
   { id: 'days', title: 'Cycle Days', hint: 'Set DSO, DIO, and DPO assumptions.' },
+  { id: 'growth', title: 'Growth Scenarios', hint: 'Optional multi-year WC funding projection.' },
   { id: 'review', title: 'Review & Run', hint: 'Confirm assumptions and run calculation.' },
 ];
 
@@ -16,6 +25,9 @@ const defaultForm = {
   daysSalesOutstanding: '',
   daysInventoryOnHand: '',
   daysPayablesOutstanding: '',
+  revenueGrowthPercent: '',
+  cogsGrowthPercent: '',
+  projectionYears: '0',
 };
 
 function parseNumber(value) {
@@ -88,6 +100,30 @@ export default function WorkingCapitalWizard({ clientId }) {
   const [pullError, setPullError] = useState('');
   const [pullAudit, setPullAudit] = useState('');
 
+  const { staleFields, snapshotMeta } = useFinancialSnapshotPrefill({
+    clientId,
+    worksheetKey: 'working-capital-analysis',
+    applyPrefill,
+    currentForm: form,
+    onlyEmpty: true,
+  });
+
+  const draftPayload = useMemo(() => ({ form }), [form]);
+  useWorksheetStepDraft({
+    clientId,
+    worksheetKey: 'working-capital-analysis',
+    stepIndex,
+    setStepIndex,
+    draftPayload,
+    onRestoreDraft: (draft) => {
+      if (draft.form && typeof draft.form === 'object') {
+        resetForm({ ...defaultForm, ...draft.form });
+      }
+    },
+  });
+
+  useWorksheetShellForm(form);
+
   const progress = ((stepIndex + 1) / steps.length) * 100;
 
   const canAdvance = useMemo(() => {
@@ -117,6 +153,8 @@ export default function WorkingCapitalWizard({ clientId }) {
     setPullError('');
     setPullAudit('');
   }
+
+  useWorksheetShellRunLoader(loadRun);
 
   function resetToNewRun() {
     resetForm(defaultForm);
@@ -321,6 +359,11 @@ export default function WorkingCapitalWizard({ clientId }) {
     }
   }
 
+  function handlePortBridgePatch(patch, portKey) {
+    applyPrefill(patch, portKey);
+    setPullAudit(`Imported from workbook port ${portKey}.`);
+  }
+
   async function calculateAndSave(event) {
     event.preventDefault();
     setLoading(true);
@@ -333,6 +376,9 @@ export default function WorkingCapitalWizard({ clientId }) {
         daysSalesOutstanding: parseNumber(form.daysSalesOutstanding),
         daysInventoryOnHand: parseNumber(form.daysInventoryOnHand),
         daysPayablesOutstanding: parseNumber(form.daysPayablesOutstanding),
+        revenueGrowthPercent: parseNumber(form.revenueGrowthPercent) || null,
+        cogsGrowthPercent: parseNumber(form.cogsGrowthPercent) || null,
+        projectionYears: parseNumber(form.projectionYears),
       };
 
       const calculationResponse = await fetch('/api/worksheets/working-capital/calculate', {
@@ -365,6 +411,11 @@ export default function WorkingCapitalWizard({ clientId }) {
       };
       setRunId(savedRun.id);
       setRuns((prev) => [savedRun, ...prev.filter((run) => run.id !== savedRun.id)].slice(0, 10));
+      await patchFinancialSnapshot(
+        clientId,
+        'working-capital-analysis',
+        buildSnapshotPatch('working-capital-analysis', payload, calculationData.result),
+      );
       clearPrefillTracking();
     } catch (err) {
       setError(err.message || 'Unable to complete working capital run.');
@@ -419,6 +470,8 @@ export default function WorkingCapitalWizard({ clientId }) {
         <h1>Working Capital Analysis</h1>
         <p>Model cash tied up in receivables and inventory, offset by payables financing, then export to PDF.</p>
       </header>
+
+      <SnapshotStatusBanner staleFields={staleFields} snapshotMeta={snapshotMeta} />
 
       <div className="wizard-progress" aria-hidden="true">
         <span style={{ width: `${progress}%` }} />
@@ -519,6 +572,42 @@ export default function WorkingCapitalWizard({ clientId }) {
         )}
 
         {stepIndex === 2 && (
+          <div className="wizard-fields">
+            <label>
+              Revenue Growth % (annual)
+              <WorksheetInput
+                type="number"
+                step="0.1"
+                value={form.revenueGrowthPercent}
+                onChange={(e) => updateField('revenueGrowthPercent', e.target.value)}
+                placeholder="e.g. 8"
+              />
+            </label>
+            <label>
+              COGS Growth % (annual, optional)
+              <WorksheetInput
+                type="number"
+                step="0.1"
+                value={form.cogsGrowthPercent}
+                onChange={(e) => updateField('cogsGrowthPercent', e.target.value)}
+                placeholder="Defaults to revenue growth"
+              />
+            </label>
+            <label>
+              Projection Years (0–5)
+              <WorksheetInput
+                type="number"
+                min="0"
+                max="5"
+                value={form.projectionYears}
+                onChange={(e) => updateField('projectionYears', e.target.value)}
+                placeholder="0 = base year only"
+              />
+            </label>
+          </div>
+        )}
+
+        {stepIndex === 3 && (
           <div className="client-review-grid">
             <article>
               <span>Annual Revenue</span>
@@ -539,6 +628,15 @@ export default function WorkingCapitalWizard({ clientId }) {
               <span>Current Run</span>
               <strong>{runId ? `Loaded run ${runId.slice(0, 8)}...` : 'New run (unsaved)'}</strong>
             </article>
+            {parseNumber(form.projectionYears) > 0 ? (
+              <article>
+                <span>Growth Scenarios</span>
+                <strong>
+                  {parseNumber(form.projectionYears)} yr @ {percent(parseNumber(form.revenueGrowthPercent))} revenue
+                  {form.cogsGrowthPercent ? ` / ${percent(parseNumber(form.cogsGrowthPercent))} COGS` : ''}
+                </strong>
+              </article>
+            ) : null}
           </div>
         )}
 
@@ -610,6 +708,34 @@ export default function WorkingCapitalWizard({ clientId }) {
             </ul>
           ) : null}
 
+          {Array.isArray(result.scenarios) && result.scenarios.length > 0 ? (
+            <div className="table-wrap">
+              <h3>Working Capital Growth Scenarios</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Revenue</th>
+                    <th>Net WC</th>
+                    <th>Δ WC</th>
+                    <th>Cumulative Funding</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {result.scenarios.map((row) => (
+                    <tr key={row.yearOffset}>
+                      <td>+{row.yearOffset}</td>
+                      <td>{currency(row.revenue)}</td>
+                      <td>{currency(row.netWorkingCapital)}</td>
+                      <td>{currency(row.deltaWorkingCapital)}</td>
+                      <td>{currency(row.cumulativeFundingNeed)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
+
           {runId ? <p className="wizard-meta">Saved run ID: {runId}</p> : null}
         </section>
       ) : null}
@@ -631,6 +757,7 @@ export default function WorkingCapitalWizard({ clientId }) {
             {pullLoading ? 'Pulling...' : 'Pull from P&L + Balance Sheet'}
           </button>
         </div>
+        <PortBridgePanel clientId={clientId} worksheetKey="working-capital-analysis" onApplyPatch={handlePortBridgePatch} />
         {pullAudit ? <p className="wizard-meta">{pullAudit}</p> : null}
         <ul className="wizard-history-list">
           {runs.slice(0, 10).map((run) => (

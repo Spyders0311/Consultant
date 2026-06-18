@@ -1,7 +1,8 @@
 import AuthForm from '@/app/components/AuthForm';
 
 export const metadata = {
-  title: 'BMS Portal Login',
+  title: 'Sign In | BMS Portal',
+  description: 'Consultant sign in for the BMS Intelligent Portal secure decision engine.',
 };
 
 export default async function LoginPage({ searchParams }) {

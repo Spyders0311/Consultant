@@ -11,6 +11,21 @@ function friendlyError(paramError) {
   return '';
 }
 
+const LOGIN_FEATURES = [
+  {
+    title: 'Consultant workspace',
+    copy: 'Manage client engagements, worksheets, and financial analysis from one secure dashboard.',
+  },
+  {
+    title: 'Server-side calculations',
+    copy: 'Spreadsheet-grade valuation logic runs on the server. Inputs in, results out — logic stays protected.',
+  },
+  {
+    title: 'Client command center',
+    copy: 'Track worksheet progress, KPIs, and deliverables across every active engagement.',
+  },
+];
+
 export default function AuthForm({ paramError, nextPath }) {
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
@@ -70,83 +85,121 @@ export default function AuthForm({ paramError, nextPath }) {
   }
 
   return (
-    <main className="auth-wrap">
-      <section className="auth-card">
-        <p className="eyebrow">BMS Portal Access</p>
-        <h1>{mode === 'login' ? 'Consultant Login' : 'Consultant Sign Up'}</h1>
-        <p className="auth-copy">Use your consultant credentials to access the portal dashboard.</p>
+    <main className="portal-wrap login-page">
+      <section className="login-brand-bar" aria-label="Portal branding">
+        <div>
+          <p className="eyebrow">BMS Intelligent Portal</p>
+          <p className="login-brand-bar__tagline">Consultant access only</p>
+        </div>
+      </section>
 
-        {displayError && <p className="auth-error">{displayError}</p>}
+      <section className="hero login-hero">
+        <p className="eyebrow">Secure Decision Engine</p>
+        <h1>{mode === 'login' ? 'Sign in to your workspace' : 'Create your consultant account'}</h1>
+        <p>
+          Spreadsheet-grade valuation logic runs on the server. The browser only sends inputs and receives
+          results.
+        </p>
+      </section>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          {mode === 'signup' && (
-            <label className="field">
-              <span>Full Name</span>
-              <input
-                type="text"
-                autoComplete="name"
-                value={fullName}
-                onChange={(event) => setFullName(event.target.value)}
-                required
-              />
-            </label>
-          )}
+      <section className="panel login-panel">
+        <div className="login-layout">
+          <aside className="login-aside" aria-label="Portal capabilities">
+            {LOGIN_FEATURES.map((feature) => (
+              <article key={feature.title} className="card login-feature-card">
+                <h3>{feature.title}</h3>
+                <p>{feature.copy}</p>
+              </article>
+            ))}
+          </aside>
 
-          {mode === 'signup' && (
-            <label className="field">
-              <span>Workspace Name</span>
-              <input
-                type="text"
-                value={workspaceName}
-                onChange={(event) => setWorkspaceName(event.target.value)}
-                placeholder="BMS Consulting"
-                required
-              />
-            </label>
-          )}
+          <div className="login-form-shell wizard-card">
+            <p className="wizard-kicker">{mode === 'login' ? 'Consultant login' : 'New consultant'}</p>
+            <h2 className="login-form-title">
+              {mode === 'login' ? 'Welcome back' : 'Get started'}
+            </h2>
+            <p className="login-form-copy">
+              {mode === 'login'
+                ? 'Use your consultant credentials to access the portal dashboard.'
+                : 'Set up your workspace to begin onboarding clients and running analysis.'}
+            </p>
 
-          <label className="field">
-            <span>Email</span>
-            <input
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              required
-            />
-          </label>
+            {displayError && <p className="login-form-error">{displayError}</p>}
 
-          <label className="field">
-            <span>Password</span>
-            <input
-              type="password"
-              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              required
-              minLength={8}
-            />
-          </label>
+            <form onSubmit={handleSubmit} className="login-form">
+              {mode === 'signup' && (
+                <label className="field">
+                  <span>Full Name</span>
+                  <input
+                    type="text"
+                    autoComplete="name"
+                    value={fullName}
+                    onChange={(event) => setFullName(event.target.value)}
+                    required
+                  />
+                </label>
+              )}
 
-          <div className="actions">
-            <button type="submit" disabled={busy}>
-              {busy ? 'Submitting...' : mode === 'login' ? 'Login' : 'Create Account'}
-            </button>
+              {mode === 'signup' && (
+                <label className="field">
+                  <span>Workspace Name</span>
+                  <input
+                    type="text"
+                    value={workspaceName}
+                    onChange={(event) => setWorkspaceName(event.target.value)}
+                    placeholder="BMS Consulting"
+                    required
+                  />
+                </label>
+              )}
+
+              <label className="field">
+                <span>Email</span>
+                <input
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
+              </label>
+
+              <label className="field">
+                <span>Password</span>
+                <input
+                  type="password"
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  required
+                  minLength={8}
+                />
+              </label>
+
+              <div className="login-form-actions">
+                <button type="submit" disabled={busy}>
+                  {busy ? 'Submitting...' : mode === 'login' ? 'Sign in' : 'Create account'}
+                </button>
+                <button
+                  type="button"
+                  className="ghost"
+                  onClick={() => {
+                    setMode((value) => (value === 'login' ? 'signup' : 'login'));
+                    setStatus('');
+                  }}
+                >
+                  {mode === 'login' ? 'Need an account? Sign up' : 'Already have an account? Sign in'}
+                </button>
+              </div>
+
+              {status && (
+                <p className={status.includes('created') ? 'login-form-success' : 'login-form-status'}>
+                  {status}
+                </p>
+              )}
+            </form>
           </div>
-
-          {status && <p className="auth-status">{status}</p>}
-        </form>
-
-        <button
-          type="button"
-          className="auth-toggle"
-          onClick={() => {
-            setMode((value) => (value === 'login' ? 'signup' : 'login'));
-            setStatus('');
-          }}
-        >
-          {mode === 'login' ? 'Need an account? Sign up' : 'Already have an account? Login'}
-        </button>
+        </div>
       </section>
     </main>
   );

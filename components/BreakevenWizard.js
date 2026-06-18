@@ -3,9 +3,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import WorksheetInput from '@/components/worksheet/WorksheetInput';
 import usePrefillableForm from '@/lib/client/usePrefillableForm';
+import useFinancialSnapshotPrefill from '@/lib/client/useFinancialSnapshotPrefill';
+import useWorksheetStepDraft from '@/lib/client/useWorksheetStepDraft';
+import useWorksheetShellForm from '@/lib/client/useWorksheetShellForm';
+import useWorksheetShellRunLoader from '@/lib/client/useWorksheetShellRunLoader';
+import { patchFinancialSnapshot } from '@/lib/client/patchFinancialSnapshot';
+import { buildSnapshotPatch } from '@/lib/worksheets/snapshotWriteFields';
+import { pullBreakevenFromAllSources } from '@/lib/worksheets/worksheetPullHelpers';
+import SnapshotStatusBanner from '@/components/worksheet/SnapshotStatusBanner';
+import PortBridgePanel from '@/components/worksheet/PortBridgePanel';
 
 const steps = [
   { id: 'revenue', title: 'Revenue & COGS', hint: 'Define annual sales and direct costs.' },
+  { id: 'cost-stack', title: 'Cost Stack', hint: 'Optional labor, indirect, and G&A layers.' },
   { id: 'fixed', title: 'Fixed Expenses', hint: 'Set annual overhead that must be covered.' },
   { id: 'capacity', title: 'Work Capacity', hint: 'Convert annual breakeven into daily/hourly targets.' },
   { id: 'review', title: 'Review & Run', hint: 'Confirm assumptions and run calculation.' },
@@ -14,9 +24,15 @@ const steps = [
 const defaultForm = {
   annualRevenue: '',
   cogsAmount: '',
+  laborAmount: '',
+  indirectCostsAmount: '',
+  generalAdministrativeCostsAmount: '',
+  profitAmount: '',
+  monthsInPeriod: '12',
+  calculationMethod: 'auto',
   fixedExpensesAmount: '',
-  workDaysPerYear: '',
-  workHoursPerDay: '',
+  workDaysPerYear: '250',
+  workHoursPerDay: '8',
 };
 
 function parseNumber(value) {
@@ -80,12 +96,37 @@ export default function BreakevenWizard({ clientId }) {
   const [pullError, setPullError] = useState('');
   const [pullAudit, setPullAudit] = useState('');
 
+  const { staleFields, snapshotMeta } = useFinancialSnapshotPrefill({
+    clientId,
+    worksheetKey: 'breakeven-analysis',
+    applyPrefill,
+    currentForm: form,
+    onlyEmpty: true,
+  });
+
+  const draftPayload = useMemo(() => ({ form }), [form]);
+  useWorksheetStepDraft({
+    clientId,
+    worksheetKey: 'breakeven-analysis',
+    stepIndex,
+    setStepIndex,
+    draftPayload,
+    onRestoreDraft: (draft) => {
+      if (draft.form && typeof draft.form === 'object') {
+        resetForm({ ...defaultForm, ...draft.form });
+      }
+    },
+  });
+
+  useWorksheetShellForm(form);
+
   const progress = ((stepIndex + 1) / steps.length) * 100;
 
   const canAdvance = useMemo(() => {
     if (stepIndex === 0) return parseNumber(form.annualRevenue) > 0;
-    if (stepIndex === 1) return parseNumber(form.fixedExpensesAmount) >= 0;
-    if (stepIndex === 2) return parseNumber(form.workDaysPerYear) > 0 && parseNumber(form.workHoursPerDay) > 0;
+    if (stepIndex === 1) return true;
+    if (stepIndex === 2) return parseNumber(form.fixedExpensesAmount) >= 0;
+    if (stepIndex === 3) return parseNumber(form.workDaysPerYear) > 0 && parseNumber(form.workHoursPerDay) > 0;
     return true;
   }, [form, stepIndex]);
 
@@ -104,6 +145,8 @@ export default function BreakevenWizard({ clientId }) {
     setPullError('');
     setPullAudit('');
   }
+
+  useWorksheetShellRunLoader(loadRun);
 
   function resetToNewRun() {
     resetForm(defaultForm);
@@ -160,63 +203,36 @@ export default function BreakevenWizard({ clientId }) {
     setError('');
 
     try {
-      const response = await fetch(
-        `/api/worksheets/pl-comparisons/runs?client_id=${encodeURIComponent(clientId)}&limit=1`,
-        { cache: 'no-store' },
-      );
-      const data = await response.json();
-      if (!response.ok || !data.ok) {
-        throw new Error(data.error || 'Unable to load P&L Comparisons runs.');
-      }
+      const { patch, missingFields, sources, auditRuns } = await pullBreakevenFromAllSources(clientId);
 
-      const sourceRun = data.runs?.[0];
-      if (!sourceRun) {
+      if (!auditRuns.plRun) {
         throw new Error('No P&L Comparisons runs found to prefill from.');
       }
 
-      const latestYear = pickLatestYearRow(sourceRun?.inputs?.years);
-      if (!latestYear) {
-        throw new Error('Latest P&L run has no 4-year input grid to map from.');
-      }
-
-      const patch = {};
-      const missingFields = [];
-
-      if (isFiniteNumber(latestYear.revenue)) {
-        patch.annualRevenue = Number(latestYear.revenue);
-      } else {
-        missingFields.push('Annual Revenue');
-      }
-
-      if (isFiniteNumber(latestYear.cogs)) {
-        patch.cogsAmount = Number(latestYear.cogs);
-      } else {
-        missingFields.push('COGS Amount');
-      }
-
-      if (isFiniteNumber(latestYear.operatingExpenses) && isFiniteNumber(latestYear.otherExpenses)) {
-        patch.fixedExpensesAmount = Number(latestYear.operatingExpenses) + Number(latestYear.otherExpenses);
-      } else {
-        missingFields.push('Fixed Expenses (Operating + Other)');
-      }
-
       if (Object.keys(patch).length === 0) {
-        throw new Error(`Could not map any Breakeven fields from P&L Comparisons. Missing: ${missingFields.join(', ')}`);
+        throw new Error(`Could not map any Breakeven fields. Missing: ${missingFields.join(', ')}`);
       }
 
-      applyPrefill(patch, 'P&L Comparisons');
+      applyPrefill(patch, sources.join(' + ') || 'Linked worksheets');
 
       if (missingFields.length > 0) {
         setPullError(`Some fields were not prefilled: ${missingFields.join(', ')}.`);
       }
 
-      setPullAudit(`Prefilled from P&L Comparisons run ${formatRunTimestamp(sourceRun.created_at)}`);
+      setPullAudit(
+        `Prefilled from ${sources.join(', ')} (P&L run ${formatRunTimestamp(auditRuns.plRun.created_at)})`,
+      );
       setStepIndex(0);
     } catch (err) {
-      setPullError(err.message || 'Unable to prefill from P&L Comparisons.');
+      setPullError(err.message || 'Unable to prefill from linked worksheets.');
     } finally {
       setPullLoading(false);
     }
+  }
+
+  function handlePortBridgePatch(patch, portKey) {
+    applyPrefill(patch, portKey);
+    setPullAudit(`Imported from workbook port ${portKey}.`);
   }
 
   async function calculateAndSave(event) {
@@ -228,6 +244,12 @@ export default function BreakevenWizard({ clientId }) {
       const payload = {
         annualRevenue: parseNumber(form.annualRevenue),
         cogsAmount: parseNumber(form.cogsAmount),
+        laborAmount: parseNumber(form.laborAmount),
+        indirectCostsAmount: parseNumber(form.indirectCostsAmount),
+        generalAdministrativeCostsAmount: parseNumber(form.generalAdministrativeCostsAmount),
+        profitAmount: form.profitAmount === '' ? null : parseNumber(form.profitAmount),
+        monthsInPeriod: parseNumber(form.monthsInPeriod) || 12,
+        calculationMethod: form.calculationMethod || 'auto',
         fixedExpensesAmount: parseNumber(form.fixedExpensesAmount),
         workDaysPerYear: parseNumber(form.workDaysPerYear),
         workHoursPerDay: parseNumber(form.workHoursPerDay),
@@ -264,6 +286,11 @@ export default function BreakevenWizard({ clientId }) {
       setRunId(savedRun.id);
       setRuns((prev) => [savedRun, ...prev.filter((run) => run.id !== savedRun.id)].slice(0, 10));
       clearPrefillTracking();
+      await patchFinancialSnapshot(
+        clientId,
+        'breakeven-analysis',
+        buildSnapshotPatch('breakeven-analysis', payload, calculationData.result),
+      );
     } catch (err) {
       setError(err.message || 'Unable to complete breakeven run.');
     } finally {
@@ -317,6 +344,8 @@ export default function BreakevenWizard({ clientId }) {
         <h1>Breakeven Analysis</h1>
         <p>Walk through assumptions, run protected backend calculations, and export a consultant-ready PDF.</p>
       </header>
+
+      <SnapshotStatusBanner staleFields={staleFields} snapshotMeta={snapshotMeta} />
 
       <div className="wizard-progress" aria-hidden="true">
         <span style={{ width: `${progress}%` }} />
@@ -378,6 +407,40 @@ export default function BreakevenWizard({ clientId }) {
         {stepIndex === 1 && (
           <div className="wizard-fields">
             <label>
+              Direct Labor (optional)
+              <WorksheetInput type="number" min="0" value={form.laborAmount} onChange={(e) => updateField('laborAmount', e.target.value)} />
+            </label>
+            <label>
+              Indirect Costs (optional)
+              <WorksheetInput type="number" min="0" value={form.indirectCostsAmount} onChange={(e) => updateField('indirectCostsAmount', e.target.value)} />
+            </label>
+            <label>
+              G&A Costs (optional)
+              <WorksheetInput type="number" min="0" value={form.generalAdministrativeCostsAmount} onChange={(e) => updateField('generalAdministrativeCostsAmount', e.target.value)} />
+            </label>
+            <label>
+              Net Profit (office-tool method)
+              <WorksheetInput type="number" min="0" value={form.profitAmount} onChange={(e) => updateField('profitAmount', e.target.value)} />
+            </label>
+            <label>
+              Months In Period
+              <WorksheetInput type="number" min="1" max="12" value={form.monthsInPeriod} onChange={(e) => updateField('monthsInPeriod', e.target.value)} />
+            </label>
+            <label>
+              Calculation Method
+              <select value={form.calculationMethod} onChange={(e) => updateField('calculationMethod', e.target.value)}>
+                <option value="auto">Auto</option>
+                <option value="gross_margin">Gross Margin</option>
+                <option value="contribution">Contribution Margin</option>
+                <option value="office_tool">Office Tool</option>
+              </select>
+            </label>
+          </div>
+        )}
+
+        {stepIndex === 2 && (
+          <div className="wizard-fields">
+            <label>
               Fixed Expenses (Annual)
               <WorksheetInput
                 type="number"
@@ -392,7 +455,7 @@ export default function BreakevenWizard({ clientId }) {
           </div>
         )}
 
-        {stepIndex === 2 && (
+        {stepIndex === 3 && (
           <div className="wizard-fields">
             <label>
               Work Days Per Year
@@ -403,7 +466,7 @@ export default function BreakevenWizard({ clientId }) {
                 onChange={(event) => updateField('workDaysPerYear', event.target.value)}
                 placeholder="e.g. 250"
                 isPrefilled={Boolean(prefilledFields.workDaysPerYear)}
-                isTouched={Boolean(touchedFields.workDaysPerYear)}
+                isTouched={Boolean(touchedFields.workHoursPerDay)}
               />
             </label>
             <label>
@@ -421,7 +484,7 @@ export default function BreakevenWizard({ clientId }) {
           </div>
         )}
 
-        {stepIndex === 3 && (
+        {stepIndex === 4 && (
           <div className="client-review-grid">
             <article>
               <span>Annual Revenue</span>
@@ -538,9 +601,10 @@ export default function BreakevenWizard({ clientId }) {
             Start new run
           </button>
           <button type="button" className="ghost" onClick={pullLinkedData} disabled={loading || pullLoading || !clientId}>
-            {pullLoading ? 'Pulling...' : 'Pull from P&L Comparisons'}
+            {pullLoading ? 'Pulling...' : 'Pull from all feeders'}
           </button>
         </div>
+        <PortBridgePanel clientId={clientId} worksheetKey="breakeven-analysis" onApplyPatch={handlePortBridgePatch} />
         {pullAudit ? <p className="wizard-meta">{pullAudit}</p> : null}
         <ul className="wizard-history-list">
           {runs.slice(0, 10).map((run) => (

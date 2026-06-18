@@ -1,7 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import WorksheetInput from '@/components/worksheet/WorksheetInput';
+import useFinancialSnapshotPrefill from '@/lib/client/useFinancialSnapshotPrefill';
+import { patchFinancialSnapshot } from '@/lib/client/patchFinancialSnapshot';
+import { buildSnapshotPatch } from '@/lib/worksheets/snapshotWriteFields';
+import SnapshotStatusBanner from '@/components/worksheet/SnapshotStatusBanner';
+import useWorksheetStepDraft from '@/lib/client/useWorksheetStepDraft';
+import useWorksheetShellRunLoader from '@/lib/client/useWorksheetShellRunLoader';
 
 const steps = [
   { id: 'base', title: 'Base Inputs', hint: 'Set base year, revenue, and COGS assumptions.' },
@@ -11,13 +17,20 @@ const steps = [
 
 function defaultFormValues() {
   return {
-    baseYear: '',
+    baseYear: String(new Date().getFullYear()),
+    horizonYears: '5',
     baseRevenue: '',
     revenueGrowthPercent: '',
     baseCogsPercent: '',
     baseFixedExpenses: '',
+    fixedPayroll: '',
+    fixedRentUtilities: '',
+    fixedOther: '',
     fixedExpenseGrowthPercent: '',
     taxRatePercent: '',
+    marketGrowthPercent: '',
+    inflationPercent: '',
+    discountRatePercent: '',
   };
 }
 
@@ -60,9 +73,9 @@ function formatRunTimestamp(value) {
   });
 }
 
-export default function FiveYearProjectionsWizard({ clientId }) {
+export default function FiveYearProjectionsWizard({ clientId, initialBaseline = null }) {
   const [stepIndex, setStepIndex] = useState(0);
-  const [form, setForm] = useState(() => defaultFormValues());
+  const [form, setForm] = useState(() => ({ ...defaultFormValues(), ...(initialBaseline || {}) }));
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -71,6 +84,32 @@ export default function FiveYearProjectionsWizard({ clientId }) {
   const [runsLoading, setRunsLoading] = useState(false);
   const [error, setError] = useState('');
   const [pdfError, setPdfError] = useState('');
+
+  const applyPrefill = useCallback((patch) => {
+    setForm((prev) => ({ ...prev, ...patch }));
+  }, []);
+
+  const { staleFields, snapshotMeta } = useFinancialSnapshotPrefill({
+    clientId,
+    worksheetKey: '5-year-projections',
+    applyPrefill,
+    currentForm: form,
+    onlyEmpty: true,
+  });
+
+  const draftPayload = useMemo(() => ({ form }), [form]);
+  useWorksheetStepDraft({
+    clientId,
+    worksheetKey: '5-year-projections',
+    stepIndex,
+    setStepIndex,
+    draftPayload,
+    onRestoreDraft: (draft) => {
+      if (draft.form && typeof draft.form === 'object') {
+        setForm((prev) => ({ ...prev, ...draft.form }));
+      }
+    },
+  });
 
   const progress = ((stepIndex + 1) / steps.length) * 100;
 
@@ -103,6 +142,8 @@ export default function FiveYearProjectionsWizard({ clientId }) {
     setPdfError('');
   }
 
+  useWorksheetShellRunLoader(loadRun);
+
   function resetToNewRun() {
     setForm(defaultFormValues());
     setResult(null);
@@ -111,6 +152,11 @@ export default function FiveYearProjectionsWizard({ clientId }) {
     setError('');
     setPdfError('');
   }
+
+  useEffect(() => {
+    if (!initialBaseline) return;
+    setForm((prev) => ({ ...defaultFormValues(), ...initialBaseline, ...prev }));
+  }, [initialBaseline]);
 
   useEffect(() => {
     let cancelled = false;
@@ -156,12 +202,19 @@ export default function FiveYearProjectionsWizard({ clientId }) {
     try {
       const payload = {
         baseYear: parseNumber(form.baseYear),
+        horizonYears: parseNumber(form.horizonYears) || 5,
         baseRevenue: parseNumber(form.baseRevenue),
         revenueGrowthPercent: parseNumber(form.revenueGrowthPercent),
         baseCogsPercent: parseNumber(form.baseCogsPercent),
         baseFixedExpenses: parseNumber(form.baseFixedExpenses),
+        fixedPayroll: parseOptionalNumber(form.fixedPayroll),
+        fixedRentUtilities: parseOptionalNumber(form.fixedRentUtilities),
+        fixedOther: parseOptionalNumber(form.fixedOther),
         fixedExpenseGrowthPercent: parseNumber(form.fixedExpenseGrowthPercent),
         taxRatePercent: parseOptionalNumber(form.taxRatePercent),
+        marketGrowthPercent: parseOptionalNumber(form.marketGrowthPercent),
+        inflationPercent: parseOptionalNumber(form.inflationPercent),
+        discountRatePercent: parseOptionalNumber(form.discountRatePercent),
       };
 
       const calculationResponse = await fetch('/api/worksheets/five-year-projections/calculate', {
@@ -194,6 +247,11 @@ export default function FiveYearProjectionsWizard({ clientId }) {
       };
       setRunId(savedRun.id);
       setRuns((prev) => [savedRun, ...prev.filter((run) => run.id !== savedRun.id)].slice(0, 10));
+      await patchFinancialSnapshot(
+        clientId,
+        '5-year-projections',
+        buildSnapshotPatch('5-year-projections', payload, calculationData.result),
+      );
     } catch (err) {
       setError(err.message || 'Unable to complete five year projections run.');
     } finally {
@@ -248,6 +306,8 @@ export default function FiveYearProjectionsWizard({ clientId }) {
         <p>Forecast five years of revenue, margins, EBITDA, and optional after-tax net income.</p>
       </header>
 
+      <SnapshotStatusBanner staleFields={staleFields} snapshotMeta={snapshotMeta} />
+
       <div className="wizard-progress" aria-hidden="true">
         <span style={{ width: `${progress}%` }} />
       </div>
@@ -278,6 +338,10 @@ export default function FiveYearProjectionsWizard({ clientId }) {
       <form className="wizard-card" onSubmit={calculateAndSave}>
         {stepIndex === 0 && (
           <div className="wizard-fields">
+            <label>
+              Horizon Years
+              <WorksheetInput type="number" min="3" max="10" value={form.horizonYears} onChange={(e) => updateField('horizonYears', e.target.value)} />
+            </label>
             <label>
               Base Year
               <WorksheetInput
@@ -328,6 +392,18 @@ export default function FiveYearProjectionsWizard({ clientId }) {
         {stepIndex === 1 && (
           <div className="wizard-fields">
             <label>
+              Fixed Payroll (optional)
+              <WorksheetInput type="number" min="0" value={form.fixedPayroll} onChange={(e) => updateField('fixedPayroll', e.target.value)} />
+            </label>
+            <label>
+              Rent + Utilities (optional)
+              <WorksheetInput type="number" min="0" value={form.fixedRentUtilities} onChange={(e) => updateField('fixedRentUtilities', e.target.value)} />
+            </label>
+            <label>
+              Other Fixed (optional)
+              <WorksheetInput type="number" min="0" value={form.fixedOther} onChange={(e) => updateField('fixedOther', e.target.value)} />
+            </label>
+            <label>
               Base Fixed Expenses
               <WorksheetInput
                 type="number"
@@ -347,6 +423,18 @@ export default function FiveYearProjectionsWizard({ clientId }) {
                 onChange={(event) => updateField('fixedExpenseGrowthPercent', event.target.value)}
                 placeholder="e.g. 3"
               />
+            </label>
+            <label>
+              Market Growth % (optional)
+              <WorksheetInput type="number" step="0.1" value={form.marketGrowthPercent} onChange={(e) => updateField('marketGrowthPercent', e.target.value)} />
+            </label>
+            <label>
+              Inflation % (optional)
+              <WorksheetInput type="number" step="0.1" value={form.inflationPercent} onChange={(e) => updateField('inflationPercent', e.target.value)} />
+            </label>
+            <label>
+              Discount Rate % (optional, for NPV)
+              <WorksheetInput type="number" step="0.1" min="0" max="100" value={form.discountRatePercent} onChange={(e) => updateField('discountRatePercent', e.target.value)} />
             </label>
             <label>
               Tax Rate % (Optional)

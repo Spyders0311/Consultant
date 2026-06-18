@@ -1,48 +1,39 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import WorksheetInput from '@/components/worksheet/WorksheetInput';
-
-const steps = [
-  { id: 'revenue-margin', title: 'Revenue / Margin', hint: 'Enter annual revenue and COGS.' },
-  { id: 'fixed-expenses', title: 'Fixed Expenses', hint: 'Set annual fixed overhead burden.' },
-  { id: 'working-capital', title: 'Working Capital Drivers', hint: 'Set DSO, DIO, and DPO assumptions.' },
-  { id: 'capacity', title: 'Capacity', hint: 'Set work days and work hours assumptions.' },
-  { id: 'review', title: 'Review & Run', hint: 'Validate assumptions and run baseline intake.' },
-];
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import CFITableView from '@/components/CFITableView';
+import useFinancialSnapshotPrefill from '@/lib/client/useFinancialSnapshotPrefill';
+import useWorksheetStepDraft from '@/lib/client/useWorksheetStepDraft';
+import useWorksheetShellRunLoader from '@/lib/client/useWorksheetShellRunLoader';
+import { patchFinancialSnapshot } from '@/lib/client/patchFinancialSnapshot';
+import { buildSnapshotPatch } from '@/lib/worksheets/snapshotWriteFields';
+import {
+  fetchLatestRun,
+  mapCFIFromSources,
+  normalizePLYearRow,
+  pickLatestYearRow,
+} from '@/lib/worksheets/worksheetPullHelpers';
+import SnapshotStatusBanner from '@/components/worksheet/SnapshotStatusBanner';
 
 const defaultForm = {
   annualRevenue: '',
   annualCogs: '',
   annualFixedExpenses: '',
+  laborAmount: '',
+  indirectCostsAmount: '',
+  generalAdministrativeCostsAmount: '',
+  profitAmount: '',
   daysSalesOutstanding: '',
   daysInventoryOnHand: '',
   daysPayablesOutstanding: '',
-  workDaysPerYear: '',
-  workHoursPerDay: '',
+  workDaysPerYear: '250',
+  workHoursPerDay: '8',
   optionalNotes: '',
 };
 
 function parseNumber(value) {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function currency(value) {
-  if (value === null || value === undefined || Number.isNaN(Number(value))) return 'n/a';
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(
-    Number(value),
-  );
-}
-
-function number(value, maximumFractionDigits = 1) {
-  if (value === null || value === undefined || Number.isNaN(Number(value))) return 'n/a';
-  return new Intl.NumberFormat('en-US', { maximumFractionDigits }).format(Number(value));
-}
-
-function percent(value) {
-  if (value === null || value === undefined || Number.isNaN(Number(value))) return 'n/a';
-  return `${Number(value).toFixed(1)}%`;
 }
 
 function formatRunTimestamp(value) {
@@ -66,48 +57,68 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
   const [runsLoading, setRunsLoading] = useState(false);
   const [error, setError] = useState('');
   const [pdfError, setPdfError] = useState('');
+  const [pullLoading, setPullLoading] = useState(false);
+  const [pullError, setPullError] = useState('');
+  const [linkedPlYear, setLinkedPlYear] = useState(null);
+  const [linkedBsYear, setLinkedBsYear] = useState(null);
+  const [linkedBsComputed, setLinkedBsComputed] = useState(null);
 
-  const progress = ((stepIndex + 1) / steps.length) * 100;
+  const applyPrefill = useCallback((patch) => {
+    setForm((prev) => ({ ...prev, ...patch }));
+  }, []);
 
-  const canAdvance = useMemo(() => {
-    if (stepIndex === 0) {
-      return parseNumber(form.annualRevenue) >= 0 && parseNumber(form.annualCogs) >= 0;
-    }
-    if (stepIndex === 1) {
-      return parseNumber(form.annualFixedExpenses) >= 0;
-    }
-    if (stepIndex === 2) {
-      return (
-        parseNumber(form.daysSalesOutstanding) >= 0 &&
-        parseNumber(form.daysInventoryOnHand) >= 0 &&
-        parseNumber(form.daysPayablesOutstanding) >= 0
-      );
-    }
-    if (stepIndex === 3) {
-      return parseNumber(form.workDaysPerYear) > 0 && parseNumber(form.workHoursPerDay) > 0;
-    }
-    return true;
-  }, [form, stepIndex]);
+  const { staleFields, snapshotMeta } = useFinancialSnapshotPrefill({
+    clientId,
+    worksheetKey: 'current-financial-information',
+    applyPrefill,
+    currentForm: form,
+    onlyEmpty: true,
+  });
+
+  const draftPayload = useMemo(() => ({ form }), [form]);
+  useWorksheetStepDraft({
+    clientId,
+    worksheetKey: 'current-financial-information',
+    stepIndex,
+    setStepIndex,
+    draftPayload,
+    onRestoreDraft: (draft) => {
+      if (draft.form && typeof draft.form === 'object') {
+        setForm((prev) => ({ ...prev, ...draft.form }));
+      }
+    },
+  });
 
   function updateField(name, value) {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
-  function loadRun(run) {
+  const loadRun = useCallback((run) => {
     if (!run) return;
     setForm({ ...defaultForm, ...(run.inputs || {}) });
     setResult(run.outputs || null);
     setRunId(run.id || '');
-    setStepIndex(steps.length - 1);
     setError('');
     setPdfError('');
+  }, []);
+
+  useWorksheetShellRunLoader(loadRun);
+
+  async function refreshLinkedSources() {
+    if (!clientId) return;
+    const [plRun, bsRun] = await Promise.all([
+      fetchLatestRun(clientId, '/api/worksheets/pl-comparisons/runs'),
+      fetchLatestRun(clientId, '/api/worksheets/balance-sheet-comparisons/runs'),
+    ]);
+    setLinkedPlYear(normalizePLYearRow(pickLatestYearRow(plRun?.inputs?.years)));
+    setLinkedBsYear(pickLatestYearRow(bsRun?.inputs?.years));
+    setLinkedBsComputed(pickLatestYearRow(bsRun?.outputs?.years));
   }
 
   function resetToNewRun() {
     setForm(defaultForm);
     setResult(null);
     setRunId('');
-    setStepIndex(0);
     setError('');
     setPdfError('');
   }
@@ -121,18 +132,16 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
       try {
         const response = await fetch(
           `/api/worksheets/current-financial-information/runs?client_id=${encodeURIComponent(clientId)}`,
-          {
-            cache: 'no-store',
-          },
+          { cache: 'no-store' },
         );
         const data = await response.json();
         if (!response.ok || !data.ok) {
           throw new Error(data.error || 'Unable to load current financial information history.');
         }
 
-        const fetchedRuns = data.runs || [];
-        if (cancelled) return;
-        setRuns(fetchedRuns);
+        if (!cancelled) {
+          setRuns(data.runs || []);
+        }
       } catch (err) {
         if (!cancelled) {
           setError(err.message || 'Unable to load current financial information history.');
@@ -145,11 +154,44 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
     }
 
     fetchRuns();
+    refreshLinkedSources().catch(() => {});
 
     return () => {
       cancelled = true;
     };
   }, [clientId]);
+
+  async function pullLinkedData() {
+    if (!clientId) return;
+    setPullLoading(true);
+    setPullError('');
+    try {
+      const [plRun, bsRun, beRun] = await Promise.all([
+        fetchLatestRun(clientId, '/api/worksheets/pl-comparisons/runs'),
+        fetchLatestRun(clientId, '/api/worksheets/balance-sheet-comparisons/runs'),
+        fetchLatestRun(clientId, '/api/worksheets/breakeven/runs'),
+      ]);
+
+      const plYear = normalizePLYearRow(pickLatestYearRow(plRun?.inputs?.years));
+      const bsYear = pickLatestYearRow(bsRun?.inputs?.years);
+      const beInputs = beRun?.inputs;
+
+      setLinkedPlYear(plYear);
+      setLinkedBsYear(bsYear);
+      setLinkedBsComputed(pickLatestYearRow(bsRun?.outputs?.years));
+
+      const patch = mapCFIFromSources({ plYear, bsYear, beInputs });
+      applyPrefill(
+        Object.fromEntries(
+          Object.entries(patch).map(([key, value]) => [key, value === undefined || value === null ? '' : String(value)]),
+        ),
+      );
+    } catch (err) {
+      setPullError(err.message || 'Unable to pull linked worksheet data.');
+    } finally {
+      setPullLoading(false);
+    }
+  }
 
   async function calculateAndSave(event) {
     event.preventDefault();
@@ -161,6 +203,10 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
         annualRevenue: parseNumber(form.annualRevenue),
         annualCogs: parseNumber(form.annualCogs),
         annualFixedExpenses: parseNumber(form.annualFixedExpenses),
+        laborAmount: parseNumber(form.laborAmount),
+        indirectCostsAmount: parseNumber(form.indirectCostsAmount),
+        generalAdministrativeCostsAmount: parseNumber(form.generalAdministrativeCostsAmount),
+        profitAmount: form.profitAmount === '' ? null : parseNumber(form.profitAmount),
         daysSalesOutstanding: parseNumber(form.daysSalesOutstanding),
         daysInventoryOnHand: parseNumber(form.daysInventoryOnHand),
         daysPayablesOutstanding: parseNumber(form.daysPayablesOutstanding),
@@ -199,6 +245,11 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
       };
       setRunId(savedRun.id);
       setRuns((prev) => [savedRun, ...prev.filter((run) => run.id !== savedRun.id)].slice(0, 10));
+      await patchFinancialSnapshot(
+        clientId,
+        'current-financial-information',
+        buildSnapshotPatch('current-financial-information', payload, calculationData.result),
+      );
     } catch (err) {
       setError(err.message || 'Unable to complete current financial information run.');
     } finally {
@@ -264,202 +315,29 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
   }
 
   return (
-    <section className="wizard-shell">
-      <header className="wizard-header">
-        <p className="wizard-kicker">Analyst Program</p>
-        <h1>Current Financial Information</h1>
-        <p>Capture baseline margin, breakeven load, and working capital posture in one intake run.</p>
-      </header>
+    <section className="wizard-shell cfi-wizard">
+      <SnapshotStatusBanner staleFields={staleFields} snapshotMeta={snapshotMeta} />
 
-      <div className="wizard-progress" aria-hidden="true">
-        <span style={{ width: `${progress}%` }} />
-      </div>
+      <form onSubmit={calculateAndSave}>
+        <CFITableView
+          form={form}
+          onFieldChange={updateField}
+          result={result}
+          linkedPlYear={linkedPlYear}
+          linkedBsYear={linkedBsYear}
+          linkedBsComputed={linkedBsComputed}
+          staleFields={staleFields}
+          sectionIndex={stepIndex}
+          onSectionChange={setStepIndex}
+        />
 
-      <ol className="wizard-step-list">
-        {steps.map((step, idx) => {
-          const isCurrent = idx === stepIndex;
-          const isCompleted = idx < stepIndex;
-          const canJumpForward = idx > stepIndex ? canAdvance : true;
-
-          return (
-            <li key={step.id}>
-              <button
-                type="button"
-                className={`wizard-step-button ${isCurrent ? 'active' : ''} ${isCompleted ? 'complete' : ''}`}
-                onClick={() => setStepIndex(idx)}
-                disabled={loading || !canJumpForward}
-                aria-current={isCurrent ? 'step' : undefined}
-              >
-                <strong>{step.title}</strong>
-                <span>{step.hint}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
-
-      <form className="wizard-card" onSubmit={calculateAndSave}>
-        {stepIndex === 0 && (
-          <div className="wizard-fields">
-            <label>
-              Annual Revenue
-              <WorksheetInput
-                type="number"
-                min="0"
-                value={form.annualRevenue}
-                onChange={(event) => updateField('annualRevenue', event.target.value)}
-                placeholder="e.g. 1250000"
-              />
-            </label>
-            <label>
-              Annual COGS
-              <WorksheetInput
-                type="number"
-                min="0"
-                value={form.annualCogs}
-                onChange={(event) => updateField('annualCogs', event.target.value)}
-                placeholder="e.g. 700000"
-              />
-            </label>
-          </div>
-        )}
-
-        {stepIndex === 1 && (
-          <div className="wizard-fields">
-            <label>
-              Annual Fixed Expenses
-              <WorksheetInput
-                type="number"
-                min="0"
-                value={form.annualFixedExpenses}
-                onChange={(event) => updateField('annualFixedExpenses', event.target.value)}
-                placeholder="e.g. 320000"
-              />
-            </label>
-            <label>
-              Optional Notes
-              <textarea
-                rows={5}
-                value={form.optionalNotes}
-                onChange={(event) => updateField('optionalNotes', event.target.value)}
-                placeholder="Context for assumptions or known outliers."
-              />
-            </label>
-          </div>
-        )}
-
-        {stepIndex === 2 && (
-          <div className="wizard-fields">
-            <label>
-              Days Sales Outstanding (DSO)
-              <WorksheetInput
-                type="number"
-                min="0"
-                value={form.daysSalesOutstanding}
-                onChange={(event) => updateField('daysSalesOutstanding', event.target.value)}
-                placeholder="e.g. 45"
-              />
-            </label>
-            <label>
-              Days Inventory On Hand (DIO)
-              <WorksheetInput
-                type="number"
-                min="0"
-                value={form.daysInventoryOnHand}
-                onChange={(event) => updateField('daysInventoryOnHand', event.target.value)}
-                placeholder="e.g. 38"
-              />
-            </label>
-            <label>
-              Days Payables Outstanding (DPO)
-              <WorksheetInput
-                type="number"
-                min="0"
-                value={form.daysPayablesOutstanding}
-                onChange={(event) => updateField('daysPayablesOutstanding', event.target.value)}
-                placeholder="e.g. 30"
-              />
-            </label>
-          </div>
-        )}
-
-        {stepIndex === 3 && (
-          <div className="wizard-fields">
-            <label>
-              Work Days Per Year
-              <WorksheetInput
-                type="number"
-                min="1"
-                value={form.workDaysPerYear}
-                onChange={(event) => updateField('workDaysPerYear', event.target.value)}
-                placeholder="e.g. 250"
-              />
-            </label>
-            <label>
-              Work Hours Per Day
-              <WorksheetInput
-                type="number"
-                min="1"
-                value={form.workHoursPerDay}
-                onChange={(event) => updateField('workHoursPerDay', event.target.value)}
-                placeholder="e.g. 8"
-              />
-            </label>
-          </div>
-        )}
-
-        {stepIndex === 4 && (
-          <div className="client-review-grid">
-            <article>
-              <span>Annual Revenue</span>
-              <strong>{currency(form.annualRevenue)}</strong>
-            </article>
-            <article>
-              <span>Annual COGS</span>
-              <strong>{currency(form.annualCogs)}</strong>
-            </article>
-            <article>
-              <span>Annual Fixed Expenses</span>
-              <strong>{currency(form.annualFixedExpenses)}</strong>
-            </article>
-            <article>
-              <span>Cycle Days</span>
-              <strong>
-                DSO {number(form.daysSalesOutstanding)} + DIO {number(form.daysInventoryOnHand)} - DPO{' '}
-                {number(form.daysPayablesOutstanding)}
-              </strong>
-            </article>
-            <article>
-              <span>Capacity</span>
-              <strong>
-                {parseNumber(form.workDaysPerYear)} days x {parseNumber(form.workHoursPerDay)} hrs
-              </strong>
-            </article>
-            <article>
-              <span>Current Run</span>
-              <strong>{runId ? `Loaded run ${runId.slice(0, 8)}...` : 'New run (unsaved)'}</strong>
-            </article>
-          </div>
-        )}
-
-        <div className="wizard-actions">
-          <button
-            type="button"
-            className="ghost"
-            disabled={loading || stepIndex === 0}
-            onClick={() => setStepIndex((prev) => Math.max(0, prev - 1))}
-          >
-            Back
+        <div className="wizard-actions cfi-wizard__actions">
+          <button type="button" className="ghost" onClick={pullLinkedData} disabled={pullLoading || !clientId}>
+            {pullLoading ? 'Pulling...' : 'Pull from saved worksheets'}
           </button>
-          {stepIndex < steps.length - 1 ? (
-            <button type="button" disabled={loading || !canAdvance} onClick={() => setStepIndex((prev) => prev + 1)}>
-              Continue
-            </button>
-          ) : (
-            <button type="submit" disabled={loading}>
-              {loading ? 'Running...' : 'Calculate + Save'}
-            </button>
-          )}
+          <button type="submit" disabled={loading}>
+            {loading ? 'Running...' : 'Calculate + Save'}
+          </button>
           <button type="button" disabled={!result || pdfLoading} onClick={downloadPdf}>
             {pdfLoading ? 'Preparing PDF...' : 'Download PDF'}
           </button>
@@ -469,76 +347,15 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
         {pdfError ? <p className="wizard-error">{pdfError}</p> : null}
       </form>
 
-      {result ? (
-        <section className="wizard-result">
-          <div className="wizard-kpis">
-            <article>
-              <span>Gross Margin Amount</span>
-              <strong>{currency(result.grossMarginAmount)}</strong>
-            </article>
-            <article>
-              <span>Gross Margin Percent</span>
-              <strong>{percent(result.grossMarginPercent)}</strong>
-            </article>
-            <article>
-              <span>Breakeven Revenue</span>
-              <strong>{currency(result.breakevenRevenue)}</strong>
-            </article>
-            <article>
-              <span>Net Working Capital</span>
-              <strong>{currency(result.netWorkingCapital)}</strong>
-            </article>
-          </div>
-
-          <div className="wizard-kpis">
-            <article>
-              <span>A/R Investment</span>
-              <strong>{currency(result.arInvestment)}</strong>
-            </article>
-            <article>
-              <span>Inventory Investment</span>
-              <strong>{currency(result.inventoryInvestment)}</strong>
-            </article>
-            <article>
-              <span>A/P Financing</span>
-              <strong>{currency(result.apFinancing)}</strong>
-            </article>
-            <article>
-              <span>Cash Conversion Cycle</span>
-              <strong>{number(result.cashConversionCycle, 2)} days</strong>
-            </article>
-          </div>
-
-          <div className="wizard-kpis">
-            <article>
-              <span>Breakeven Daily</span>
-              <strong>{currency(result.breakevenDaily)}</strong>
-            </article>
-            <article>
-              <span>Breakeven Weekly</span>
-              <strong>{currency(result.breakevenWeekly)}</strong>
-            </article>
-            <article>
-              <span>Breakeven Monthly</span>
-              <strong>{currency(result.breakevenMonthly)}</strong>
-            </article>
-            <article>
-              <span>Breakeven Hourly</span>
-              <strong>{currency(result.breakevenHourly)}</strong>
-            </article>
-          </div>
-
-          {(result.warnings || []).length > 0 ? (
-            <ul className="warnings">
-              {result.warnings.map((warning) => (
-                <li key={warning}>{warning}</li>
-              ))}
-            </ul>
-          ) : null}
-
-          {runId ? <p className="wizard-meta">Saved run ID: {runId}</p> : null}
-        </section>
+      {result && (result.warnings || []).length > 0 ? (
+        <ul className="warnings">
+          {result.warnings.map((warning) => (
+            <li key={warning}>{warning}</li>
+          ))}
+        </ul>
       ) : null}
+
+      {runId ? <p className="wizard-meta">Saved run ID: {runId}</p> : null}
 
       <section className="wizard-history" aria-label="Current financial information run history">
         <div className="wizard-history-actions">
@@ -554,6 +371,7 @@ export default function CurrentFinancialInformationWizard({ clientId }) {
             Start new run
           </button>
         </div>
+        {pullError ? <p className="wizard-error">{pullError}</p> : null}
         <ul className="wizard-history-list">
           {runs.slice(0, 10).map((run) => (
             <li key={run.id}>

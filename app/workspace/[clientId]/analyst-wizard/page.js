@@ -1,49 +1,29 @@
-import Link from 'next/link';
-import worksheetCatalog from '@/knowledge/workbooks/worksheet_catalog.json';
+import { redirect } from 'next/navigation';
+
+import AnalystWorksheetHub from '@/components/hub/AnalystWorksheetHub';
+import { isConsultant } from '@/lib/supabase/auth';
+import { createClient } from '@/lib/supabase/server';
+import { getClientHubStatus } from '@/lib/server/hubStatus';
 
 export default async function WorkspaceAnalystWizardPage({ params }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
+  if (!isConsultant(user)) redirect('/login?error=unauthorized');
+
   const { clientId } = await params;
-  const wizardSheets = worksheetCatalog.filter((entry) => entry.category === 'analyst-wizard');
-  const coreSheets = wizardSheets.filter((entry) => entry.priorityRank > 0);
-  const otherSheets = wizardSheets.filter((entry) => entry.priorityRank <= 0);
+  const { data: client, error: clientError } = await supabase
+    .from('clients')
+    .select('id')
+    .eq('id', clientId)
+    .maybeSingle();
 
-  return (
-    <section className="panel worksheet-picker">
-      <h2>Analyst Wizard Worksheets</h2>
-      <p>Select a worksheet to continue. Core worksheets are listed first.</p>
+  if (clientError || !client) redirect('/dashboard/clients');
 
-      <ul className="worksheet-list">
-        <li>
-          <Link href={`/workspace/${clientId}/analyst-wizard/guided-intake`} className="worksheet-link worksheet-link-core">
-            Guided Intake Wizard
-          </Link>
-        </li>
-      </ul>
+  const hubStatus = await getClientHubStatus(clientId, supabase);
 
-      {coreSheets.length > 0 ? <h3>Core worksheets</h3> : null}
-      <ul className="worksheet-list">
-        {coreSheets.map((entry) => (
-          <li key={entry.key}>
-            <Link
-              href={`/workspace/${clientId}/analyst-wizard/sheets/${entry.key}`}
-              className="worksheet-link worksheet-link-core"
-            >
-              {entry.sheetName}
-            </Link>
-          </li>
-        ))}
-      </ul>
-
-      {otherSheets.length > 0 ? <h3>All worksheets</h3> : null}
-      <ul className="worksheet-list">
-        {otherSheets.map((entry) => (
-          <li key={entry.key}>
-            <Link href={`/workspace/${clientId}/analyst-wizard/sheets/${entry.key}`} className="worksheet-link">
-              {entry.sheetName}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
+  return <AnalystWorksheetHub clientId={clientId} hubStatus={hubStatus} />;
 }

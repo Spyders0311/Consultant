@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+import { buildClientProfilePatchFromBasicClientInfo, mergeClientProfile } from '@/lib/worksheets/clientProfile';
+
 function parseLimit(rawLimit) {
   const parsed = Number.parseInt(rawLimit || '10', 10);
   if (!Number.isFinite(parsed)) return 10;
@@ -83,6 +85,40 @@ export async function POST(request) {
       { ok: false, error: error.message || 'Failed to save basic client info run.' },
       { status: 500 },
     );
+  }
+
+  const inputs = insertPayload.inputs || {};
+  const clientPatch = buildClientProfilePatchFromBasicClientInfo(inputs);
+
+  if (Object.keys(clientPatch).length > 0) {
+    if (clientPatch.client_profile) {
+      const { data: existingClient, error: existingError } = await supabase
+        .from('clients')
+        .select('client_profile')
+        .eq('id', clientId)
+        .maybeSingle();
+
+      if (existingError) {
+        return NextResponse.json(
+          { ok: false, error: existingError.message || 'Failed to load client profile.' },
+          { status: 500 },
+        );
+      }
+
+      clientPatch.client_profile = mergeClientProfile(
+        existingClient?.client_profile,
+        clientPatch.client_profile,
+      );
+    }
+
+    const { error: updateError } = await supabase.from('clients').update(clientPatch).eq('id', clientId);
+
+    if (updateError) {
+      return NextResponse.json(
+        { ok: false, error: updateError.message || 'Run saved but client profile update failed.' },
+        { status: 500 },
+      );
+    }
   }
 
   return NextResponse.json({ ok: true, id: data.id });

@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "worksheets": {
+    "breakeven-analysis": {
+      "inputs": [
+        "annualRevenue",
+        "calculationMethod",
+        "cogsAmount",
+        "fixedExpensesAmount",
+        "generalAdministrativeCostsAmount",
+        "indirectCostsAmount",
+        "laborAmount",
+        "monthsInPeriod",
+        "profitAmount",
+        "workDaysPerYear",
+        "workHoursPerDay"
+      ],
+      "outputs": [
+        "breakevenDaily",
+        "breakevenDays",
+        "breakevenHourly",
+        "breakevenMonthly",
+        "breakevenPercent",
+        "breakevenRevenue",
+        "breakevenWeekly",
+        "calculationMethod",
+        "contributionMargin",
+        "fixedCostsAmount",
+        "grossMarginAmount",
+        "grossMarginPercent",
+        "monthsInPeriod",
+        "notes",
+        "operatingIncome",
+        "variableCostsAmount"
+      ]
+    },
+    "working-capital-analysis": {
+      "inputs": [
+        "annualCogs",
+        "annualRevenue",
+        "cogsGrowthPercent",
+        "daysInventoryOnHand",
+        "daysPayablesOutstanding",
+        "daysSalesOutstanding",
+        "projectionYears",
+        "revenueGrowthPercent"
+      ],
+      "outputs": [
+        "apFinancing",
+        "arInvestment",
+        "cashConversionCycle",
+        "cogsGrowthPercent",
+        "inventoryInvestment",
+        "netWorkingCapital",
+        "projectionYears",
+        "revenueGrowthPercent",
+        "scenarios",
+        "warnings",
+        "workingCapitalPercentOfRevenue"
+      ]
+    },
+    "current-financial-information": {
+      "inputs": [
+        "annualCogs",
+        "annualFixedExpenses",
+        "annualRevenue",
+        "daysInventoryOnHand",
+        "daysPayablesOutstanding",
+        "daysSalesOutstanding",
+        "generalAdministrativeCostsAmount",
+        "indirectCostsAmount",
+        "laborAmount",
+        "optionalNotes",
+        "profitAmount",
+        "workDaysPerYear",
+        "workHoursPerDay"
+      ],
+      "outputs": [
+        "apFinancing",
+        "arInvestment",
+        "breakevenDaily",
+        "breakevenHourly",
+        "breakevenMonthly",
+        "breakevenRevenue",
+        "breakevenWeekly",
+        "cashConversionCycle",
+        "grossMarginAmount",
+        "grossMarginPercent",
+        "inventoryInvestment",
+        "netWorkingCapital",
+        "warnings"
+      ]
+    },
+    "five-year-projections": {
+      "inputs": [
+        "baseCogsPercent",
+        "baseFixedExpenses",
+        "baseRevenue",
+        "baseYear",
+        "discountRatePercent",
+        "fixedExpenseGrowthPercent",
+        "fixedOther",
+        "fixedPayroll",
+        "fixedRentUtilities",
+        "horizonYears",
+        "inflationPercent",
+        "marketGrowthPercent",
+        "revenueGrowthPercent",
+        "taxRatePercent"
+      ],
+      "outputs": [
+        "horizonYears",
+        "summary",
+        "warnings",
+        "years"
+      ]
+    },
+    "basic-client-info": {
+      "inputs": [
+        "companyName",
+        "industry",
+        "locationCity",
+        "locationState",
+        "notes",
+        "primaryContactEmail",
+        "primaryContactName",
+        "primaryContactPhone"
+      ],
+      "outputs": [
+        "companyName",
+        "industry",
+        "locationCity",
+        "locationState",
+        "notes",
+        "primaryContactEmail",
+        "primaryContactName",
+        "primaryContactPhone",
+        "summaryBlock",
+        "warnings"
+      ]
+    },
+    "p-l-comparisons": {
+      "inputs": [
+        "years"
+      ]
+    },
+    "balance-sht-comparisons": {
+      "inputs": [
+        "years"
+      ]
+    },
+    "misc-direct-expenses": {
+      "inputs": [
+        "lines"
+      ]
+    },
+    "misc-indirect-expenses": {
+      "inputs": [
+        "lines"
+      ]
+    },
+    "twelve-month-pl-comparisons": {
+      "inputs": [
+        "months",
+        "year"
+      ]
+    },
+    "twelve-month-analysis": {
+      "inputs": [
+        "analysisType",
+        "months",
+        "year"
+      ]
+    },
+    "financial-ratios": {
+      "inputs": [
+        "bsComputed",
+        "bsYear",
+        "plYear"
+      ]
+    }
+  }
+}

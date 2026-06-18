@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { isConsultant } from '@/lib/supabase/auth';
 import WorkspaceTabNav from '@/components/WorkspaceTabNav';
+import WorkspaceBreadcrumbTrail from '@/components/WorkspaceBreadcrumbTrail';
 
 export default async function WorkspaceLayout({ children, params }) {
   const supabase = await createClient();
@@ -34,6 +35,10 @@ export default async function WorkspaceLayout({ children, params }) {
     <main className="portal-wrap workspace-shell">
       <section className="workspace-header">
         <div>
+          <WorkspaceBreadcrumbTrail
+            clientId={clientId}
+            clientName={client.company_name || 'Untitled client'}
+          />
           <p className="eyebrow">Client Workspace</p>
           <h1>{client.company_name || 'Untitled client'}</h1>
         </div>

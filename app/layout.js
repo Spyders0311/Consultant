@@ -1,4 +1,5 @@
 import './globals.css';
+import './styles/workspace.css';
 
 export const metadata = {
   title: 'BMS Portal',

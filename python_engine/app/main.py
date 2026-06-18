@@ -5,6 +5,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
+from .analyst.breakeven import calculate_analyst_breakeven
+from .analyst.expense_lines import calculate_expense_lines
+from .analyst.four_year_history import generate_four_year_history
+from .analyst.pl_rollup import normalize_pl_year
+from .analyst.projections import calculate_five_year_projections
+from .analyst.financial_ratios import calculate_financial_ratios
+from .analyst.monthly_analysis import calculate_monthly_analysis
+from .analyst.twelve_month import calculate_twelve_month_pl
+from .analyst.wc_scenarios import calculate_working_capital_with_scenarios
 from .calculation_service import run_projection
 from .models import (
     AnalystWizardInput,
@@ -16,13 +25,21 @@ from .models import (
     BreakevenResult,
     CurrentFinancialInformationInput,
     CurrentFinancialInformationResult,
+    FinancialRatiosInput,
+    FourYearHistoryInput,
     FiveYearProjectionsInput,
     FiveYearProjectionsResult,
+    MiscExpenseInput,
+    MonthlyAnalysisInput,
     PLComparisonsInput,
+    TwelveMonthPLInput,
     WorkingCapitalInput,
     WorkingCapitalResult,
+    WorkbookPortInput,
+    WorkbookPortResult,
 )
 from .spreadsheet_context import WorkbookContext, load_workbook_context
+from .workbook_ports import calculate_workbook_port as run_workbook_port
 
 ENGINE_VERSION = "1.0.0"
 
@@ -181,50 +198,8 @@ def calculate_basic_client_info(payload: dict):
 def calculate_breakeven(payload: dict):
     try:
         validated = BreakevenInput.model_validate(payload)
-
-        annual_revenue = float(validated.annual_revenue)
-        cogs_amount = float(validated.cogs_amount)
-        fixed_expenses = float(validated.fixed_expenses_amount)
-        work_days = float(validated.work_days_per_year or 250)
-        work_hours = float(validated.work_hours_per_day or 8)
-
-        gross_margin_amount = annual_revenue - cogs_amount
-        gross_margin_percent = (gross_margin_amount / annual_revenue * 100) if annual_revenue > 0 else 0.0
-        warnings: list[str] = []
-
-        breakeven_revenue = None
-        if gross_margin_amount <= 0 or gross_margin_percent <= 0:
-            warnings.append(
-                "Gross margin is zero or negative. Breakeven cannot be computed until revenue exceeds COGS."
-            )
-        else:
-            contribution_margin_ratio = gross_margin_percent / 100
-            breakeven_revenue = fixed_expenses / contribution_margin_ratio
-
-        breakeven_percent = None
-        if breakeven_revenue is not None and annual_revenue > 0:
-            breakeven_percent = (breakeven_revenue / annual_revenue) * 100
-        elif annual_revenue <= 0:
-            warnings.append("Annual revenue is zero. Breakeven percent cannot be compared against current revenue.")
-
-        breakeven_monthly = breakeven_revenue / 12 if breakeven_revenue is not None else None
-        breakeven_daily = breakeven_revenue / work_days if breakeven_revenue is not None else None
-        breakeven_weekly = breakeven_daily * 5 if breakeven_daily is not None else None
-        breakeven_hourly = breakeven_daily / work_hours if breakeven_daily is not None else None
-
-        result = BreakevenResult.model_validate(
-            {
-                "grossMarginAmount": gross_margin_amount,
-                "grossMarginPercent": gross_margin_percent,
-                "breakevenRevenue": breakeven_revenue,
-                "breakevenPercent": breakeven_percent,
-                "breakevenMonthly": breakeven_monthly,
-                "breakevenWeekly": breakeven_weekly,
-                "breakevenDaily": breakeven_daily,
-                "breakevenHourly": breakeven_hourly,
-                "notes": warnings,
-            }
-        )
+        computed = calculate_analyst_breakeven(validated.model_dump(by_alias=True))
+        result = BreakevenResult.model_validate(computed)
         return {"ok": True, "result": result.model_dump(by_alias=True)}
     except ValidationError as error:
         return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
@@ -236,38 +211,8 @@ def calculate_breakeven(payload: dict):
 def calculate_working_capital(payload: dict):
     try:
         validated = WorkingCapitalInput.model_validate(payload)
-
-        annual_revenue = float(validated.annual_revenue)
-        annual_cogs = float(validated.annual_cogs)
-        dso = float(validated.days_sales_outstanding)
-        dio = float(validated.days_inventory_on_hand)
-        dpo = float(validated.days_payables_outstanding)
-
-        ar_investment = (annual_revenue / 365.0) * dso
-        inventory_investment = (annual_cogs / 365.0) * dio
-        ap_financing = (annual_cogs / 365.0) * dpo
-        net_working_capital = ar_investment + inventory_investment - ap_financing
-        cash_conversion_cycle = dso + dio - dpo
-
-        warnings: list[str] = []
-        if annual_revenue <= 0:
-            warnings.append("Annual revenue is zero. Working capital as a percent of revenue cannot be computed.")
-
-        working_capital_percent_of_revenue = (
-            (net_working_capital / annual_revenue) * 100 if annual_revenue > 0 else None
-        )
-
-        result = WorkingCapitalResult.model_validate(
-            {
-                "arInvestment": ar_investment,
-                "inventoryInvestment": inventory_investment,
-                "apFinancing": ap_financing,
-                "netWorkingCapital": net_working_capital,
-                "cashConversionCycle": cash_conversion_cycle,
-                "workingCapitalPercentOfRevenue": working_capital_percent_of_revenue,
-                "warnings": warnings,
-            }
-        )
+        computed = calculate_working_capital_with_scenarios(validated.model_dump(by_alias=True))
+        result = WorkingCapitalResult.model_validate(computed)
         return {"ok": True, "result": result.model_dump(by_alias=True)}
     except ValidationError as error:
         return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
@@ -299,12 +244,19 @@ def calculate_current_financial_information(payload: dict):
         if annual_cogs > annual_revenue:
             warnings.append("Annual COGS exceeds annual revenue. Gross margin is negative.")
 
-        breakeven_revenue = None
-        contribution_margin_ratio = gross_margin_percent / 100
-        if contribution_margin_ratio <= 0:
-            warnings.append("Gross margin is zero or negative. Breakeven revenue cannot be computed.")
-        else:
-            breakeven_revenue = annual_fixed_expenses / contribution_margin_ratio
+        breakeven_payload = {
+            "annualRevenue": float(validated.annual_revenue),
+            "cogsAmount": float(validated.annual_cogs),
+            "fixedExpensesAmount": float(validated.annual_fixed_expenses),
+            "laborAmount": float(validated.labor_amount),
+            "indirectCostsAmount": float(validated.indirect_costs_amount),
+            "generalAdministrativeCostsAmount": float(validated.general_administrative_costs_amount),
+            "profitAmount": validated.profit_amount,
+            "workDaysPerYear": float(validated.work_days_per_year),
+            "workHoursPerDay": float(validated.work_hours_per_day),
+        }
+        breakeven = calculate_analyst_breakeven(breakeven_payload)
+        breakeven_revenue = breakeven.get("breakevenRevenue")
 
         ar_investment = (annual_revenue / 365.0) * dso
         inventory_investment = (annual_cogs / 365.0) * dio
@@ -315,10 +267,11 @@ def calculate_current_financial_information(payload: dict):
         if cash_conversion_cycle < 0:
             warnings.append("Cash conversion cycle is negative. Verify DPO and cycle assumptions.")
 
-        breakeven_daily = breakeven_revenue / work_days if breakeven_revenue is not None else None
-        breakeven_weekly = breakeven_daily * 5 if breakeven_daily is not None else None
-        breakeven_monthly = breakeven_revenue / 12 if breakeven_revenue is not None else None
-        breakeven_hourly = breakeven_daily / work_hours if breakeven_daily is not None else None
+        breakeven_daily = breakeven.get("breakevenDaily")
+        breakeven_weekly = breakeven.get("breakevenWeekly")
+        breakeven_monthly = breakeven.get("breakevenMonthly")
+        breakeven_hourly = breakeven.get("breakevenHourly")
+        warnings.extend(breakeven.get("notes") or [])
 
         result = CurrentFinancialInformationResult.model_validate(
             {
@@ -345,71 +298,11 @@ def calculate_current_financial_information(payload: dict):
 
 
 @app.post("/api/v1/worksheets/five-year-projections/calculate")
-def calculate_five_year_projections(payload: dict):
+def calculate_five_year_projections_route(payload: dict):
     try:
         validated = FiveYearProjectionsInput.model_validate(payload)
-
-        base_year = int(validated.base_year)
-        initial_revenue = float(validated.base_revenue)
-        revenue_growth_rate = float(validated.revenue_growth_percent) / 100.0
-        cogs_rate = float(validated.base_cogs_percent) / 100.0
-        initial_fixed_expenses = float(validated.base_fixed_expenses)
-        fixed_expense_growth_rate = float(validated.fixed_expense_growth_percent) / 100.0
-        tax_rate = (
-            None if validated.tax_rate_percent is None else float(validated.tax_rate_percent) / 100.0
-        )
-
-        warnings: list[str] = []
-        if initial_revenue == 0:
-            warnings.append("Base revenue is zero. Margin metrics and earnings may be less meaningful.")
-        if tax_rate is None:
-            warnings.append("Tax rate not provided. Taxes and net income were omitted.")
-
-        years: list[dict] = []
-
-        for offset in range(5):
-            year = base_year + offset
-            revenue = initial_revenue * ((1 + revenue_growth_rate) ** offset)
-            cogs = revenue * cogs_rate
-            gross_profit = revenue - cogs
-            gross_margin_pct = (gross_profit / revenue * 100) if revenue > 0 else None
-
-            fixed_expenses = initial_fixed_expenses * ((1 + fixed_expense_growth_rate) ** offset)
-            ebitda = gross_profit - fixed_expenses
-            ebitda_margin_pct = (ebitda / revenue * 100) if revenue > 0 else None
-
-            taxes = None
-            net_income = None
-            if tax_rate is not None:
-                taxes = max(0.0, ebitda * tax_rate)
-                net_income = ebitda - taxes
-
-            years.append(
-                {
-                    "year": year,
-                    "revenue": revenue,
-                    "cogs": cogs,
-                    "grossProfit": gross_profit,
-                    "grossMarginPct": gross_margin_pct,
-                    "fixedExpenses": fixed_expenses,
-                    "ebitda": ebitda,
-                    "ebitdaMarginPct": ebitda_margin_pct,
-                    "taxes": taxes,
-                    "netIncome": net_income,
-                }
-            )
-
-        if all((row.get("ebitda") or 0) < 0 for row in years):
-            warnings.append("EBITDA is negative in every projected year. Review pricing, COGS, and fixed cost inputs.")
-        if any((row.get("grossMarginPct") or 0) < 0 for row in years):
-            warnings.append("Gross margin is negative in at least one projected year.")
-
-        result = FiveYearProjectionsResult.model_validate(
-            {
-                "years": years,
-                "warnings": warnings,
-            }
-        )
+        computed = calculate_five_year_projections(validated.model_dump(by_alias=True))
+        result = FiveYearProjectionsResult.model_validate(computed)
         return {"ok": True, "result": result.model_dump(by_alias=True)}
     except ValidationError as error:
         return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
@@ -426,10 +319,11 @@ def calculate_pl_comparisons(payload: dict):
         per_year: list[dict] = []
 
         for row in sorted_years:
-            revenue = float(row.revenue)
-            cogs = float(row.cogs)
-            operating_expenses = float(row.operating_expenses)
-            other_expenses = float(row.other_expenses)
+            normalized = normalize_pl_year(row.model_dump(by_alias=True))
+            revenue = float(normalized["revenue"])
+            cogs = float(normalized["cogs"])
+            operating_expenses = float(normalized["operatingExpenses"])
+            other_expenses = float(normalized["otherExpenses"])
 
             gross_profit = revenue - cogs
             ebit = gross_profit - operating_expenses
@@ -439,11 +333,15 @@ def calculate_pl_comparisons(payload: dict):
 
             per_year.append(
                 {
-                    "year": row.year,
+                    "year": normalized["year"],
                     "revenue": revenue,
                     "cogs": cogs,
                     "operatingExpenses": operating_expenses,
                     "otherExpenses": other_expenses,
+                    "lineItems": normalized.get("lineItems") or [],
+                    "laborAmount": normalized.get("laborAmount"),
+                    "indirectCostsAmount": normalized.get("indirectCostsAmount"),
+                    "generalAdministrativeCostsAmount": normalized.get("generalAdministrativeCostsAmount"),
                     "grossProfit": gross_profit,
                     "grossMarginPct": gross_margin_pct,
                     "ebit": ebit,
@@ -487,17 +385,20 @@ def calculate_balance_sheet_comparisons(payload: dict):
             ar = float(row.ar)
             inventory = float(row.inventory)
             other_current_assets = float(row.other_current_assets)
+            intangible_assets = float(row.intangible_assets)
             fixed_assets = float(row.fixed_assets)
             other_assets = float(row.other_assets)
             ap = float(row.ap)
+            current_portion_ltd = float(row.current_portion_ltd)
             other_current_liabilities = float(row.other_current_liabilities)
             long_term_debt = float(row.long_term_debt)
             other_liabilities = float(row.other_liabilities)
+            retained_earnings = row.retained_earnings
             equity = float(row.equity)
 
             total_current_assets = cash + ar + inventory + other_current_assets
-            total_assets = total_current_assets + fixed_assets + other_assets
-            total_current_liabilities = ap + other_current_liabilities
+            total_assets = total_current_assets + fixed_assets + other_assets + intangible_assets
+            total_current_liabilities = ap + current_portion_ltd + other_current_liabilities
             total_liabilities = total_current_liabilities + long_term_debt + other_liabilities
             working_capital = total_current_assets - total_current_liabilities
 
@@ -520,9 +421,15 @@ def calculate_balance_sheet_comparisons(payload: dict):
                     "Balance sheet does not balance (Assets != Liabilities + Equity)."
                 )
 
+            if retained_earnings is not None and retained_earnings > equity + 0.01:
+                warnings.append("Retained earnings exceeds total equity. Verify equity allocation.")
+
             per_year.append(
                 {
                     "year": row.year,
+                    "intangibleAssets": intangible_assets,
+                    "currentPortionLtd": current_portion_ltd,
+                    "retainedEarnings": retained_earnings,
                     "totalCurrentAssets": total_current_assets,
                     "totalAssets": total_assets,
                     "totalCurrentLiabilities": total_current_liabilities,
@@ -538,6 +445,123 @@ def calculate_balance_sheet_comparisons(payload: dict):
             )
 
         return {"ok": True, "result": {"years": per_year}}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/misc-direct-expenses/calculate")
+def calculate_misc_direct_expenses(payload: dict):
+    try:
+        validated = MiscExpenseInput.model_validate(payload)
+        lines = [line.model_dump(by_alias=True) for line in validated.lines]
+        result = calculate_expense_lines(lines, "direct")
+        return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/misc-indirect-expenses/calculate")
+def calculate_misc_indirect_expenses(payload: dict):
+    try:
+        validated = MiscExpenseInput.model_validate(payload)
+        lines = [line.model_dump(by_alias=True) for line in validated.lines]
+        result = calculate_expense_lines(lines, "indirect")
+        return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/twelve-month-analysis/calculate")
+def calculate_twelve_month_analysis(payload: dict):
+    try:
+        validated = MonthlyAnalysisInput.model_validate(payload)
+        months = [month.model_dump(by_alias=True) for month in validated.months]
+        result = calculate_monthly_analysis(
+            {
+                "year": validated.year,
+                "analysisType": validated.analysis_type,
+                "months": months,
+            }
+        )
+        return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/twelve-month-pl-comparisons/calculate")
+def calculate_twelve_month_pl_comparisons(payload: dict):
+    try:
+        validated = TwelveMonthPLInput.model_validate(payload)
+        months = [month.model_dump(by_alias=True) for month in validated.months]
+        result = calculate_twelve_month_pl({"year": validated.year, "months": months})
+        return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/financial-ratios/calculate")
+def calculate_financial_ratios_route(payload: dict):
+    try:
+        validated = FinancialRatiosInput.model_validate(payload)
+        pl_year = validated.pl_year.model_dump(by_alias=True) if validated.pl_year else {}
+        bs_year = validated.bs_year.model_dump(by_alias=True) if validated.bs_year else {}
+        result = calculate_financial_ratios(
+            {
+                "plYear": pl_year,
+                "bsYear": bs_year,
+                "bsComputed": validated.bs_computed,
+            }
+        )
+        return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/four-year-history/generate")
+def generate_four_year_history_route(payload: dict):
+    try:
+        validated = FourYearHistoryInput.model_validate(payload)
+        result = generate_four_year_history(validated.model_dump(by_alias=True))
+        return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/workbook-ports/calculate")
+def calculate_workbook_port(payload: dict):
+    try:
+        validated = WorkbookPortInput.model_validate(payload)
+        try:
+            computed = run_workbook_port(validated.workbook_key, validated.inputs)
+        except KeyError:
+            return JSONResponse(
+                status_code=404,
+                content={"ok": False, "error": f"Unsupported workbook port: {validated.workbook_key}"},
+            )
+
+        result = WorkbookPortResult.model_validate(
+            {
+                "workbookKey": validated.workbook_key,
+                "summary": computed.get("summary", {}),
+                "rows": computed.get("rows", []),
+                "warnings": computed.get("warnings", []),
+            }
+        )
+        return {"ok": True, "result": result.model_dump(by_alias=True)}
     except ValidationError as error:
         return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
     except Exception as error:  # noqa: BLE001

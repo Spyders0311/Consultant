@@ -2,20 +2,30 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import WorksheetInput from '@/components/worksheet/WorksheetInput';
+import PLLineItemsEditor from '@/components/worksheet/PLLineItemsEditor';
+import { patchFinancialSnapshot } from '@/lib/client/patchFinancialSnapshot';
+import { fetchFinancialSnapshot } from '@/lib/client/fetchFinancialSnapshot';
+import { buildSnapshotPatch } from '@/lib/worksheets/snapshotWriteFields';
+import { rollupPLLineItems } from '@/lib/worksheets/plRollup';
+import PortBridgePanel from '@/components/worksheet/PortBridgePanel';
+import useWorksheetStepDraft from '@/lib/client/useWorksheetStepDraft';
+import useWorksheetShellRunLoader from '@/lib/client/useWorksheetShellRunLoader';
+import { pushTwelveMonthPLToAnnual } from '@/lib/client/pushFeederToPL';
 
 const steps = [
-  { id: 'grid', title: 'Enter 4 Years', hint: 'Input revenue and expense buckets by year.' },
+  { id: 'grid', title: 'Enter 4 Years', hint: 'Use summary buckets or detailed line items per year.' },
   { id: 'review', title: 'Review & Run', hint: 'Validate assumptions, then run.' },
   { id: 'results', title: 'Results', hint: 'View trends, load history, and export PDF.' },
 ];
 
 function makeDefaultYears() {
-  return Array.from({ length: 4 }, (_, idx) => ({
+  return Array.from({ length: 4 }, () => ({
     year: '',
     revenue: '',
     cogs: '',
     operatingExpenses: '',
     otherExpenses: '',
+    lineItems: [],
   }));
 }
 
@@ -46,7 +56,7 @@ function formatRunTimestamp(value) {
   });
 }
 
-export default function PLComparisonsWizard({ clientId }) {
+export default function PLComparisonsWizard({ clientId, clientRow = null }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [years, setYears] = useState(makeDefaultYears);
   const [loading, setLoading] = useState(false);
@@ -56,7 +66,32 @@ export default function PLComparisonsWizard({ clientId }) {
   const [runs, setRuns] = useState([]);
   const [runsLoading, setRunsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState('');
   const [pdfError, setPdfError] = useState('');
+  const [inputMode, setInputMode] = useState('buckets');
+  const [activeYearIndex, setActiveYearIndex] = useState(0);
+  const [snapshotPrefilled, setSnapshotPrefilled] = useState(false);
+
+  const draftPayload = useMemo(() => ({ years, inputMode, activeYearIndex }), [years, inputMode, activeYearIndex]);
+  useWorksheetStepDraft({
+    clientId,
+    worksheetKey: 'p-l-comparisons',
+    stepIndex,
+    setStepIndex,
+    draftPayload,
+    onRestoreDraft: (draft) => {
+      if (Array.isArray(draft.years)) {
+        setYears(draft.years);
+      }
+      if (typeof draft.inputMode === 'string') {
+        setInputMode(draft.inputMode);
+      }
+      if (typeof draft.activeYearIndex === 'number') {
+        setActiveYearIndex(draft.activeYearIndex);
+      }
+    },
+  });
 
   const progress = ((stepIndex + 1) / steps.length) * 100;
 
@@ -72,6 +107,26 @@ export default function PLComparisonsWizard({ clientId }) {
     setYears((prev) => prev.map((row, rowIdx) => (rowIdx === index ? { ...row, [field]: value } : row)));
   }
 
+  function updateYearLineItems(index, lineItems) {
+    const rollup = rollupPLLineItems(
+      lineItems.map((line) => ({ category: line.category, amount: Number(line.amount) || 0 })),
+    );
+    setYears((prev) =>
+      prev.map((row, rowIdx) =>
+        rowIdx === index
+          ? {
+              ...row,
+              lineItems,
+              revenue: rollup.revenue || row.revenue,
+              cogs: rollup.cogs || row.cogs,
+              operatingExpenses: rollup.operatingExpenses || row.operatingExpenses,
+              otherExpenses: rollup.otherExpenses || row.otherExpenses,
+            }
+          : row,
+      ),
+    );
+  }
+
   function loadRun(run) {
     if (!run) return;
     const inputYears = Array.isArray(run.inputs?.years) ? run.inputs.years : [];
@@ -81,7 +136,11 @@ export default function PLComparisonsWizard({ clientId }) {
       cogs: parseNumber(row?.cogs),
       operatingExpenses: parseNumber(row?.operatingExpenses),
       otherExpenses: parseNumber(row?.otherExpenses),
+      lineItems: Array.isArray(row?.lineItems) ? row.lineItems : [],
     }));
+
+    const hasLineItems = normalized.some((row) => row.lineItems.length > 0);
+    setInputMode(hasLineItems ? 'lineItems' : 'buckets');
 
     setYears(normalized.length === 4 ? normalized : makeDefaultYears());
     setResult(run.outputs || null);
@@ -91,6 +150,8 @@ export default function PLComparisonsWizard({ clientId }) {
     setPdfError('');
   }
 
+  useWorksheetShellRunLoader(loadRun);
+
   function resetToNewRun() {
     setYears(makeDefaultYears());
     setResult(null);
@@ -99,6 +160,48 @@ export default function PLComparisonsWizard({ clientId }) {
     setError('');
     setPdfError('');
   }
+
+  useEffect(() => {
+    let cancelled = false;
+    async function prefillFromSnapshot() {
+      if (!clientId || snapshotPrefilled) return;
+      try {
+        const data = await fetchFinancialSnapshot(clientId);
+        const snap = data.snapshot || {};
+        const latestIndex = 3;
+        setYears((prev) => {
+          const next = [...prev];
+          const row = { ...next[latestIndex] };
+          let changed = false;
+          if (!row.revenue && snap.annualRevenue != null) {
+            row.revenue = snap.annualRevenue;
+            changed = true;
+          }
+          if (!row.cogs && snap.annualCogs != null) {
+            row.cogs = snap.annualCogs;
+            changed = true;
+          }
+          if (!row.operatingExpenses && snap.annualOperatingExpenses != null) {
+            row.operatingExpenses = snap.annualOperatingExpenses;
+            changed = true;
+          }
+          if (!row.otherExpenses && snap.annualOtherExpenses != null) {
+            row.otherExpenses = snap.annualOtherExpenses;
+            changed = true;
+          }
+          if (changed) next[latestIndex] = row;
+          return changed ? next : prev;
+        });
+        if (!cancelled) setSnapshotPrefilled(true);
+      } catch {
+        // best-effort
+      }
+    }
+    prefillFromSnapshot();
+    return () => {
+      cancelled = true;
+    };
+  }, [clientId, snapshotPrefilled]);
 
   useEffect(() => {
     let cancelled = false;
@@ -137,6 +240,111 @@ export default function PLComparisonsWizard({ clientId }) {
     };
   }, [clientId]);
 
+  async function generateFourYearHistory() {
+    setHistoryLoading(true);
+    setHistoryError('');
+    try {
+      const [miscDirectRes, miscIndirectRes] = await Promise.all([
+        fetch(`/api/worksheets/misc-direct-expenses/runs?client_id=${encodeURIComponent(clientId)}&limit=1`),
+        fetch(`/api/worksheets/misc-indirect-expenses/runs?client_id=${encodeURIComponent(clientId)}&limit=1`),
+      ]);
+      const [miscDirectData, miscIndirectData] = await Promise.all([miscDirectRes.json(), miscIndirectRes.json()]);
+
+      const response = await fetch('/api/worksheets/four-year-history/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client: mapClientRowToApiClient(clientRow),
+          miscDirect: miscDirectData.runs?.[0]?.outputs || null,
+          miscIndirect: miscIndirectData.runs?.[0]?.outputs || null,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Unable to generate 4-year history.');
+
+      const plYears = data.result?.plYears || [];
+      if (plYears.length === 4) {
+        setYears(
+          plYears.map((row) => ({
+            year: row.year,
+            revenue: row.revenue,
+            cogs: row.cogs,
+            operatingExpenses: row.operatingExpenses,
+            otherExpenses: row.otherExpenses,
+          })),
+        );
+      }
+    } catch (err) {
+      setHistoryError(err.message || 'Unable to generate 4-year history.');
+    } finally {
+      setHistoryLoading(false);
+    }
+  }
+
+  function handlePortBridgePatch(patch) {
+    if (patch?.plLines) {
+      const rolled = rollupPLLineItems(patch.plLines);
+      setYears((prev) => {
+        const next = [...prev];
+        const idx = next.length - 1;
+        next[idx] = {
+          ...next[idx],
+          lineItems: patch.plLines,
+          revenue: rolled.revenue,
+          cogs: rolled.cogs,
+          operatingExpenses: rolled.operatingExpenses,
+          otherExpenses: rolled.otherExpenses,
+        };
+        return next;
+      });
+      setInputMode('lineItems');
+      setHistoryError('');
+    }
+  }
+
+  async function importFromF1000() {
+    setHistoryLoading(true);
+    setHistoryError('');
+    try {
+      const response = await fetch(
+        `/api/worksheets/workbook-ports/runs?client_id=${encodeURIComponent(clientId)}&workbook_key=f-1000-pl&limit=1`,
+        { cache: 'no-store' },
+      );
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Unable to load F-1000 run.');
+      const run = data.runs?.[0];
+      const lines = run?.inputs?.plLines || [];
+      if (!lines.length) throw new Error('F-1000 run has no P&L lines.');
+
+      const rollup = { revenue: 0, cogs: 0, operatingExpenses: 0, otherExpenses: 0 };
+      for (const line of lines) {
+        const amount = Number(line.amount || 0);
+        const category = String(line.category || '').toLowerCase();
+        if (category === 'revenue') rollup.revenue += amount;
+        else if (category === 'cogs') rollup.cogs += amount;
+        else if (category === 'opex') rollup.operatingExpenses += amount;
+        else rollup.otherExpenses += amount;
+      }
+
+      setYears((prev) => {
+        const next = [...prev];
+        const target = next[next.length - 1] || makeDefaultYears()[3];
+        next[next.length - 1] = {
+          ...target,
+          revenue: rollup.revenue,
+          cogs: rollup.cogs,
+          operatingExpenses: rollup.operatingExpenses,
+          otherExpenses: rollup.otherExpenses,
+        };
+        return next;
+      });
+    } catch (err) {
+      setHistoryError(err.message || 'Unable to import from F-1000.');
+    } finally {
+      setHistoryLoading(false);
+    }
+  }
+
   async function calculateAndSave(event) {
     event.preventDefault();
     setLoading(true);
@@ -150,6 +358,11 @@ export default function PLComparisonsWizard({ clientId }) {
           cogs: parseNumber(row.cogs),
           operatingExpenses: parseNumber(row.operatingExpenses),
           otherExpenses: parseNumber(row.otherExpenses),
+          lineItems: (row.lineItems || []).map((line) => ({
+            category: line.category,
+            description: line.description || '',
+            amount: parseNumber(line.amount),
+          })),
         })),
       };
 
@@ -184,6 +397,12 @@ export default function PLComparisonsWizard({ clientId }) {
       setRunId(savedRun.id);
       setRuns((prev) => [savedRun, ...prev.filter((run) => run.id !== savedRun.id)].slice(0, 10));
       setStepIndex(2);
+      const latest = payload.years[payload.years.length - 1];
+      await patchFinancialSnapshot(
+        clientId,
+        'p-l-comparisons',
+        buildSnapshotPatch('p-l-comparisons', payload, calculationData.result),
+      );
     } catch (err) {
       setError(err.message || 'Unable to complete P&L comparison run.');
     } finally {
@@ -268,6 +487,25 @@ export default function PLComparisonsWizard({ clientId }) {
 
       <form className="wizard-card" onSubmit={calculateAndSave}>
         {stepIndex === 0 && (
+          <div>
+            <div className="wizard-history-actions">
+              <button
+                type="button"
+                className={inputMode === 'buckets' ? 'wizard-step-button active' : 'ghost'}
+                onClick={() => setInputMode('buckets')}
+              >
+                Summary buckets
+              </button>
+              <button
+                type="button"
+                className={inputMode === 'lineItems' ? 'wizard-step-button active' : 'ghost'}
+                onClick={() => setInputMode('lineItems')}
+              >
+                Line items
+              </button>
+            </div>
+
+            {inputMode === 'buckets' ? (
           <div className="table-wrap">
             <table>
               <thead>
@@ -331,6 +569,54 @@ export default function PLComparisonsWizard({ clientId }) {
                 ))}
               </tbody>
             </table>
+            <div className="wizard-history-actions">
+              <button type="button" className="ghost" disabled={historyLoading} onClick={generateFourYearHistory}>
+                {historyLoading ? 'Generating...' : 'Generate 4-Year History'}
+              </button>
+              <button type="button" className="ghost" disabled={historyLoading} onClick={importFromF1000}>
+                Import from F-1000
+              </button>
+            </div>
+            <PortBridgePanel clientId={clientId} worksheetKey="p-l-comparisons" onApplyPatch={handlePortBridgePatch} />
+            {historyError ? <p className="wizard-error">{historyError}</p> : null}
+          </div>
+            ) : (
+              <div>
+                <div className="wizard-step-list" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {years.map((row, idx) => (
+                    <button
+                      key={`year-tab-${idx}`}
+                      type="button"
+                      className={activeYearIndex === idx ? 'wizard-step-button active' : 'ghost'}
+                      onClick={() => setActiveYearIndex(idx)}
+                    >
+                      Year {idx + 1}{row.year ? ` (${row.year})` : ''}
+                    </button>
+                  ))}
+                </div>
+                <WorksheetInput
+                  label="Year"
+                  type="number"
+                  min="1900"
+                  value={years[activeYearIndex]?.year ?? ''}
+                  onChange={(e) => updateYearCell(activeYearIndex, 'year', e.target.value)}
+                />
+                <PLLineItemsEditor
+                  yearLabel={`Year ${activeYearIndex + 1}`}
+                  lineItems={years[activeYearIndex]?.lineItems || []}
+                  onChange={(items) => updateYearLineItems(activeYearIndex, items)}
+                />
+                <div className="wizard-history-actions">
+                  <button type="button" className="ghost" disabled={historyLoading} onClick={generateFourYearHistory}>
+                    {historyLoading ? 'Generating...' : 'Generate 4-Year History'}
+                  </button>
+                  <button type="button" className="ghost" disabled={historyLoading} onClick={importFromF1000}>
+                    Import from F-1000
+                  </button>
+                </div>
+                {historyError ? <p className="wizard-error">{historyError}</p> : null}
+              </div>
+            )}
           </div>
         )}
 

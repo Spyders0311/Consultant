@@ -1,31 +1,17 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import WorksheetInput from '@/components/worksheet/WorksheetInput';
-
-const steps = [
-  { id: 'company', title: 'Company Profile', hint: 'Set core company and location details.' },
-  { id: 'contact', title: 'Primary Contact', hint: 'Capture who we should coordinate with.' },
-  { id: 'review', title: 'Review & Run', hint: 'Generate normalized output and save run.' },
-];
-
-function normalizePrefill(initialClientInfo) {
-  void initialClientInfo;
-  return {
-    companyName: '',
-    industry: '',
-    primaryContactName: '',
-    primaryContactEmail: '',
-    primaryContactPhone: '',
-    locationCity: '',
-    locationState: '',
-    notes: '',
-  };
-}
-
-function cleanText(value) {
-  return String(value || '').trim();
-}
+import BasicClientInfoAccordion from '@/components/BasicClientInfoAccordion';
+import useWorksheetStepDraft from '@/lib/client/useWorksheetStepDraft';
+import useWorksheetShellRunLoader from '@/lib/client/useWorksheetShellRunLoader';
+import {
+  BASIC_CLIENT_INFO_SECTIONS,
+  buildBasicClientInfoSectionStatuses,
+} from '@/lib/worksheets/basicClientInfoSections';
+import {
+  buildBasicClientInfoCalculationPayload,
+  mapClientRowToBasicClientInfoForm,
+} from '@/lib/worksheets/clientProfile';
 
 function formatRunTimestamp(value) {
   if (!value) return 'Unknown date';
@@ -38,8 +24,8 @@ function formatRunTimestamp(value) {
 }
 
 export default function BasicClientInfoWizard({ clientId, initialClientInfo = null }) {
-  const [stepIndex, setStepIndex] = useState(0);
-  const [form, setForm] = useState(() => normalizePrefill(initialClientInfo));
+  const [openSectionIndex, setOpenSectionIndex] = useState(0);
+  const [form, setForm] = useState(() => mapClientRowToBasicClientInfoForm(initialClientInfo));
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -49,19 +35,31 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
   const [error, setError] = useState('');
   const [pdfError, setPdfError] = useState('');
 
-  const progress = ((stepIndex + 1) / steps.length) * 100;
+  const draftPayload = useMemo(() => ({ form }), [form]);
+  useWorksheetStepDraft({
+    clientId,
+    worksheetKey: 'basic-client-info',
+    stepIndex: openSectionIndex,
+    setStepIndex: setOpenSectionIndex,
+    draftPayload,
+    onRestoreDraft: (draft) => {
+      if (draft.form && typeof draft.form === 'object') {
+        setForm((prev) => ({ ...prev, ...draft.form }));
+      }
+    },
+  });
 
-  const canAdvance = useMemo(() => {
-    if (stepIndex === 0) return cleanText(form.companyName).length > 0 || cleanText(form.industry).length > 0;
-    if (stepIndex === 1) {
-      return (
-        cleanText(form.primaryContactName).length > 0 ||
-        cleanText(form.primaryContactEmail).length > 0 ||
-        cleanText(form.primaryContactPhone).length > 0
-      );
-    }
-    return true;
-  }, [form, stepIndex]);
+  const sectionStatuses = useMemo(
+    () => buildBasicClientInfoSectionStatuses(form, Boolean(runId || result)),
+    [form, runId, result],
+  );
+
+  const completedSections = useMemo(
+    () => Object.values(sectionStatuses).filter((status) => status === 'complete').length,
+    [sectionStatuses],
+  );
+
+  const progress = Math.round((completedSections / BASIC_CLIENT_INFO_SECTIONS.length) * 100);
 
   function updateField(name, value) {
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -69,25 +67,27 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
 
   function loadRun(run) {
     if (!run) return;
-    setForm({ ...normalizePrefill(initialClientInfo), ...(run.inputs || {}) });
+    setForm({ ...mapClientRowToBasicClientInfoForm(initialClientInfo), ...(run.inputs || {}) });
     setResult(run.outputs || null);
     setRunId(run.id || '');
-    setStepIndex(steps.length - 1);
+    setOpenSectionIndex(BASIC_CLIENT_INFO_SECTIONS.length - 1);
     setError('');
     setPdfError('');
   }
 
+  useWorksheetShellRunLoader(loadRun);
+
   function resetToNewRun() {
-    setForm(normalizePrefill(initialClientInfo));
+    setForm(mapClientRowToBasicClientInfoForm(initialClientInfo));
     setResult(null);
     setRunId('');
-    setStepIndex(0);
+    setOpenSectionIndex(0);
     setError('');
     setPdfError('');
   }
 
   useEffect(() => {
-    setForm((prev) => ({ ...normalizePrefill(initialClientInfo), ...prev }));
+    setForm((prev) => ({ ...mapClientRowToBasicClientInfoForm(initialClientInfo), ...prev }));
   }, [initialClientInfo]);
 
   useEffect(() => {
@@ -105,10 +105,9 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
           throw new Error(data.error || 'Unable to load basic client info history.');
         }
 
-        const fetchedRuns = data.runs || [];
-        if (cancelled) return;
-
-        setRuns(fetchedRuns);
+        if (!cancelled) {
+          setRuns(data.runs || []);
+        }
       } catch (err) {
         if (!cancelled) {
           setError(err.message || 'Unable to load basic client info history.');
@@ -133,16 +132,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
     setError('');
 
     try {
-      const payload = {
-        companyName: cleanText(form.companyName),
-        industry: cleanText(form.industry),
-        primaryContactName: cleanText(form.primaryContactName),
-        primaryContactEmail: cleanText(form.primaryContactEmail),
-        primaryContactPhone: cleanText(form.primaryContactPhone),
-        locationCity: cleanText(form.locationCity),
-        locationState: cleanText(form.locationState),
-        notes: cleanText(form.notes),
-      };
+      const payload = buildBasicClientInfoCalculationPayload(form);
 
       const calculationResponse = await fetch('/api/worksheets/basic-client-info/calculate', {
         method: 'POST',
@@ -159,7 +149,7 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
       const runResponse = await fetch('/api/worksheets/basic-client-info/runs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client_id: clientId, inputs: payload, outputs: calculationData.result }),
+        body: JSON.stringify({ client_id: clientId, inputs: { ...form, ...payload }, outputs: calculationData.result }),
       });
       const runData = await runResponse.json();
       if (!runResponse.ok || !runData.ok) {
@@ -169,12 +159,12 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
       const savedRun = {
         id: runData.id || '',
         created_at: new Date().toISOString(),
-        inputs: payload,
+        inputs: { ...form, ...payload },
         outputs: calculationData.result,
       };
       setRunId(savedRun.id);
       setRuns((prev) => [savedRun, ...prev.filter((run) => run.id !== savedRun.id)].slice(0, 10));
-      setStepIndex(steps.length - 1);
+      setOpenSectionIndex(BASIC_CLIENT_INFO_SECTIONS.length - 1);
     } catch (err) {
       setError(err.message || 'Unable to complete basic client info run.');
     } finally {
@@ -221,226 +211,41 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
     }
   }
 
-  return (
-    <section className="wizard-shell">
-      <header className="wizard-header">
-        <p className="wizard-kicker">Analyst Program</p>
-        <h1>Basic Client Info</h1>
-        <p>Capture and normalize core client profile details, save run history, and export a PDF snapshot.</p>
-      </header>
-
-      <div className="wizard-progress" aria-hidden="true">
-        <span style={{ width: `${progress}%` }} />
+  const reviewSlot = (
+    <>
+      <div className="wizard-fields">
+        <label>
+          Company Name
+          <input type="text" value={form.companyName} readOnly />
+        </label>
+        <label>
+          Industry
+          <input type="text" value={form.industry} readOnly />
+        </label>
+        <label>
+          Primary Contact
+          <input type="text" value={form.primaryContactName} readOnly />
+        </label>
+        <label>
+          Location
+          <input
+            type="text"
+            value={[form.locationCity, form.locationState].filter(Boolean).join(', ')}
+            readOnly
+          />
+        </label>
       </div>
-
-      <ol className="wizard-step-list">
-        {steps.map((step, idx) => {
-          const isCurrent = idx === stepIndex;
-          const isComplete = idx < stepIndex;
-
-          return (
-            <li key={step.id}>
-              <button
-                type="button"
-                className={`wizard-step-button ${isCurrent ? 'active' : ''} ${isComplete ? 'complete' : ''}`.trim()}
-                onClick={() => setStepIndex(idx)}
-                disabled={loading}
-              >
-                <strong>{step.title}</strong>
-                <span>{step.hint}</span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
-
-      <form className="wizard-card" onSubmit={calculateAndSave}>
-        {stepIndex === 0 ? (
-          <div className="wizard-fields">
-            <label>
-              Company Name
-              <WorksheetInput
-                type="text"
-                value={form.companyName}
-                onChange={(event) => updateField('companyName', event.target.value)}
-                placeholder="Acme Services LLC"
-                disabled={loading}
-              />
-            </label>
-            <label>
-              Industry
-              <WorksheetInput
-                type="text"
-                value={form.industry}
-                onChange={(event) => updateField('industry', event.target.value)}
-                placeholder="Commercial Services"
-                disabled={loading}
-              />
-            </label>
-            <label>
-              Location City
-              <WorksheetInput
-                type="text"
-                value={form.locationCity}
-                onChange={(event) => updateField('locationCity', event.target.value)}
-                placeholder="Chicago"
-                disabled={loading}
-              />
-            </label>
-            <label>
-              Location State
-              <WorksheetInput
-                type="text"
-                value={form.locationState}
-                onChange={(event) => updateField('locationState', event.target.value)}
-                placeholder="IL"
-                disabled={loading}
-              />
-            </label>
-          </div>
-        ) : null}
-
-        {stepIndex === 1 ? (
-          <div className="wizard-fields">
-            <label>
-              Primary Contact Name
-              <WorksheetInput
-                type="text"
-                value={form.primaryContactName}
-                onChange={(event) => updateField('primaryContactName', event.target.value)}
-                placeholder="Jane Doe"
-                disabled={loading}
-              />
-            </label>
-            <label>
-              Primary Contact Email
-              <WorksheetInput
-                type="email"
-                value={form.primaryContactEmail}
-                onChange={(event) => updateField('primaryContactEmail', event.target.value)}
-                placeholder="jane@acme.com"
-                disabled={loading}
-              />
-            </label>
-            <label>
-              Primary Contact Phone
-              <WorksheetInput
-                type="text"
-                value={form.primaryContactPhone}
-                onChange={(event) => updateField('primaryContactPhone', event.target.value)}
-                placeholder="(312) 555-0100"
-                disabled={loading}
-              />
-            </label>
-            <label style={{ gridColumn: '1 / -1' }}>
-              Notes
-              <textarea
-                value={form.notes}
-                onChange={(event) => updateField('notes', event.target.value)}
-                placeholder="Optional context for consultant prep."
-                disabled={loading}
-              />
-            </label>
-          </div>
-        ) : null}
-
-        {stepIndex === 2 ? (
-          <>
-            <div className="wizard-fields">
-              <label>
-                Company Name
-                <WorksheetInput
-                  type="text"
-                  value={form.companyName}
-                  onChange={(event) => updateField('companyName', event.target.value)}
-                  disabled={loading}
-                />
-              </label>
-              <label>
-                Industry
-                <WorksheetInput
-                  type="text"
-                  value={form.industry}
-                  onChange={(event) => updateField('industry', event.target.value)}
-                  disabled={loading}
-                />
-              </label>
-              <label>
-                Primary Contact Name
-                <WorksheetInput
-                  type="text"
-                  value={form.primaryContactName}
-                  onChange={(event) => updateField('primaryContactName', event.target.value)}
-                  disabled={loading}
-                />
-              </label>
-              <label>
-                Primary Contact Email
-                <WorksheetInput
-                  type="email"
-                  value={form.primaryContactEmail}
-                  onChange={(event) => updateField('primaryContactEmail', event.target.value)}
-                  disabled={loading}
-                />
-              </label>
-              <label>
-                Primary Contact Phone
-                <WorksheetInput
-                  type="text"
-                  value={form.primaryContactPhone}
-                  onChange={(event) => updateField('primaryContactPhone', event.target.value)}
-                  disabled={loading}
-                />
-              </label>
-              <label>
-                Location City
-                <WorksheetInput
-                  type="text"
-                  value={form.locationCity}
-                  onChange={(event) => updateField('locationCity', event.target.value)}
-                  disabled={loading}
-                />
-              </label>
-              <label>
-                Location State
-                <WorksheetInput
-                  type="text"
-                  value={form.locationState}
-                  onChange={(event) => updateField('locationState', event.target.value)}
-                  disabled={loading}
-                />
-              </label>
-              <label style={{ gridColumn: '1 / -1' }}>
-                Notes
-                <textarea value={form.notes} onChange={(event) => updateField('notes', event.target.value)} disabled={loading} />
-              </label>
-            </div>
-            <p className="wizard-meta">Click Calculate+Save to normalize fields and persist this run.</p>
-          </>
-        ) : null}
-
-        <div className="wizard-actions">
-          <button type="button" className="ghost" onClick={() => setStepIndex((idx) => Math.max(0, idx - 1))} disabled={loading || stepIndex === 0}>
-            Back
-          </button>
-          {stepIndex < steps.length - 1 ? (
-            <button type="button" onClick={() => setStepIndex((idx) => Math.min(steps.length - 1, idx + 1))} disabled={loading || !canAdvance}>
-              Next
-            </button>
-          ) : (
-            <button type="submit" disabled={loading}>
-              {loading ? 'Running...' : 'Calculate+Save'}
-            </button>
-          )}
-          <button type="button" className="ghost" onClick={downloadPdf} disabled={pdfLoading || !result}>
-            {pdfLoading ? 'Preparing PDF...' : 'Download PDF'}
-          </button>
-        </div>
-
-        {error ? <p className="wizard-error">{error}</p> : null}
-        {pdfError ? <p className="wizard-error">{pdfError}</p> : null}
-      </form>
-
+      <p className="wizard-meta">Click Calculate+Save to normalize fields and persist this run.</p>
+      <div className="wizard-actions">
+        <button type="submit" disabled={loading}>
+          {loading ? 'Running...' : 'Calculate+Save'}
+        </button>
+        <button type="button" className="ghost" onClick={downloadPdf} disabled={pdfLoading || !result}>
+          {pdfLoading ? 'Preparing PDF...' : 'Download PDF'}
+        </button>
+      </div>
+      {error ? <p className="wizard-error">{error}</p> : null}
+      {pdfError ? <p className="wizard-error">{pdfError}</p> : null}
       {result ? (
         <section className="wizard-result" aria-live="polite">
           <h2 style={{ marginTop: 0 }}>Normalized Summary</h2>
@@ -462,29 +267,44 @@ export default function BasicClientInfoWizard({ clientId, initialClientInfo = nu
               <strong>{[result.locationCity, result.locationState].filter(Boolean).join(', ') || 'n/a'}</strong>
             </article>
           </div>
-
           <div className="card" style={{ marginBottom: 10 }}>
             <h3 style={{ marginTop: 0 }}>Summary Block</h3>
             <pre style={{ margin: 0, whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>{result.summaryBlock || 'n/a'}</pre>
           </div>
-
-          {Array.isArray(result.warnings) && result.warnings.length > 0 ? (
-            <ul className="warnings">
-              {result.warnings.map((warning) => (
-                <li key={warning}>{warning}</li>
-              ))}
-            </ul>
-          ) : (
-            <p className="wizard-meta" style={{ marginTop: 0 }}>
-              No contact warnings.
-            </p>
-          )}
-
           <p className="wizard-meta" style={{ marginBottom: 0 }}>
             Run ID: {runId || 'unsaved'}
           </p>
         </section>
       ) : null}
+    </>
+  );
+
+  return (
+    <section className="wizard-shell bci-wizard">
+      <header className="wizard-header">
+        <p className="wizard-kicker">Analyst Program</p>
+        <h1>Basic Client Info</h1>
+        <p>Complete the seven profile sections, then save a normalized client info run.</p>
+      </header>
+
+      <div className="wizard-progress" aria-hidden="true">
+        <span style={{ width: `${progress}%` }} />
+      </div>
+      <p className="wizard-meta bci-wizard__progress-copy">
+        {completedSections} of {BASIC_CLIENT_INFO_SECTIONS.length} sections complete
+      </p>
+
+      <form className="wizard-card" onSubmit={calculateAndSave}>
+        <BasicClientInfoAccordion
+          form={form}
+          onFieldChange={updateField}
+          openSectionIndex={openSectionIndex}
+          onSectionToggle={setOpenSectionIndex}
+          sectionStatuses={sectionStatuses}
+          loading={loading}
+          reviewSlot={reviewSlot}
+        />
+      </form>
 
       <section className="wizard-history" aria-label="Basic client info run history">
         <div className="wizard-history-actions">
