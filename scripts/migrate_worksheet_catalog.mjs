@@ -28,9 +28,10 @@ function main() {
 
   const integrated = migrated.filter((entry) => entry.integrationStatus !== 'planned');
   const core = migrated.filter((entry) => entry.coreRank != null);
+  const deprecated = migrated.filter((entry) => entry.integrationStatus === 'deprecated');
 
-  if (integrated.length !== 23) {
-    console.warn(`Expected 23 integrated worksheets, found ${integrated.length}`);
+  if (deprecated.length !== 3) {
+    console.warn(`Expected 3 deprecated worksheets, found ${deprecated.length}`);
   }
   if (core.length !== 7) {
     console.warn(`Expected 7 coreRank worksheets, found ${core.length}`);

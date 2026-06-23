@@ -6,13 +6,18 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from .analyst.breakeven import calculate_analyst_breakeven
+from .analyst.engagement_report import build_engagement_report
 from .analyst.expense_lines import calculate_expense_lines
 from .analyst.four_year_history import generate_four_year_history
+from .analyst.matrix_scoring import score_matrix_responses
+from .analyst.pl_analysis import calculate_pl_analysis
 from .analyst.pl_rollup import normalize_pl_year
 from .analyst.projections import calculate_five_year_projections
 from .analyst.financial_ratios import calculate_financial_ratios
 from .analyst.monthly_analysis import calculate_monthly_analysis
+from .analyst.roi_analysis import calculate_roi_analysis
 from .analyst.twelve_month import calculate_twelve_month_pl
+from .analyst.valuation import calculate_business_valuation
 from .analyst.wc_scenarios import calculate_working_capital_with_scenarios
 from .calculation_service import run_projection
 from .models import (
@@ -29,10 +34,15 @@ from .models import (
     FourYearHistoryInput,
     FiveYearProjectionsInput,
     FiveYearProjectionsResult,
+    EngagementReportInput,
+    MatrixScoringInput,
     MiscExpenseInput,
     MonthlyAnalysisInput,
+    PLAnalysisInput,
     PLComparisonsInput,
+    ROIAnalysisInput,
     TwelveMonthPLInput,
+    ValuationInput,
     WorkingCapitalInput,
     WorkingCapitalResult,
     WorkbookPortInput,
@@ -534,6 +544,66 @@ def generate_four_year_history_route(payload: dict):
     try:
         validated = FourYearHistoryInput.model_validate(payload)
         result = generate_four_year_history(validated.model_dump(by_alias=True))
+        return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/pl-analysis/calculate")
+def calculate_pl_analysis_route(payload: dict):
+    try:
+        validated = PLAnalysisInput.model_validate(payload)
+        result = calculate_pl_analysis(validated.model_dump(by_alias=True))
+        return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/roi-analysis/calculate")
+def calculate_roi_analysis_route(payload: dict):
+    try:
+        validated = ROIAnalysisInput.model_validate(payload)
+        result = calculate_roi_analysis(validated.model_dump(by_alias=True))
+        return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/valuation/calculate")
+def calculate_valuation_route(payload: dict):
+    try:
+        validated = ValuationInput.model_validate(payload)
+        result = calculate_business_valuation(validated.model_dump(by_alias=True))
+        return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/engagement-report/build")
+def build_engagement_report_route(payload: dict):
+    try:
+        validated = EngagementReportInput.model_validate(payload)
+        result = build_engagement_report(validated.model_dump(by_alias=True))
+        return {"ok": True, "result": result}
+    except ValidationError as error:
+        return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=400, content={"ok": False, "error": str(error)})
+
+
+@app.post("/api/v1/worksheets/matrix-scoring/calculate")
+def calculate_matrix_scoring_route(payload: dict):
+    try:
+        validated = MatrixScoringInput.model_validate(payload)
+        result = score_matrix_responses(validated.model_dump(by_alias=True))
         return {"ok": True, "result": result}
     except ValidationError as error:
         return JSONResponse(status_code=422, content={"ok": False, "error": error.errors()})

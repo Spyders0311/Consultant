@@ -10,7 +10,7 @@ Last updated: 2026-06-10
 | Labor & budget | `f-200a`, `f-200b`, `f-700c` | Done |
 | Job costing suite | `job-estimating-master`, `f-500a`, `f-500c` | Done |
 
-## Live ports (22)
+## Live ports (26)
 
 | portSlug | Source workbook |
 |---|---|
@@ -36,6 +36,10 @@ Last updated: 2026-06-10
 | `job-estimating-master` | Job Estimating MASTER.xls |
 | `f-500a-example-bid-worksheet` | F-500a Example Bid Worksheet.xlsx |
 | `f-500c-job-costing-template` | F-500c Job Costing Template.xlsx |
+| `4-year-comp-pl-optimal` | 4 Year Comp P&L Optimal |
+| `f-700b-budget-planning` | F-700b Budget Planning Worksheet |
+| `employee-productivity` | Employee Productivity |
+| `6-wk-cash-flow-wa` | 6 Wk Cash Flow WA |
 
 ## Shared modules
 
@@ -48,10 +52,7 @@ Last updated: 2026-06-10
 
 | portSlug | Workbook |
 |---|---|
-| `4-year-comp-pl-optimal` | 4 Year Comp P&L Optimal |
-| `f-700b-budget-planning` | F-700b Budget Planning Worksheet |
-| `employee-productivity` | Employee Productivity |
-| `6-wk-cash-flow-wa` | 6 Wk Cash Flow WA |
+| _None queued — prior next-candidate batch shipped._ |
 
 ## Per-port checklist
 

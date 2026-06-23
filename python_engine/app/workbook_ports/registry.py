@@ -8,6 +8,10 @@ from .advanced_ports import (
     calculate_f500a_example_bid_worksheet,
     calculate_f500c_job_costing_template,
     calculate_f700c_annual_budget,
+    calculate_f700b_budget_planning,
+    calculate_four_year_comp_pl_optimal,
+    calculate_employee_productivity,
+    calculate_six_wk_cash_flow_wa,
     calculate_job_estimating_master,
 )
 from .calculators import (
@@ -56,6 +60,10 @@ WORKBOOK_PORT_CALCULATORS: dict[str, WorkbookPortCalculator] = {
     "job-estimating-master": calculate_job_estimating_master,
     "f-500a-example-bid-worksheet": calculate_f500a_example_bid_worksheet,
     "f-500c-job-costing-template": calculate_f500c_job_costing_template,
+    "4-year-comp-pl-optimal": calculate_four_year_comp_pl_optimal,
+    "f-700b-budget-planning": calculate_f700b_budget_planning,
+    "employee-productivity": calculate_employee_productivity,
+    "6-wk-cash-flow-wa": calculate_six_wk_cash_flow_wa,
 }
 
 

@@ -8,19 +8,27 @@ def _num(value, default: float = 0.0) -> float:
         return default
 
 
+def _pl_net_income(pl: dict) -> tuple[float, float, float, float]:
+    revenue = _num(pl.get("revenue"))
+    cogs = _num(pl.get("cogs"))
+    operating = _num(pl.get("operatingExpenses"))
+    other = _num(pl.get("otherExpenses"))
+    interest = _num(pl.get("interestExpense"))
+    gross_profit = revenue - cogs
+    operating_income = gross_profit - operating
+    ebit = operating_income
+    net_income = operating_income - other - interest
+    return revenue, gross_profit, operating_income, net_income
+
+
 def calculate_financial_ratios(payload: dict) -> dict:
     pl = payload.get("plYear") or {}
     bs = payload.get("bsYear") or {}
     bs_computed = payload.get("bsComputed") or {}
 
-    revenue = _num(pl.get("revenue"))
+    revenue, gross_profit, operating_income, net_income = _pl_net_income(pl)
     cogs = _num(pl.get("cogs"))
-    operating = _num(pl.get("operatingExpenses"))
-    other = _num(pl.get("otherExpenses"))
-
-    gross_profit = revenue - cogs
-    operating_income = gross_profit - operating
-    net_income = operating_income - other
+    interest_expense = _num(pl.get("interestExpense"))
 
     cash = _num(bs.get("cash"))
     ar = _num(bs.get("ar"))
@@ -66,22 +74,29 @@ def calculate_financial_ratios(payload: dict) -> dict:
 
     if total_current_liabilities > 0:
         ratios["currentRatio"] = round(total_current_assets / total_current_liabilities, 2)
+        quick_assets = cash + ar
+        ratios["quickRatio"] = round(quick_assets / total_current_liabilities, 2)
     else:
-        warnings.append("Current liabilities are zero; current ratio is undefined.")
+        warnings.append("Current liabilities are zero; liquidity ratios are undefined.")
         ratios["currentRatio"] = None
+        ratios["quickRatio"] = None
 
     if total_assets > 0:
         ratios["debtRatio"] = round(total_liabilities / total_assets, 2)
         ratios["equityRatio"] = round(equity / total_assets, 2)
+        ratios["returnOnAssetsPct"] = round((net_income / total_assets) * 100, 2)
     else:
-        warnings.append("Total assets are zero; debt and equity ratios are undefined.")
+        warnings.append("Total assets are zero; debt, equity, and ROA ratios are undefined.")
         ratios["debtRatio"] = None
         ratios["equityRatio"] = None
+        ratios["returnOnAssetsPct"] = None
 
     if equity > 0:
         ratios["debtToEquity"] = round(total_liabilities / equity, 2)
+        ratios["returnOnEquityPct"] = round((net_income / equity) * 100, 2)
     else:
         ratios["debtToEquity"] = None
+        ratios["returnOnEquityPct"] = None
 
     if cogs > 0 and inventory > 0:
         ratios["inventoryTurnover"] = round(cogs / inventory, 2)
@@ -94,6 +109,37 @@ def calculate_financial_ratios(payload: dict) -> dict:
         ratios["arTurnover"] = round(revenue / ar, 2)
     else:
         ratios["arTurnover"] = None
+
+    if interest_expense > 0:
+        ratios["timesInterestEarned"] = round(operating_income / interest_expense, 2)
+    else:
+        ratios["timesInterestEarned"] = None
+        if operating_income != 0:
+            warnings.append("Interest expense not provided; times interest earned is undefined.")
+
+    # Altman Z-Score (private company variants)
+    working_capital = total_current_assets - total_current_liabilities
+    retained_earnings = _num(bs.get("retainedEarnings"))
+    if retained_earnings == 0:
+        retained_earnings = equity * 0.6
+
+    if total_assets > 0:
+        x1 = working_capital / total_assets
+        x2 = retained_earnings / total_assets
+        x3 = operating_income / total_assets
+        x4 = equity / total_liabilities if total_liabilities > 0 else 0.0
+        x5 = revenue / total_assets
+        z_light = 0.717 * x1 + 0.847 * x2 + 3.107 * x3 + 0.420 * x4 + 0.998 * x5
+        z_heavy = 0.717 * x1 + 0.847 * x2 + 3.107 * x3 + 0.420 * x4 + 0.998 * x5 + 0.1 * (fixed_assets / total_assets)
+        ratios["zScorePrivateLightAssets"] = round(z_light, 2)
+        ratios["zScorePrivateHeavyAssets"] = round(z_heavy, 2)
+        ratios["zScoreZone"] = (
+            "distress" if z_light < 1.23 else "grey" if z_light < 2.9 else "safe"
+        )
+    else:
+        ratios["zScorePrivateLightAssets"] = None
+        ratios["zScorePrivateHeavyAssets"] = None
+        ratios["zScoreZone"] = None
 
     working_capital = total_current_assets - total_current_liabilities
     ratios["workingCapital"] = round(working_capital, 2)

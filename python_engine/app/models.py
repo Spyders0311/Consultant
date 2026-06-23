@@ -319,6 +319,7 @@ class FinancialRatiosYearInput(BaseModel):
     cogs: float | None = Field(ge=0, default=None)
     operating_expenses: float | None = Field(alias="operatingExpenses", ge=0, default=None)
     other_expenses: float | None = Field(alias="otherExpenses", ge=0, default=None)
+    interest_expense: float | None = Field(alias="interestExpense", ge=0, default=None)
 
 
 class FinancialRatiosBSYearInput(BaseModel):
@@ -335,6 +336,7 @@ class FinancialRatiosBSYearInput(BaseModel):
     other_current_liabilities: float = Field(alias="otherCurrentLiabilities", ge=0, default=0)
     long_term_debt: float = Field(alias="longTermDebt", ge=0, default=0)
     other_liabilities: float = Field(alias="otherLiabilities", ge=0, default=0)
+    retained_earnings: float | None = Field(alias="retainedEarnings", ge=0, default=None)
     equity: float = Field(ge=0, default=0)
 
 
@@ -342,6 +344,45 @@ class FinancialRatiosInput(BaseModel):
     pl_year: FinancialRatiosYearInput | None = Field(alias="plYear", default=None)
     bs_year: FinancialRatiosBSYearInput | None = Field(alias="bsYear", default=None)
     bs_computed: dict = Field(alias="bsComputed", default_factory=dict)
+
+
+class PLAnalysisInput(BaseModel):
+    analysis_type: str = Field(alias="analysisType", min_length=1, max_length=40)
+    years: list[dict] = Field(default_factory=list)
+
+
+class ROIAnalysisInput(BaseModel):
+    roi_type: str = Field(alias="roiType", min_length=1, max_length=40)
+    annual_revenue: float = Field(alias="annualRevenue", ge=0, default=0)
+    annual_cogs: float = Field(alias="annualCogs", ge=0, default=0)
+    gross_profit: float = Field(alias="grossProfit", default=0)
+    category_total: float = Field(alias="categoryTotal", ge=0, default=0)
+
+
+class ValuationInput(BaseModel):
+    scenario: str = Field(min_length=1, max_length=40)
+    annual_revenue: float = Field(alias="annualRevenue", ge=0, default=0)
+    ebitda: float = Field(ge=0, default=0)
+    ebitda_margin_pct: float | None = Field(alias="ebitdaMarginPct", default=None)
+    ebitda_multiple: float | None = Field(alias="ebitdaMultiple", default=None)
+    asset_adjustment: float = Field(alias="assetAdjustment", default=0)
+    improvement_premium_pct: float | None = Field(alias="improvementPremiumPct", default=None)
+    total_debt: float = Field(alias="totalDebt", ge=0, default=0)
+    cash: float = Field(ge=0, default=0)
+
+
+class EngagementReportInput(BaseModel):
+    section: str = Field(min_length=1, max_length=80)
+    client: dict = Field(default_factory=dict)
+    financials: dict = Field(default_factory=dict)
+    memo: str = Field(default="")
+
+
+class MatrixScoringInput(BaseModel):
+    matrix_key: str = Field(alias="matrixKey", min_length=1, max_length=80)
+    questions: list[dict] = Field(default_factory=list)
+    responses: dict = Field(default_factory=dict)
+    source_responses: list[dict] = Field(alias="sourceResponses", default_factory=list)
 
 
 class WorkbookPortInput(BaseModel):

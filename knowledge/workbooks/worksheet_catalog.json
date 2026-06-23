@@ -106,7 +106,7 @@
     "sheetName": "4 YR PIE",
     "category": "analyst-wizard",
     "hubCategory": "financial-analysis",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — 4 YR PIE."
   },
   {
@@ -122,7 +122,7 @@
     "sheetName": "Business Impact",
     "category": "analyst-wizard",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Business Impact."
   },
   {
@@ -130,7 +130,7 @@
     "sheetName": "CLIENT BUSINESS GOALS",
     "category": "analyst-wizard",
     "hubCategory": "financial-analysis",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — CLIENT BUSINESS GOALS."
   },
   {
@@ -138,7 +138,7 @@
     "sheetName": "CLIENT PERSONAL GOALS",
     "category": "analyst-wizard",
     "hubCategory": "financial-analysis",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — CLIENT PERSONAL GOALS."
   },
   {
@@ -154,7 +154,7 @@
     "sheetName": "Contractor Matrix",
     "category": "analyst-wizard",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Contractor Matrix."
   },
   {
@@ -162,7 +162,7 @@
     "sheetName": "Cost of Business YR1 Vs. YR2",
     "category": "analyst-wizard",
     "hubCategory": "financial-analysis",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Cost of Business YR1 Vs. YR2."
   },
   {
@@ -170,7 +170,7 @@
     "sheetName": "Cost of Business YR3 Vs. YR4",
     "category": "analyst-wizard",
     "hubCategory": "financial-analysis",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Cost of Business YR3 Vs. YR4."
   },
   {
@@ -178,7 +178,7 @@
     "sheetName": "CURRENT BUSINESS VAL APPROX",
     "category": "analyst-wizard",
     "hubCategory": "valuation",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — CURRENT BUSINESS VAL APPROX."
   },
   {
@@ -202,7 +202,7 @@
     "sheetName": "DIRECTORY",
     "category": "analyst-wizard",
     "hubCategory": "financial-analysis",
-    "integrationStatus": "planned",
+    "integrationStatus": "deprecated",
     "description": "Planned worksheet — DIRECTORY."
   },
   {
@@ -218,7 +218,7 @@
     "sheetName": "Financial Matrix",
     "category": "analyst-wizard",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Financial Matrix."
   },
   {
@@ -226,7 +226,7 @@
     "sheetName": "FIXED BUSINESS VAL APPROX",
     "category": "analyst-wizard",
     "hubCategory": "valuation",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — FIXED BUSINESS VAL APPROX."
   },
   {
@@ -242,7 +242,7 @@
     "sheetName": "IMPROVED BUSINESS VAL APPROX",
     "category": "analyst-wizard",
     "hubCategory": "valuation",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — IMPROVED BUSINESS VAL APPROX."
   },
   {
@@ -250,7 +250,7 @@
     "sheetName": "Intro",
     "category": "analyst-wizard",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Intro."
   },
   {
@@ -266,7 +266,7 @@
     "sheetName": "Line Graphs",
     "category": "analyst-wizard",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Line Graphs."
   },
   {
@@ -274,7 +274,7 @@
     "sheetName": "Manufact Matrix",
     "category": "analyst-wizard",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Manufact Matrix."
   },
   {
@@ -282,7 +282,7 @@
     "sheetName": "Mgmt Memo",
     "category": "analyst-wizard",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Mgmt Memo."
   },
   {
@@ -314,7 +314,7 @@
     "sheetName": "Operational Matrix",
     "category": "analyst-wizard",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Operational Matrix."
   },
   {
@@ -322,7 +322,7 @@
     "sheetName": "Organizational Matrix",
     "category": "analyst-wizard",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Organizational Matrix."
   },
   {
@@ -330,7 +330,7 @@
     "sheetName": "Owner Return Line Graphs",
     "category": "analyst-wizard",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Owner Return Line Graphs."
   },
   {
@@ -338,7 +338,7 @@
     "sheetName": "P&L COMPARISONS MIN MAX",
     "category": "analyst-wizard",
     "hubCategory": "financial-analysis",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — P&L COMPARISONS MIN MAX."
   },
   {
@@ -346,7 +346,7 @@
     "sheetName": "Quick Ratio",
     "category": "analyst-wizard",
     "hubCategory": "ratios",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Quick Ratio."
   },
   {
@@ -354,7 +354,7 @@
     "sheetName": "R O I - MISC DIRECT",
     "category": "analyst-wizard",
     "hubCategory": "labor-payroll",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — R O I - MISC DIRECT."
   },
   {
@@ -362,7 +362,7 @@
     "sheetName": "Ratios Introduction",
     "category": "analyst-wizard",
     "hubCategory": "ratios",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Ratios Introduction."
   },
   {
@@ -370,7 +370,7 @@
     "sheetName": "REPORT COVER SHEET",
     "category": "analyst-wizard",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — REPORT COVER SHEET."
   },
   {
@@ -378,7 +378,7 @@
     "sheetName": "Return on Assets",
     "category": "analyst-wizard",
     "hubCategory": "ratios",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Return on Assets."
   },
   {
@@ -386,7 +386,7 @@
     "sheetName": "Return on Equity",
     "category": "analyst-wizard",
     "hubCategory": "ratios",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Return on Equity."
   },
   {
@@ -394,7 +394,7 @@
     "sheetName": "Return on Investment - C.O.G.S.",
     "category": "analyst-wizard",
     "hubCategory": "labor-payroll",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Return on Investment - C.O.G.S.."
   },
   {
@@ -402,7 +402,7 @@
     "sheetName": "Return on Investment - LABOR",
     "category": "analyst-wizard",
     "hubCategory": "labor-payroll",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Return on Investment - LABOR."
   },
   {
@@ -410,7 +410,7 @@
     "sheetName": "Return on Investment - MATERIAL",
     "category": "analyst-wizard",
     "hubCategory": "labor-payroll",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Return on Investment - MATERIAL."
   },
   {
@@ -418,7 +418,7 @@
     "sheetName": "Return on Investment - SUB-CONT",
     "category": "analyst-wizard",
     "hubCategory": "labor-payroll",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Return on Investment - SUB-CONT."
   },
   {
@@ -426,7 +426,7 @@
     "sheetName": "ROI-INDIRECT- SLIDE #1",
     "category": "analyst-wizard",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — ROI-INDIRECT- SLIDE #1."
   },
   {
@@ -434,7 +434,7 @@
     "sheetName": "ROI-INDIRECT- SLIDE #2",
     "category": "analyst-wizard",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — ROI-INDIRECT- SLIDE #2."
   },
   {
@@ -442,7 +442,7 @@
     "sheetName": "ROI-INDIRECT- SLIDE #3",
     "category": "analyst-wizard",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — ROI-INDIRECT- SLIDE #3."
   },
   {
@@ -450,7 +450,7 @@
     "sheetName": "ROI-INDIRECT- SLIDE #4",
     "category": "analyst-wizard",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — ROI-INDIRECT- SLIDE #4."
   },
   {
@@ -458,7 +458,7 @@
     "sheetName": "Sheet1",
     "category": "analyst-wizard",
     "hubCategory": "financial-analysis",
-    "integrationStatus": "planned",
+    "integrationStatus": "deprecated",
     "description": "Planned worksheet — Sheet1."
   },
   {
@@ -466,7 +466,7 @@
     "sheetName": "Sheet2",
     "category": "analyst-wizard",
     "hubCategory": "financial-analysis",
-    "integrationStatus": "planned",
+    "integrationStatus": "deprecated",
     "description": "Planned worksheet — Sheet2."
   },
   {
@@ -474,7 +474,7 @@
     "sheetName": "Times Interest Earned Ratio",
     "category": "analyst-wizard",
     "hubCategory": "ratios",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Times Interest Earned Ratio."
   },
   {
@@ -482,7 +482,7 @@
     "sheetName": "Z SCORE -PRIVATE & HEAVY ASSETS",
     "category": "analyst-wizard",
     "hubCategory": "ratios",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Z SCORE -PRIVATE & HEAVY ASSETS."
   },
   {
@@ -490,7 +490,7 @@
     "sheetName": "Z SCORE -PRIVATE & LIGHT ASSETS",
     "category": "analyst-wizard",
     "hubCategory": "ratios",
-    "integrationStatus": "planned",
+    "integrationStatus": "derived",
     "description": "Planned worksheet — Z SCORE -PRIVATE & LIGHT ASSETS."
   },
   {
@@ -507,7 +507,7 @@
     "sheetName": "HOTEL of RECORD FORM",
     "category": "bms-forms",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — HOTEL of RECORD FORM."
   },
   {
@@ -515,7 +515,7 @@
     "sheetName": "Emp Questionnaire Graph",
     "category": "consulting",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Emp Questionnaire Graph."
   },
   {
@@ -523,7 +523,7 @@
     "sheetName": "Employee Eval Matrix",
     "category": "consulting",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Employee Eval Matrix."
   },
   {
@@ -531,7 +531,7 @@
     "sheetName": "Employee Questionnaire PG1",
     "category": "consulting",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Employee Questionnaire PG1."
   },
   {
@@ -539,7 +539,7 @@
     "sheetName": "Employee Questionnaire PG2",
     "category": "consulting",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Employee Questionnaire PG2."
   },
   {
@@ -547,7 +547,7 @@
     "sheetName": "Employee Questionnaire Tally",
     "category": "consulting",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Employee Questionnaire Tally."
   },
   {
@@ -555,7 +555,7 @@
     "sheetName": "Management Matrix",
     "category": "consulting",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Management Matrix."
   },
   {
@@ -563,7 +563,7 @@
     "sheetName": "MANAGEMENT STYLES",
     "category": "consulting",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — MANAGEMENT STYLES."
   },
   {
@@ -571,7 +571,7 @@
     "sheetName": "INITIAL CONSULTATION INVOICE",
     "category": "invoice-billing",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — INITIAL CONSULTATION INVOICE."
   },
   {
@@ -579,7 +579,7 @@
     "sheetName": "PS Retainer Invoice",
     "category": "invoice-billing",
     "hubCategory": "reports-slides",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — PS Retainer Invoice."
   },
   {
@@ -587,7 +587,7 @@
     "sheetName": "Sales & Marketing Matrix",
     "category": "marketing",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Sales & Marketing Matrix."
   },
   {
@@ -595,7 +595,7 @@
     "sheetName": "Sales & Marketing- Dist. Matrix",
     "category": "marketing",
     "hubCategory": "matrices",
-    "integrationStatus": "planned",
+    "integrationStatus": "native",
     "description": "Planned worksheet — Sales & Marketing- Dist. Matrix."
   }
 ]

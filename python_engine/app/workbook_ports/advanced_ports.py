@@ -334,3 +334,115 @@ def calculate_f500c_job_costing_template(inputs: dict) -> dict:
         "rows": rows,
         "warnings": warnings,
     }
+
+
+def calculate_four_year_comp_pl_optimal(inputs: dict) -> dict:
+    years = inputs.get("years") or []
+    rows = []
+    best_margin = None
+    best_year = None
+    for raw in years[:4]:
+        row = raw if isinstance(raw, dict) else {}
+        revenue = num(row.get("revenue"))
+        cogs = num(row.get("cogs"))
+        opex = num(row.get("operatingExpenses"))
+        gross = revenue - cogs
+        net = gross - opex
+        margin = pct(net, revenue)
+        if margin is not None and (best_margin is None or margin > best_margin):
+            best_margin = margin
+            best_year = row.get("year")
+        rows.append(
+            {
+                "year": row.get("year"),
+                "revenue": round_money(revenue),
+                "netIncome": round_money(net),
+                "netMarginPct": margin,
+            }
+        )
+    return {
+        "summary": {
+            "optimalYear": best_year,
+            "optimalNetMarginPct": best_margin,
+            "yearCount": len(rows),
+        },
+        "rows": rows,
+        "warnings": [] if rows else ["Provide up to four P&L years."],
+    }
+
+
+def calculate_f700b_budget_planning(inputs: dict) -> dict:
+    annual_revenue = num(inputs.get("annualRevenue"))
+    growth_pct = num(inputs.get("growthPercent")) or 5.0
+    categories = inputs.get("categories") or []
+    rows = []
+    total_budget = 0.0
+    for raw in categories[:24]:
+        item = raw if isinstance(raw, dict) else {}
+        base = num(item.get("annualAmount"))
+        amount = base * (1 + growth_pct / 100.0)
+        rows.append({"category": item.get("category") or "General", "budgetAmount": round_money(amount)})
+        total_budget += amount
+    return {
+        "summary": {
+            "annualRevenue": round_money(annual_revenue),
+            "growthPercent": growth_pct,
+            "totalBudget": round_money(total_budget),
+            "budgetToRevenuePct": pct(total_budget, annual_revenue),
+        },
+        "rows": rows,
+        "warnings": [] if rows else ["Add budget categories to plan."],
+    }
+
+
+def calculate_employee_productivity(inputs: dict) -> dict:
+    revenue = num(inputs.get("annualRevenue"))
+    employees = num(inputs.get("employeeCount")) or 1.0
+    hours = num(inputs.get("hoursPerEmployee")) or 2080.0
+    revenue_per_employee = revenue / employees if employees else 0
+    revenue_per_hour = revenue / (employees * hours) if employees and hours else 0
+    return {
+        "summary": {
+            "annualRevenue": round_money(revenue),
+            "employeeCount": employees,
+            "revenuePerEmployee": round_money(revenue_per_employee),
+            "revenuePerHour": round_money(revenue_per_hour),
+        },
+        "rows": [
+            {
+                "metric": "Revenue / Employee",
+                "value": round_money(revenue_per_employee),
+            },
+            {"metric": "Revenue / Labor Hour", "value": round_money(revenue_per_hour)},
+        ],
+        "warnings": [],
+    }
+
+
+def calculate_six_wk_cash_flow_wa(inputs: dict) -> dict:
+    opening = num(inputs.get("openingCash"))
+    weeks = inputs.get("weeks") or []
+    rows = []
+    balance = opening
+    for index, raw in enumerate(weeks[:6]):
+        week = raw if isinstance(raw, dict) else {}
+        inflow = num(week.get("inflow"))
+        outflow = num(week.get("outflow"))
+        balance += inflow - outflow
+        rows.append(
+            {
+                "week": week.get("label") or f"Week {index + 1}",
+                "inflow": round_money(inflow),
+                "outflow": round_money(outflow),
+                "endingCash": round_money(balance),
+            }
+        )
+    return {
+        "summary": {
+            "openingCash": round_money(opening),
+            "endingCash": round_money(balance),
+            "netChange": round_money(balance - opening),
+        },
+        "rows": rows,
+        "warnings": [] if rows else ["Enter six weekly cash flow rows."],
+    }

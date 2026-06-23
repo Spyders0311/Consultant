@@ -332,6 +332,25 @@ class F500SuitePortTests(unittest.TestCase):
         self.assertEqual(result["summary"]["totalVariance"], 100.0)
         self.assertEqual(result["rows"][0]["status"], "Over")
 
+    def test_four_year_comp_pl_optimal(self) -> None:
+        result = calculate_workbook_port(
+            "4-year-comp-pl-optimal",
+            {
+                "years": [
+                    {"year": 2023, "revenue": 900_000, "cogs": 500_000, "operatingExpenses": 200_000},
+                    {"year": 2024, "revenue": 1_000_000, "cogs": 600_000, "operatingExpenses": 250_000},
+                ]
+            },
+        )
+        self.assertEqual(result["summary"]["yearCount"], 2)
+
+    def test_employee_productivity(self) -> None:
+        result = calculate_workbook_port(
+            "employee-productivity",
+            {"annualRevenue": 1_000_000, "employeeCount": 10, "hoursPerEmployee": 2080},
+        )
+        self.assertEqual(result["summary"]["revenuePerEmployee"], 100_000.0)
+
 
 if __name__ == "__main__":
     unittest.main()

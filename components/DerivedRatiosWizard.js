@@ -58,6 +58,7 @@ export default function DerivedRatiosWizard({ clientId, sheetKey, clientRow = nu
               cogs: plYear.cogs,
               operatingExpenses: plYear.operatingExpenses,
               otherExpenses: plYear.otherExpenses,
+              interestExpense: plYear.interestExpense,
             }
           : null,
         bsYear: bsYear || null,

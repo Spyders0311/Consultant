@@ -169,6 +169,48 @@ class AnalystWorksheetTests(unittest.TestCase):
         )
         self.assertEqual(result["ratios"]["grossProfitMarginPct"], 40.0)
         self.assertIsNotNone(result["ratios"]["currentRatio"])
+        self.assertIsNotNone(result["ratios"]["quickRatio"])
+        self.assertIsNotNone(result["ratios"]["returnOnAssetsPct"])
+
+    def test_pl_analysis_min_max(self) -> None:
+        from app.analyst.pl_analysis import calculate_pl_analysis
+
+        result = calculate_pl_analysis(
+            {
+                "analysisType": "min-max",
+                "years": [
+                    {"year": 2023, "revenue": 900_000, "cogs": 500_000, "operatingExpenses": 200_000, "otherExpenses": 50_000},
+                    {"year": 2024, "revenue": 1_000_000, "cogs": 600_000, "operatingExpenses": 250_000, "otherExpenses": 50_000},
+                ],
+            }
+        )
+        self.assertIn("revenue", result["summary"])
+
+    def test_roi_analysis(self) -> None:
+        from app.analyst.roi_analysis import calculate_roi_analysis
+
+        result = calculate_roi_analysis(
+            {"roiType": "labor", "annualRevenue": 1_000_000, "annualCogs": 600_000, "categoryTotal": 200_000}
+        )
+        self.assertEqual(result["shareOfRevenuePct"], 20.0)
+
+    def test_valuation(self) -> None:
+        from app.analyst.valuation import calculate_business_valuation
+
+        result = calculate_business_valuation({"scenario": "current", "ebitda": 200_000, "ebitdaMultiple": 4})
+        self.assertEqual(result["enterpriseValue"], 800_000.0)
+
+    def test_matrix_scoring(self) -> None:
+        from app.analyst.matrix_scoring import score_matrix_responses
+
+        result = score_matrix_responses(
+            {
+                "matrixKey": "management-matrix",
+                "questions": [{"id": "mg1", "label": "Leadership", "category": "Leadership"}],
+                "responses": {"mg1": 5},
+            }
+        )
+        self.assertEqual(result["scorePct"], 100.0)
 
 
 if __name__ == "__main__":
