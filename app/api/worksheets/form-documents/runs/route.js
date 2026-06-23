@@ -17,6 +17,7 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const clientId = searchParams.get('client_id') || searchParams.get('clientId');
   const formType = searchParams.get('form_type') || searchParams.get('formType');
+  const invoiceType = searchParams.get('invoice_type') || searchParams.get('invoiceType');
   if (!clientId) return Response.json({ ok: false, error: 'Missing client_id.' }, { status: 400 });
 
   let query = supabase
@@ -26,6 +27,7 @@ export async function GET(request) {
     .order('created_at', { ascending: false })
     .limit(parseLimit(searchParams.get('limit')));
   if (formType) query = query.eq('form_type', formType);
+  if (invoiceType) query = query.eq('invoice_type', invoiceType);
 
   const { data, error } = await query;
   if (error) return Response.json({ ok: false, error: error.message }, { status: 500 });

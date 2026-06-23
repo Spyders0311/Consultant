@@ -1911,3 +1911,134 @@
   outline-offset: 2px;
   border-radius: 12px;
 }
+
+.invoice-billing {
+  display: grid;
+  gap: 16px;
+}
+
+.invoice-billing__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.invoice-billing__stat {
+  background: var(--hub-surface, #f8fafc);
+  border: 1px solid var(--hub-line, #e2e8f0);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 4px;
+}
+
+.invoice-billing__stat-label {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.invoice-billing__creator-grid {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.invoice-billing__creator-grid a {
+  display: grid;
+  gap: 6px;
+  height: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.invoice-billing__creator-cta {
+  font-size: 0.9rem;
+  color: var(--hub-accent, #0d9488);
+}
+
+.invoice-billing__history-header {
+  margin-bottom: 12px;
+}
+
+.invoice-billing__history-note {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.invoice-billing__runs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.invoice-billing__run {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--hub-line, #e2e8f0);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.invoice-billing__run-title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.invoice-billing__run-meta {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.invoice-billing__run-amount {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.invoice-billing__run-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.invoice-billing__pdf-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.invoice-billing__pdf-error {
+  color: #b91c1c;
+  font-size: 0.8rem;
+}
+
+.invoice-billing__empty {
+  margin: 0;
+  color: #64748b;
+}
+
+@media (max-width: 900px) {
+  .invoice-billing__stats,
+  .invoice-billing__creator-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-billing__run {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-billing__run-actions {
+    justify-content: flex-start;
+  }
+}

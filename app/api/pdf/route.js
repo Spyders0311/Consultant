@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
-import { buildExecutiveAnalysisPdf, buildResultsPdf } from '@/lib/server/pdf';
+import { buildExecutiveAnalysisPdf, buildInvoicePdf, buildResultsPdf } from '@/lib/server/pdf';
 import { validateExecutiveAnalysisPdfPayload } from '@/lib/reports/executiveAnalysisModel';
+import { validateInvoicePdfPayload } from '@/lib/worksheets/invoiceDocumentModel';
 import { createClient } from '@/lib/supabase/server';
+
+const CLIENT_INVOICE_SELECT =
+  'id, company_name, primary_contact_name, primary_contact_email, primary_contact_phone, location_city, location_state, ein, address_line1, address_line2, address_postal_code';
 
 export async function POST(req) {
   try {
@@ -50,6 +54,60 @@ export async function POST(req) {
         headers: {
           'Content-Type': 'application/pdf',
           'Content-Disposition': `attachment; filename="${slug}-executive-analysis.pdf"`,
+        },
+      });
+    }
+
+    if (reportType === 'invoice') {
+      const clientId = body?.clientId || body?.client_id;
+      const invoiceType = body?.invoiceType || body?.invoice_type;
+      const inputs = body?.inputs;
+
+      if (!clientId) {
+        return NextResponse.json({ ok: false, error: 'Missing clientId.' }, { status: 400 });
+      }
+
+      const { data: client, error: clientError } = await supabase
+        .from('clients')
+        .select(CLIENT_INVOICE_SELECT)
+        .eq('id', clientId)
+        .eq('consultant_id', user.id)
+        .maybeSingle();
+
+      if (clientError) {
+        return NextResponse.json({ ok: false, error: clientError.message }, { status: 500 });
+      }
+
+      if (!client) {
+        return NextResponse.json({ ok: false, error: 'Client not found.' }, { status: 404 });
+      }
+
+      try {
+        validateInvoicePdfPayload({ invoiceType, inputs, client });
+      } catch (validationError) {
+        return NextResponse.json(
+          { ok: false, error: validationError instanceof Error ? validationError.message : 'Invalid payload.' },
+          { status: 400 },
+        );
+      }
+
+      const buffer = await buildInvoicePdf({
+        invoiceType,
+        inputs,
+        client,
+        consultant,
+        runId: body?.runId || body?.run_id || null,
+      });
+
+      const slug = String(client.company_name || 'client')
+        .replace(/\s+/g, '-')
+        .toLowerCase();
+
+      return new NextResponse(buffer, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': `attachment; filename="${slug}-${invoiceType}-invoice.pdf"`,
         },
       });
     }

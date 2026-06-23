@@ -1,16 +1,35 @@
-export default function WorkspaceInvoiceBillingPage() {
+import { redirect } from 'next/navigation';
+import InvoiceBillingWorkspace from '@/components/invoice/InvoiceBillingWorkspace';
+import { createClient } from '@/lib/supabase/server';
+import { isConsultant } from '@/lib/supabase/auth';
+import { getInvoiceBillingData } from '@/lib/server/invoiceBillingData';
+
+export default async function WorkspaceInvoiceBillingPage({ params }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  if (!isConsultant(user)) {
+    redirect('/login?error=unauthorized');
+  }
+
+  const { clientId } = await params;
+  const data = await getInvoiceBillingData(supabase, clientId, user.id);
+
+  if (!data) {
+    redirect('/dashboard/clients');
+  }
+
   return (
-    <section className="panel">
-      <h2>Invoice / Billing</h2>
-      <p>
-        Invoice &amp; Billing worksheet. Maintain billing details, invoice history, payment status, and follow-ups for
-        this client.
-      </p>
-      <ul>
-        <li>Invoice schedule + line items</li>
-        <li>Payment tracking + AR notes</li>
-        <li>Collections follow-up checklist</li>
-      </ul>
-    </section>
+    <InvoiceBillingWorkspace
+      clientId={clientId}
+      clientName={data.client.company_name || 'Untitled client'}
+      runs={data.runs}
+    />
   );
 }
